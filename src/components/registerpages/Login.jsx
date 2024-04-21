@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
- 
+import "./register.css"
 function Login() {
    
     
@@ -42,16 +42,20 @@ const submitForm = (e) =>{
 
   return (
     <>
+    
+
       <div className="min-h-screen bg-base-200 flex items-center">
         <div className="card mx-auto w-full max-w-2xl  shadow-xl ">
             <div className="grid col-start-1 col-end-3  bg-base-100 rounded-xl ">
             <div className='py-10 px-5  rounded-lg border-4 border-indigo-200 border-t-indigo-500   border-b-indigo-500 '>
-                <h2 className='text-2xl font-semibold mb-2 text-center'>
-                    سجل الدخول 
-                </h2>
+            <div className="text-5xl font-extrabold text-center ">
+                    <span className=" bg-clip-text  text-transparent bg-gradient-to-l from-pink-400 to-violet-600">
+                        سجل الدخول
+                    </span>
+                </div>
                 {
-                successMess &&  <div role="alert" className="alert alert-success">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                successMess &&  <div role="alert" className="alert alert-success  text-red-50 ">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6 text-red-50" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <span>تم تسجيل الدخول بنجاح</span>
                 </div>
                 }
