@@ -1,49 +1,63 @@
 import React from 'react'
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "./register.css"
+
 function Login() {
    
-    
+     const Navigate = useNavigate();
     const [email , setEmail ] = useState("");
     const [password , setPassword ] = useState("");
     // when user first click 
     const [accept , setAccetp] = useState(false);
     const [errorMessage, setErrorMessage] = useState(false);
     const [successMess , setSuccessMess] = useState(false);
+    const [loader , setLoader ] = useState(false)
 
- 
 // submit login form 
-const submitForm = (e) =>{
-   
-    let flag = true
+const submitForm = async (e) => {
     e.preventDefault();
     setAccetp(true);
-    if ( email === "" || password.length < 5) {
-        flag = false
-    }else flag = true
-     if (flag) {
-         let res=  axios.post(`http://127.0.0.1:8000/api/login` , {
-        "email":email,
-        "password":password
-    } )
-        .then((res)=>{
-           setSuccessMess(true)
-            console.log(res.data);
-        })
-        .catch(
-            (error)=>{
-                setErrorMessage(true);
-                 setTimeout(() => {
-                    window.location.reload();
-                 }, 2000);
-            })
-}}
+    
+    if (email === "" || password.length < 5) {
+        // Invalid input, no need to proceed with the API call
+        return;
+    }
+
+    // Show loader
+    setLoader(true);
+
+    try {
+        // Make API call
+        const res = await axios.post(`http://127.0.0.1:8000/api/login`, {
+            email: email,
+            password: password
+        });
+
+        // Hide loader
+        setLoader(false);
+
+        // Handle success
+        setSuccessMess(true);
+       
+        if (res.status === 200) {
+             localStorage.setItem("email" , email)
+            Navigate("/Mainpage");
+        }
+    } catch (error) {
+        // Hide loader
+        setLoader(false);
+
+        // Handle error
+        setErrorMessage(true);
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    }
+};     
 
   return (
     <>
-    
-
       <div className="min-h-screen bg-base-200 flex items-center">
         <div className="card mx-auto w-full max-w-2xl  shadow-xl ">
             <div className="grid col-start-1 col-end-3  bg-base-100 rounded-xl ">
@@ -71,7 +85,7 @@ const submitForm = (e) =>{
                        {(password.length > 0 && password.length < 5 && accept) && <p className='text-red-600 mb-4'>يجب ألا تقل كلمة السر عن 5 أحرف</p>}
                      </div>
                     <div className='text-right text-primary'>   
-                        <Link to="/forgot-password"><span className="text-sm  inline-block  hover:text-primary hover:underline hover:cursor-pointer transition duration-200">هل نسيت كلمة السر ؟</span></Link>
+                        <Link to="/Forgetpasssword"><span className="text-sm  inline-block  hover:text-primary hover:underline hover:cursor-pointer transition duration-200">هل نسيت كلمة السر ؟</span></Link>
                     </div>
                     {errorMessage &&
                     <div role="alert" className="alert alert-error">
@@ -84,6 +98,8 @@ const submitForm = (e) =>{
                     <div className='text-center mt-4'> 
                       <Link to="/register"><span className="inline-block  text-primary underline hover:cursor-pointer transition duration-200">إنشاء حساب جديد</span></Link> هل ليس لديك حساب ؟</div>
                 </form>
+
+                {loader && <div className="spinner"></div>}
 
             </div>
         </div>

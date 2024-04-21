@@ -1,0 +1,18 @@
+aside .menu{
+    background-color: red;
+    background-color: rgba(0, 0, 0, 0.774);
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+aside .menu li{
+    padding: 1rem;
+    font-size: 25px;
+}
+aside .menu li a {
+    padding: 0.5rem 1rem; 
+}
+aside .menu li a:hover {
+     background-color: gray;
+     padding: 0.5rem 1rem;    
+}
