@@ -1,0 +1,10 @@
+.alert-success , .alert-error{
+    width: fit-content;
+    position: fixed;
+    right: 2rem;
+    top: 2rem;
+    border-radius: 5px;
+    color: white;
+    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
