@@ -17,6 +17,7 @@
     animation: spinner-plncf9 4s infinite;
     top: 35%;
     left: 45%;
+    z-index:99999;
 
  }
  
