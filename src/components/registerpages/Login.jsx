@@ -43,7 +43,9 @@ const submitForm = async (e) => {
         setSuccessMess(true);
        
         if (res.status === 200) {
-             localStorage.setItem("email" , email)
+            localStorage.setItem("username" , res.data.user.name)
+            localStorage.setItem("userrole" , res.data.user.role_name)
+            localStorage.setItem("email" , email)
             Navigate("/Mainpage");
         }
     } catch (error) {

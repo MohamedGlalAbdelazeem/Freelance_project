@@ -1,18 +1,26 @@
-aside .menu{
-    background-color: red;
-    background-color: rgba(0, 0, 0, 0.774);
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+ 
+ 
+
+#asidebar{
+    overflow-y: auto;
+   
 }
 
-aside .menu li{
-    padding: 1rem;
-    font-size: 25px;
+
+aside li{
+    background-color: rgba(128, 128, 128, 0.107);
 }
-aside .menu li a {
-    padding: 0.5rem 1rem; 
-}
-aside .menu li a:hover {
-     background-color: gray;
-     padding: 0.5rem 1rem;    
+
+@media (max-width:600px) {
+    #asidebar:hover{
+    transition: 1s ease-in-out;
+      width: 40%;
+    }
+   #admin{
+    display: none;
+   }
+    #logout{
+        display: none;
+    }
+
 }
