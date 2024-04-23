@@ -1,7 +1,7 @@
 import React from 'react'
 import Header from './Header'
 import Asidebar from './Asidebar'
-import { Outlet } from 'react-router-dom'
+import {Outlet} from 'react-router-dom';
 function Mainpage() {
   return (
      <main className='flex'>

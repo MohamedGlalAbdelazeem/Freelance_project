@@ -20,8 +20,8 @@ function handelLogout() {
     const userRole = localStorage.getItem("userrole");
 
    const  asidebarItems = [
-      {text:"إدارة المستخدمين", path:"/Userpage" , icon:<GroupAddOutlinedIcon sx={{ fontSize: 37 }}/>},
-      {text:"إدارة الفروع", path:"/Branchpage" , icon:<AddHomeWorkOutlinedIcon sx={{ fontSize: 37 }}/>},
+      {text:"إدارة الفروع", path:"/Mainpage/Branchpage" , icon:<AddHomeWorkOutlinedIcon sx={{ fontSize: 30 }}/>},
+      {text:"إدارة المستخدمين", path:"/Mainpage/Userpage" , icon:<GroupAddOutlinedIcon sx={{ fontSize: 30 }}/>},
       
     ];
 
@@ -49,7 +49,7 @@ function handelLogout() {
                 <Link to={item.path}>
               <div href="#" className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
                     {item.icon}
-                  <span className="ms-6 text-lg font-bold asidbaritems">
+                  <span className="ms-6 text-sm font-bold asidbaritems">
                       {item.text} 
                   </span>
             </div>

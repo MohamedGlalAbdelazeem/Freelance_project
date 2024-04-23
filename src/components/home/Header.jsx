@@ -2,8 +2,10 @@
 
 // this page contain header and asidbar 
 import React from 'react'
-import { useNavigate } from 'react-router-dom';
+ 
+import { useNavigate , Link } from 'react-router-dom';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+ 
 import "./home.css"
  
 function Header() {
@@ -26,21 +28,21 @@ function handelLogout() {
         </div>
         <div className="flex-none gap-2">
         
-          <div className="dropdown dropdown-end">
+          <div className="dropdown dropdown-end ">
             <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
               <div className="w-10 rounded-full bg-white">
                <AccountCircleOutlinedIcon sx={{fontSize: 40}}/>
               </div>
             </div>
-            <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+            <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-xl rounded-box w-52">
+            <Link to="/Mainpage/Userprofilepage" className='p-3  hover:text-success  '>
               <li>
-                <a className="justify-between">
                   الصفحة الشخصية
-                </a>
               </li>
-              <li><a>الإعدادات</a></li>
+            </Link>
+             
               <li>
-                  <a onClick={handelLogout} className='bg-red-500 p-3 text-white cursor-pointer hover:text-black'>
+                  <a onClick={handelLogout} className='bg-red-500 p-3 text-white cursor-pointer hover:text-black text-xl'>
                       تسجيل الخروج
                   </a>
               </li>
