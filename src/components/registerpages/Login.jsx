@@ -20,32 +20,28 @@ function Login() {
 const submitForm = async (e) => {
     e.preventDefault();
     setAccetp(true);
-    
     if (email === "" || password.length < 5) {
         // Invalid input, no need to proceed with the API call
         return;
     }
-
     // Show loader
     setLoader(true);
-
     try {
         // Make API call
         const res = await axios.post(`http://127.0.0.1:8000/api/login`, {
             email: email,
             password: password
         });
-
         // Hide loader
         setLoader(false);
 
         // Handle success
         setSuccessMess(true);
-       
         if (res.status === 200) {
             localStorage.setItem("username" , res.data.user.name)
             localStorage.setItem("userrole" , res.data.user.role_name)
             localStorage.setItem("email" , email)
+            localStorage.setItem("userToken",res.data.access_token)
             Navigate("/Mainpage");
         }
     } catch (error) {

@@ -7,6 +7,8 @@ function Userprofilepage() {
   const userRole = localStorage.getItem("userrole")
   const userEmail = localStorage.getItem("email")
 
+  // you shoud use tokent to show data
+
     // useEffect(() => {
     //     axios.get('http://127.0.0.1:8000/api/refresh')
     //         .then(response => {
@@ -40,7 +42,7 @@ function Userprofilepage() {
                         </div>
                         <div className="mt-20 text-center border-b pb-12">
                             <h1 className="text-4xl font-medium text-gray-700">{userName}</h1>
-                            <p className="font-light text-red-600 mt-3 text-2xl font-extrabold">Role : {userRole}</p>
+                            <p className="font-light text-red-600 mt-3 text-2xl">Role : {userRole}</p>
                              
                             <p className="mt-2 text-gray-500">Email : {userEmail}</p>
                         </div>

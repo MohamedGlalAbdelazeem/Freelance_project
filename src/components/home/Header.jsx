@@ -35,14 +35,14 @@ function handelLogout() {
               </div>
             </div>
             <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-xl rounded-box w-52">
-            <Link to="/Mainpage/Userprofilepage" className='p-3  hover:text-success  '>
+            <Link to="/Mainpage/Userprofilepage" className='p-3 text-sm  hover:text-success  '>
               <li>
                   الصفحة الشخصية
               </li>
             </Link>
              
               <li>
-                  <a onClick={handelLogout} className='bg-red-500 p-3 text-white cursor-pointer hover:text-black text-xl'>
+                  <a onClick={handelLogout} className='bg-red-500 p-3 text-white cursor-pointer hover:text-black text-sm'>
                       تسجيل الخروج
                   </a>
               </li>
