@@ -11,7 +11,7 @@ import axios from 'axios';
 
 function Branchpage() {
   const [branches, setBranches] = useState([]);
-  const [loader , setLoader ] = useState(false);//true
+  const [loader , setLoader ] = useState(true);//true
   const [showMessage , setShowMessage ] = useState(false);
   const Naviagate = useNavigate();
   const storedUser = localStorage.getItem('user');
@@ -103,25 +103,25 @@ const submitForm = async (e) => {
 
 
 // show branches
-// useEffect(() => {
-//   axios.get('http://127.0.0.1:8000/api/branches', {
-//     headers: {
-//       'Authorization': `Bearer ${token}`
-//     }
-//   })
-//   .then(function (response) {
-//     if (response.status === 401 ) {
-//       localStorage.removeItem('user');
-//       Naviagate("/Login")
-//       }else{
-//       setLoader(false);
-//       setBranches(response.data.data);
-//       }
-//   })
-//   .catch(function (error) {
-//     setLoader(false);
-//   })
-// },[]);
+useEffect(() => {
+  axios.get('http://127.0.0.1:8000/api/branches', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  .then(function (response) {
+    if (response.status === 401 ) {
+      localStorage.removeItem('user');
+      Naviagate("/Login")
+      }else{
+      setLoader(false);
+      setBranches(response.data.data);
+      }
+  })
+  .catch(function (error) {
+    setLoader(false);
+  })
+},[]);
 
 
 
