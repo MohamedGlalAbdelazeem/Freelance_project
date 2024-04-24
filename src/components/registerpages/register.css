@@ -11,21 +11,20 @@
  
 .spinner {
     position: fixed;
-    width: 200px;
-    height: 200px;
+    width: 300px;
+    height: 300px;
     display: grid;
     animation: spinner-plncf9 4s infinite;
-    top: 35%;
-    left: 45%;
+    top: 40%;
+    left: 36%;
     z-index:99999;
 
  }
- 
  .spinner::before,
  .spinner::after {
     content: "";
     grid-area: 1/1;
-    border: 9px solid;
+    border: 35px dashed;
     border-radius: 50%;
     border-color: #474bff #474bff #0000 #0000;
     mix-blend-mode: darken;

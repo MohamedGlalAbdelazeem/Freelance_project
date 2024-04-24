@@ -5,19 +5,22 @@ import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
  function Asidebar() {
+  
     const Navigate = useNavigate()
-    //handel logout 
+    const storedUser = localStorage.getItem('user');
+    const retrievedUser = JSON.parse(storedUser);
+    const userName = retrievedUser.user.name
+    const userRole = retrievedUser.user.role_name
+   
 function handelLogout() {
-        if (localStorage.getItem("email")) {
-            localStorage.removeItem("email")
+        if (localStorage.getItem('user')) {
+            localStorage.removeItem("user")
             Navigate("/Login")
         } else {
             return null;
         }
-      
     }
-    const userName = localStorage.getItem("username");
-    const userRole = localStorage.getItem("userrole");
+   
 
    const  asidebarItems = [
       {text:"إدارة الفروع", path:"/Mainpage/Branchpage" , icon:<AddHomeWorkOutlinedIcon sx={{ fontSize: 30 }}/>},

@@ -1,31 +1,39 @@
-import { useEffect } from 'react';
 import axios from 'axios';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { useState , useEffect } from 'react';
 
 function Userprofilepage() {
-  const userName = localStorage.getItem("username")
-  const userRole = localStorage.getItem("userrole")
-  const userEmail = localStorage.getItem("email")
 
-  // you shoud use tokent to show data
-
-    // useEffect(() => {
-    //     axios.get('http://127.0.0.1:8000/api/refresh')
-    //         .then(response => {
-    //             // Handle successful response
-    //             console.log('Response:', response.data);
-    //         })
-    //         .catch(error => {
-    //             if (error.response && error.response.status === 401) {
-    //                 // Unauthorized, redirect to login page
-                
-    //             } else {
-    //                 // Handle other errors
-    //                 console.error('Error:', error.message);
-    //             }
-    //         });
-    // }, []);
-
+    const storedUser = localStorage.getItem('user');
+    const retrievedUser = JSON.parse(storedUser);
+    const [userProfile, setUserprofile] = useState([]);
+    const [loader , setLoader ] = useState(true)
+    // useEffect to fetch data when component mounts
+    useEffect(() => {
+      const storedUser = localStorage.getItem('user');
+      const retrievedUser = JSON.parse(storedUser);
+      const token = retrievedUser.access_token;
+      axios.get('http://127.0.0.1:8000/api/refresh', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(function (response) {
+        setLoader(false)
+        setUserprofile(response.data.Admin);
+      })
+      .catch(function (error) {
+        alert(error);
+        setLoader(true);
+      })
+    }, []);
+    const userName = userProfile.name
+    const userEmail = userProfile.email
+    const userRole = userProfile.role_name
+    const userPhone = userProfile.phone_number
+    const userRoleID = userProfile.role_id
+    const userTime = userProfile.created_at
+ 
     return (
         <div className="flex bg-slate-700 rounded-3xl">
             <div className="w-full">
@@ -40,12 +48,16 @@ function Userprofilepage() {
                                 </div>
                             </div>
                         </div>
+                        {loader && <div className="spinner"></div>}
                         <div className="mt-20 text-center border-b pb-12">
-                            <h1 className="text-4xl font-medium text-gray-700">{userName}</h1>
-                            <p className="font-light text-red-600 mt-3 text-2xl">Role : {userRole}</p>
-                             
-                            <p className="mt-2 text-gray-500">Email : {userEmail}</p>
+                            <h1 className="text-4xl text-gray-700 font-bold">{userName}</h1>
+                            <p className="font-bold  text-red-600 mt-3 text-2xl underline">{userRole}</p>
+                            <p className="font-bold  text-red-600 mt-3 text-xl">Role_ID : {userRoleID}</p>
+                            <p className="font-bold  text-red-500 mt-3 text-xl"> الوقت / التاريخ : {userTime}</p>
+                            <p className="mt-2 text-gray-500">{userEmail}</p>
+                            <p className="mt-2 text-gray-500">{userPhone}</p>
                         </div>
+                        <div className="divider divider-info">تعديل المعلومات الشخصية</div>
                         <div className="mt-12 flex flex-col justify-center">
                             <p className="text-gray-600 text-center font-light lg:px-16">
                               tesssssssssssssssssssssssssst

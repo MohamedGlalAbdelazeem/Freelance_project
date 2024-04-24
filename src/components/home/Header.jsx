@@ -9,17 +9,17 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import "./home.css"
  
 function Header() {
-    const Navigate = useNavigate()
+    const Navigate = useNavigate();
+    
     //handel logout 
-function handelLogout() {
-        if (localStorage.getItem("email")) {
-            localStorage.removeItem("email")
-            Navigate("/Login")
-        } else {
-            return null;
-        }
-      
-    }
+    function handelLogout() {
+      if (localStorage.getItem('user')) {
+          localStorage.removeItem("user")
+          Navigate("/Login")
+      } else {
+          return null;
+      }
+  }
   return (
     <>
       <div className="navbar bg-black w-full" style={{backgroundColor:"#111827"}} id='headere'>
