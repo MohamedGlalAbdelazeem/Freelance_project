@@ -6,7 +6,8 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import "./branchpage.css"
+import { Switch } from '@mui/material';
+
 
 import axios from 'axios';
 
@@ -19,19 +20,15 @@ function Branchpage() {
   const storedUser = localStorage.getItem('user');
   const retrievedUser = JSON.parse(storedUser);
   const token = retrievedUser.access_token;
-
-
-// handel add branch 
-const [accept , setAccetp] = useState(false);
-const [branchName , setBranchName] = useState("");
-const [branchLocation , setbBranchLocation ] = useState("");
-const [timeFrom , setTimeFrom] = useState("");
-const [timeTo , setTimeTo] = useState("");
-const [branchHotline , setBranchHotline] = useState("");
-const [branchStatus , setBranchStatus] = useState("");
-const [inputsMessage , setInputsmessage] = useState(false);
-
-
+  // branch inputs 
+  const [branchName , setBranchName] = useState("");
+  const [branchLocation , setbBranchLocation ] = useState("");
+  const [timeFrom , setTimeFrom] = useState("");
+  const [timeTo , setTimeTo] = useState("");
+  const [branchHotline , setBranchHotline] = useState("");
+  const [branchStatus , setBranchStatus] = useState("");
+  const [inputsMessage , setInputsmessage] = useState(false);
+// handel show branch 
 useEffect(() => {
   fetchBranches();
 }, []);
@@ -82,7 +79,7 @@ const handelStorebranch = (e) => {
         }
       })
       .then(function (response) {
-        if (response.data && response.data.errors && response.data.errors.to && response.data.errors.to[0] === "To must be greter than from") {
+        if (response.status === 422 && response.data && response.data.errors && response.data.errors.to && response.data.errors.to[0] === "To must be greter than from") {
           alert("يجب أن يكون الوقت 'To' أكبر من الوقت 'From'");
         } else {
           console.log("Branch created successfully:", response.data);
@@ -163,7 +160,7 @@ return (
                   <div className="w-full px-3 sm:w-1/2">
                           <div className="mb-5">
                               <label className="mb-3 block text-base font-medium text-white">
-                                  من 
+                                 الوقت من 
                               </label>
                               <input type="time"   value={timeFrom} onChange={(e)=> setTimeFrom(e.target.value)}
                                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
@@ -173,7 +170,7 @@ return (
                       <div className="w-full px-3 sm:w-1/2">
                           <div className="mb-5">
                               <label  className="mb-3 block text-base font-medium text-white ">
-                                  إلي 
+                                  الوقت إلي  
                               </label>
                               <input type="time"  value={timeTo} onChange={(e)=> setTimeTo(e.target.value)}
                                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
@@ -181,6 +178,9 @@ return (
                           </div>
                       </div>
                   </div>
+
+
+
 
                   <div className="mb-5 pt-3">
                       <div className="-mx-3 flex flex-wrap">
@@ -192,13 +192,13 @@ return (
                               </div>
                           </div>
                           <div className="w-full px-3 sm:w-1/2">
+                              <label className='text-white'>تفعيل الفرع أم لا  ؟</label>
                               <div className="mb-5">
-                                <label className='text-white'>   إذا كان الفرع مفعل ادخل 1 
-                                  <br />
-                                  إذا كان الفرع غير مففل ادخل 0
-                                </label>
-                                  <input type="text "  value={branchStatus} onChange={(e)=> setBranchStatus(e.target.value)} placeholder="حالة الفرع"
-                                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 mt-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                              <Switch
+                                  checked={branchStatus === '1'} // '1' is considered as 'on'
+                                  onChange={(e) => setBranchStatus(e.target.checked ? '1' : '0')} // '1' for on, '0' for off
+                                  color="success"
+                                />
                              {inputsMessage&& <p className='text-red-600 py-1 px-1'>ادخل حالة الفرع</p>}
                               </div>
                           </div>
