@@ -20,7 +20,6 @@ function App() {
            <Route path="Userpage" element={<Userpage />} />
            <Route path="Branchpage" element={<Branchpage />} />
           <Route path="Userprofilepage" element={<Userprofilepage />} />
-          
         </Route>
     </Routes>
 
