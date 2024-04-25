@@ -6,13 +6,15 @@ import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutli
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import "./branchpage.css"
 
 import axios from 'axios';
 
 function Branchpage() {
+  const baseUrl = 'http://127.0.0.1:8000/api/';
   const [branches, setBranches] = useState([]);
-  const [loader , setLoader ] = useState(true);//true
-  const [showMessage , setShowMessage ] = useState(false);
+  const [loader, setLoader] = useState(true);
+  const [showMessage, setShowMessage] = useState(false);
   const Naviagate = useNavigate();
   const storedUser = localStorage.getItem('user');
   const retrievedUser = JSON.parse(storedUser);
@@ -27,108 +29,79 @@ const [timeFrom , setTimeFrom] = useState("");
 const [timeTo , setTimeTo] = useState("");
 const [branchHotline , setBranchHotline] = useState("");
 const [branchStatus , setBranchStatus] = useState("");
-
-const submitForm = async (e) => {
-   e.preventDefault();
-  setAccetp(true);
-  setLoader(true);
-  const headers = {
-    'Authorization': `Bearer ${token}`,
-    'Content-Type': 'application/json', // Assuming JSON data is being sent
-  };
-  const requestData = {
-    name: branchName,
-    location: branchLocation,
-    from: timeFrom,
-    to: timeTo,
-    hot_line: branchHotline,
-    status: branchStatus,
-  };
-  setLoader(true);
-  try {
-    // Make the POST request to add a branch
-    const res = await axios.post('http://127.0.0.1:8000/api/branches', requestData, { headers });
-    // Hide loader
-    setLoader(false);
-
-    // Check response status
-    if (res.status === 200) {
-      // Branch added successfully
-      console.log(res.data); // Log the response data if needed
-      setSuccessMess(true);
-    } else {
-      // Handle unexpected response status
-      console.error('Unexpected response status:', res.status);
-    }
-  } catch (error) {
-    // Hide loader and handle error
-    setLoader(false);
-    console.error('Error adding branch:', error);
-    if (error.response && error.response.status === 422) {
-      // If the error is a 422 Unprocessable Content error
-      const { data } = error.response;
-  
-      // Check if there are specific validation errors
-      if (data.errors) {
-        // Extract validation error messages
-        const validationErrors = Object.values(data.errors).flat();
-  
-        // Check for specific validation errors
-        if (validationErrors.includes('Already_exist')) {
-          // Handle the case where the branch already exists
-          console.log('Branch already exists');
-          // You can display a message to the user indicating that the branch already exists
-        }
-  
-        if (validationErrors.includes('To must be greater than from')) {
-          // Handle the case where the 'to' time must be greater than the 'from' time
-          console.log('To must be greater than from');
-          // You can display a message to the user indicating the time validation error
-        }
-  
-        // You can handle other specific validation errors similarly
-      } else {
-        // Handle other types of validation errors or unexpected errors
-        console.error('Unexpected validation error:', error);
-        // You can display a general error message to the user
-      }
-    } else {
-      // Handle other errors
-      console.error('Unexpected error:', error);
-      // You can display a general error message to the user
-    }
-  }
-};  
+const [inputsMessage , setInputsmessage] = useState(false);
 
 
-
-// show branches
 useEffect(() => {
-  axios.get('http://127.0.0.1:8000/api/branches', {
+  fetchBranches();
+}, []);
+const fetchBranches = () => {
+  axios.get(`${baseUrl}branches`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
   })
   .then(function (response) {
-    if (response.status === 401 ) {
-      localStorage.removeItem('user');
-      Naviagate("/Login")
-      }else{
+    if (response.status === 401) {
+      handleUnauthenticated();
+    } else {
       setLoader(false);
       setBranches(response.data.data);
-      }
+    }
   })
   .catch(function (error) {
-    setLoader(false);
-  })
-},[]);
+    console.error('Error fetching branches:', error);
+    handleUnauthenticated();
+  });
+};
 
+// hande unuthenticated
+const handleUnauthenticated = () => {
+  alert('يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية');
+  Naviagate("/Login");
+  localStorage.removeItem('user');
+};
 
+// store branch
+const handelStorebranch = (e) => {
+    e.preventDefault();
+    if (branchName === "" || branchLocation === "" || timeFrom === "" || timeTo === "" || branchHotline === "" || branchStatus === "") {
+      setInputsmessage(true);
+      return;
+    }
+    axios.post(`${baseUrl}branches`, {
+        name: branchName,
+        location: branchLocation,
+        from: timeFrom,
+        to: timeTo,
+        hot_line: branchHotline,
+        status: branchStatus,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      .then(function (response) {
+        if (response.data && response.data.errors && response.data.errors.to && response.data.errors.to[0] === "To must be greter than from") {
+          alert("يجب أن يكون الوقت 'To' أكبر من الوقت 'From'");
+        } else {
+          console.log("Branch created successfully:", response.data);
+          window.location.reload();
+        }
+      })
+      .catch(function (error) {
+        console.error('Error creating branch:', error);
+        if (error.response && error.response.status === 401 && error.response.data.message === "Unauthenticated") {
+          alert("يجب عليك التسجيل مرة اخري لانتهاء وقت الصلاحية");
+        } else {
+          console.log("Error creating branch:", error);
+        }
+      });
+};
 
-
-// handel delete branch
+// handel delete
 function deleteBranch(id) {
-  axios.delete(`http://127.0.0.1:8000/api/branches/${id}`, {
+  axios.delete(`${baseUrl}branches/${id}`, {
     headers: {
       'Authorization': `Bearer ${token}`
     }
@@ -136,15 +109,11 @@ function deleteBranch(id) {
   .then(function (response) {
     if (response.status === 401) {
       setShowMessage(true);
-      setLoader(true); // Set loader to true to hide loader
-      // Inform the user to log in again due to token expiration
-      setErrorMessage('يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية');
-
-      // Hide the message after 5 seconds
+      setLoader(true); 
+      alert('يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية');
       setTimeout(() => {
         setShowMessage(false);
       }, 2000);
-      // Redirect the user to the login page
       Naviagate("/Login");
     } else if (response.status === 204) {
       setLoader(false); 
@@ -162,40 +131,53 @@ function deleteBranch(id) {
   .catch(function (error) {
     console.error('Error deleting branch:', error);
     setLoader(true); 
+    if (error.response && error.response.status === 401 && error.response.data.message === "Unauthenticated") {
+      // Handle "Unauthenticated" error
+      alert("يجب عليك التسجيل مرة اخري لانتهاء وقت الصلاحية");
+    } else {
+      // Handle other errors
+      console.log("Error deleting branch:", error);
+    }
   });
 }
 
-  return (
+
+ 
+return (
     <main className='branchTable'>
        {/* add branch form */}
-        <div className="flex items-center justify-center border-2 rounded-xl p-1">
-          <div className="mx-auto w-full bg-white">
-              <form onSubmit={(e) => submitForm(e)}>
+        <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
+          <div className="mx-auto w-full ">
+              <form>
                   <div className="mb-5">
-                      <input type="text" value={branchName} onChange={(e)=> setBranchName(e.target.value)}  placeholder="اسم الفرع "
+                      <input type="text" value={branchName}  onChange={(e)=> setBranchName(e.target.value)}  placeholder="اسم الفرع "
                           className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                          {inputsMessage&& <p className='text-red-600 py-1 px-1'>ادخل اسم الفرع</p>}
                   </div>
                   <div className="mb-5">
-                      <input type="text" value={branchLocation} onChange={(e)=> setbBranchLocation(e.target.value)} placeholder="عنوان الفرع "
+                      <input type="text" value={branchLocation}  onChange={(e)=> setbBranchLocation(e.target.value)} placeholder="عنوان الفرع "
                           className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                         {inputsMessage&& <p className='text-red-600 py-1 px-1'>ادخل عنوان الفرع</p>}
                   </div>
                   <div className="-mx-3 flex flex-wrap">
                   <div className="w-full px-3 sm:w-1/2">
                           <div className="mb-5">
-                              <label className="mb-3 block text-base font-medium text-[#07074D]">
+                              <label className="mb-3 block text-base font-medium text-white">
                                   من 
                               </label>
-                              <input type="time" value={timeFrom} onChange={(e)=> setTimeFrom(e.target.value)}
+                              <input type="time"   value={timeFrom} onChange={(e)=> setTimeFrom(e.target.value)}
                                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                           {inputsMessage&& <p className='text-red-600 py-1 px-1'>ادخل الوقت</p>}
                           </div>
                       </div>
                       <div className="w-full px-3 sm:w-1/2">
                           <div className="mb-5">
-                              <label  className="mb-3 block text-base font-medium text-[#07074D]">
+                              <label  className="mb-3 block text-base font-medium text-white ">
                                   إلي 
                               </label>
-                              <input type="time" value={timeTo} onChange={(e)=> setTimeTo(e.target.value)}
+                              <input type="time"  value={timeTo} onChange={(e)=> setTimeTo(e.target.value)}
                                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                                {inputsMessage&& <p className='text-red-600 py-1 px-1'>ادخل الوقت</p>}
                           </div>
                       </div>
                   </div>
@@ -204,18 +186,20 @@ function deleteBranch(id) {
                       <div className="-mx-3 flex flex-wrap">
                           <div className="w-full px-3 sm:w-1/2">
                               <div className="mb-5">
-                                  <input type="text" value={branchHotline} onChange={(e)=> setBranchHotline(e.target.value)} placeholder="الخط الساخن"
+                                  <input type="text"  value={branchHotline} onChange={(e)=> setBranchHotline(e.target.value)} placeholder="الخط الساخن"
                                       className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                              {inputsMessage&& <p className='text-red-600 py-1 px-1'>ادخل الهاتف الخاص بالفرع</p>}
                               </div>
                           </div>
                           <div className="w-full px-3 sm:w-1/2">
                               <div className="mb-5">
-                                <label>   إذا كان الفرع مفعل ادخل 1 
+                                <label className='text-white'>   إذا كان الفرع مفعل ادخل 1 
                                   <br />
                                   إذا كان الفرع غير مففل ادخل 0
                                 </label>
-                                  <input type="text" value={branchStatus} onChange={(e)=> setBranchStatus(e.target.value)} placeholder="حالة الفرع"
+                                  <input type="text "  value={branchStatus} onChange={(e)=> setBranchStatus(e.target.value)} placeholder="حالة الفرع"
                                       className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 mt-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                             {inputsMessage&& <p className='text-red-600 py-1 px-1'>ادخل حالة الفرع</p>}
                               </div>
                           </div>
                         
@@ -223,18 +207,18 @@ function deleteBranch(id) {
                   </div>
 
                   <div>
-                  <button className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block">
+                  <button onClick={(e)=>{handelStorebranch(e)}} className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block">
                       إنشاء فرع جديد
                     </button>
                   </div>
               </form>
           </div>
       </div>
-<div className="divider"></div>
+    <div className="divider"></div>
 
       {/* show message for any modify in branch */}
       {showMessage&&
-      <div className="flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800">
+      <div  className="fixed z-50 flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800">
     <div className="flex items-center justify-center w-12 bg-emerald-500 text-white">
         <CheckCircleIcon/>
     </div>

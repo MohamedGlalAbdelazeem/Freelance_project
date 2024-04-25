@@ -19,14 +19,27 @@ function Userprofilepage() {
         }
       })
       .then(function (response) {
-        setLoader(false)
-        setUserprofile(response.data.Admin);
+        if (response.status === 401) {
+            handleUnauthenticated();
+          } else {
+            setLoader(false)
+           setUserprofile(response.data.Admin);
+          }
+        
       })
       .catch(function (error) {
         alert(error);
         setLoader(true);
+        handleUnauthenticated();
       })
     }, []);
+
+    // hande unuthenticated
+const handleUnauthenticated = () => {
+    alert('يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية');
+    Naviagate("/Login");
+    localStorage.removeItem('user');
+  };
     const userName = userProfile.name
     const userEmail = userProfile.email
     const userRole = userProfile.role_name

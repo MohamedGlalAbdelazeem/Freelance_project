@@ -40,7 +40,7 @@ const submitForm = async (e) => {
         if (res.status === 200) {
             const apiRes = JSON.stringify(res.data)
            localStorage.setItem("user",apiRes);
-           Navigate("/Mainpage");
+           Navigate("/Mainpage")
         }
     } catch (error) {
         // Hide loader
@@ -85,7 +85,7 @@ const submitForm = async (e) => {
                         <input type="password" value={password} onChange={(e)=>setPassword(e.target.value)} className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40" placeholder="كلمة السر "/>
                     </div>
                         {(password === "" && accept) && <p className='text-red-600 my-5'>الرجاء إدخال كلمة السر</p>}
-                        {(password.length > 0 && password.length < 5 && accept) && <p className='text-red-600 my-5'>يجب ألا تقل كلمة السر عن 6 أحرق</p>}
+                        {(password.length > 0 && password.length < 5 && accept) && <p className='text-red-600 my-5'>يجب ألا تقل كلمة السر عن  6أحرف</p>}
                     <div className='text-right'>   
                     <Link to="/Forgetpasssword"><span className="text-sm  inline-block  font-bold  text-white py-5  hover:cursor-pointer transition duration-200">هل نسيت كلمة السر ؟</span></Link>
                     </div>
