@@ -10,8 +10,6 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
     const storedUser = localStorage.getItem('user');
     const retrievedUser = JSON.parse(storedUser);
     const userName = retrievedUser.user.name
-    const userRole = retrievedUser.user.role_name
-   
 function handelLogout() {
         if (localStorage.getItem('user')) {
             localStorage.removeItem("user")
@@ -39,7 +37,6 @@ function handelLogout() {
         </div>
           <h4 className="mx-2 mt-2 font-medium text-gray-800 dark:text-gray-200">أهلا بك </h4>
           <p className="mx-2 mt-1 text-sm font-medium text-white">{userName}</p>
-         <p className="mx-2 mt-1 text-sm font-medium text-blue-300">Role : {userRole}</p>
     </div>
 
 
