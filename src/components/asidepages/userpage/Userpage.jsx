@@ -27,6 +27,7 @@ function Userpage() {
     fetchEmployees();
   }, []);
   const fetchEmployees = () => {
+    setLoader(true);
     axios
       .get(`${baseUrl}employees`, {
         headers: {
@@ -48,6 +49,7 @@ function Userpage() {
       });
   };
   const handleEmpRegister = (e) => {
+    setLoader(true);
     e.preventDefault();
     if (
       employeeName === "" ||
@@ -86,6 +88,9 @@ function Userpage() {
       })
       .catch(function (error) {
         console.error("Error fetching", error);
+      })
+      .finally(() => {
+        setLoader(false);
       });
   };
 
@@ -181,6 +186,7 @@ function Userpage() {
             <div>
               <button
                 onClick={(e) => handleEmpRegister(e)}
+                disabled={loader}
                 className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
               >
                 تسجيل عميل جديد
