@@ -19,7 +19,8 @@ function handelLogout() {
 
    const  asidebarItems = [
       {text:"إدارة الفروع", path:"/Mainpage/Branchpage" , icon:<AddHomeWorkOutlinedIcon sx={{ fontSize: 30 }}/>},
-      {text:"إدارة المستخدمين", path:"/Mainpage/Userpage" , icon:<GroupAddOutlinedIcon sx={{ fontSize: 30 }}/>},
+     { text: "إدارة المستخدمين", path: "/Mainpage/Userpage", icon: <GroupAddOutlinedIcon sx={{ fontSize: 30 }} /> },
+     { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 30 }} /> },
       
     ];
 

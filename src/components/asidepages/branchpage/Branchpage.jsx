@@ -76,9 +76,9 @@ const handelStorebranch = (e) => {
         status: branchStatus,
       }, {
         headers: {
-          'Authorization': `Bearer ${userToken}`
+          'Authorization': `Bearer ${token}`
         }
-      })
+      )
       .then(function (response) {
         if (response.status === 422 && response.data && response.data.errors && response.data.errors.to && response.data.errors.to[0] === "To must be greter than from") {
           alert("يجب أن يكون الوقت 'To' أكبر من الوقت 'From'");

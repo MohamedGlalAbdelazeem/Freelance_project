@@ -5,7 +5,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 
-function Userpage() {
+function ClientPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [loader, setLoader] = useState(true);
   const [inputsMessage, setInputsMessage] = useState(false);
@@ -15,15 +15,14 @@ function Userpage() {
   const [employeePasswordConfirm, setEmployeePasswordConfirm] = useState("");
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
-  const userToken = localStorage.getItem('user_token');
-<<<<<<< HEAD
-=======
+  const userToken = localStorage.getItem("user_token");
   const [employees, setEmployees] = useState([]);
   const [searchWay, setSearchWay] = useState("ID");
->>>>>>> 9a296346640da77bc2299defcd4c0f7c79cf574e
-  const Naviagate = useNavigate();
+  const [searchValue, setSearchValue] = useState("");
+  const [updateMode, setUpdateMode] = useState(false);
+  const [updateEmpID, setUpdateEmpID] = useState("");
 
-// hande unuthenticated
+  const Naviagate = useNavigate();
   const handleUnauthenticated = () => {
     alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");
     Naviagate("/Login");
@@ -33,7 +32,7 @@ function Userpage() {
   useEffect(() => {
     fetchEmployees();
   }, []);
-  
+
   const fetchEmployees = () => {
     setLoader(true);
     axios
@@ -56,7 +55,6 @@ function Userpage() {
         setLoader(false);
       });
   };
-// handle employee register
   const handleEmpRegister = (e) => {
     setLoader(true);
     e.preventDefault();
@@ -102,7 +100,7 @@ function Userpage() {
         setLoader(false);
       });
   };
-  const deleteEmp = (id) => { 
+  const deleteEmp = (id) => {
     setLoader(true);
     axios
       .delete(`${baseUrl}employees/${id}`, {
@@ -116,8 +114,8 @@ function Userpage() {
       })
       .catch(function (error) {
         console.error("Error fetching", error);
-      })
-  }
+      });
+  };
   const updateEmp = (id) => {
     setUpdateEmpID(id);
     setUpdateMode(true);
@@ -229,36 +227,6 @@ function Userpage() {
             <div className=" flex flex-wrap gap-3">
               <div className="flex-grow ">
                 <input
-                  type="text"
-                  value={employeePassword}
-                  onChange={(e) => setEmployeePassword(e.target.value)}
-                  placeholder="كلمة المرور"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    ادخل كلمة المرور
-                  </p>
-                )}
-              </div>
-              <div className="flex-grow ">
-                <input
-                  type="text"
-                  value={employeePasswordConfirm}
-                  onChange={(e) => setEmployeePasswordConfirm(e.target.value)}
-                  placeholder="تأكيد كلمة المرور"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    كلمتى المرور غير متطابقتين
-                  </p>
-                )}
-              </div>
-            </div>
-            <div className=" flex flex-wrap gap-3">
-              <div className="flex-grow ">
-                <input
                   type="tel"
                   value={employeePhone}
                   onChange={(e) => setEmployeePhone(e.target.value)}
@@ -277,12 +245,12 @@ function Userpage() {
                   type="text"
                   value={branchNumber}
                   onChange={(e) => setBranchNumber(e.target.value)}
-                  placeholder=" رقم الفرع"
+                  placeholder="العنوان"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {inputsMessage && (
                   <p className="text-red-300 text-sm py-1 px-1">
-                    أدخل رقم الفرع
+                    أدخل العنوان
                   </p>
                 )}
               </div>
@@ -448,4 +416,4 @@ function Userpage() {
   );
 }
 
-export default Userpage;
+export default ClientPage;
