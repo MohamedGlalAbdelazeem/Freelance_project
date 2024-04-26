@@ -9,19 +9,16 @@ import { useNavigate } from 'react-router-dom';
 import { Switch } from '@mui/material';
 import "./branchpage.css"
 import axios from 'axios';
-import CancelIcon from '@mui/icons-material/Cancel';
 
 
 function Branchpage() {
-
   const baseUrl = 'http://127.0.0.1:8000/api/';
   const [branches, setBranches] = useState([]);
   const [loader, setLoader] = useState(true);
-  const [showMessagedeletebranch, setshowMessagedeletebranch] = useState(false);
-  const [showAuthenticatedmessage, setAuthenticatedmessage] = useState(false);
+  const [showMessage, setShowMessage] = useState(false);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem('user_token');
- 
+  console.log();
   // branch inputs 
   const [branchName , setBranchName] = useState("");
   const [branchLocation , setbBranchLocation ] = useState("");
@@ -56,7 +53,7 @@ const fetchBranches = () => {
 
 // hande unuthenticated
 const handleUnauthenticated = () => {
-  setAuthenticatedmessage(true);
+  alert('يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية');
   Naviagate("/Login");
   localStorage.removeItem('user');
 };
@@ -95,7 +92,7 @@ const handelStorebranch = (e) => {
       .catch(function (error) {
         console.error('Error creating branch:', error);
         if (error.response && error.response.status === 401 && error.response.data.message === "Unauthenticated") {
-          setAuthenticatedmessage(true);
+          alert("يجب عليك التسجيل مرة اخري لانتهاء وقت الصلاحية");
         } else {
           console.log("Error creating branch:", error);
         }
@@ -107,21 +104,25 @@ const handelStorebranch = (e) => {
 function deleteBranch(id) {
   axios.delete(`${baseUrl}branches/${id}`, {
     headers: {
-      'Authorization': `Bearer ${userToken}`
+      'Authorization': `Bearer ${token}`
     }
   })
   .then(function (response) {
     if (response.status === 401) {
-      setshowMessagedeletebranch(true);
+      setShowMessage(true);
       setLoader(true); 
-      setAuthenticatedmessage(true);
+      alert('يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية');
       setTimeout(() => {
-        setshowMessagedeletebranch(false);
-      }, 2500);
+        setShowMessage(false);
+      }, 2000);
       Naviagate("/Login");
     } else if (response.status === 204) {
       setLoader(false); 
       setBranches(prevBranches => prevBranches.filter(branch => branch.id !== id));
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 1000);
     } else {
       console.error('Unexpected response status:', response.status);
       alert("من فضلك اعمل ريفريش للمتصفح ")
@@ -141,14 +142,10 @@ function deleteBranch(id) {
   });
 }
 
+
  
 return (
     <main className='branchTable'>
-          {showAuthenticatedmessage&&
-          <div role="alert" className="alert alert-error mr-44">
-          <CancelIcon/>
-          <span>يجب عليك التسجيل مرة أخري لأنتهاء وقت الخصوصية</span></div>}
-
        {/* add branch form */}
         <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
           <div className="mx-auto w-full ">
@@ -224,15 +221,15 @@ return (
     <div className="divider"></div>
 
       {/* show message for any modify in branch */}
-      {showMessagedeletebranch&&
+      {showMessage&&
       <div  className="fixed z-50 flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800">
-    <div className="flex items-center justify-center w-12 bg-red-500 text-white">
+    <div className="flex items-center justify-center w-12 bg-emerald-500 text-white">
         <CheckCircleIcon/>
     </div>
     <div className="px-4 py-2 -mx-3">
         <div className="mx-3">
-            <span className="font-semibold text-red-500">Success</span>
-            <p className="text-xl text-gray-600 dark:text-gray-200">تم حذف الفرع بنجاح</p>
+            <span className="font-semibold text-emerald-500 dark:text-emerald-400">Success</span>
+            <p className="text-sm text-gray-600 dark:text-gray-200">تم حذف الفرع بنجاح</p>
         </div>
     </div>
       </div>}
