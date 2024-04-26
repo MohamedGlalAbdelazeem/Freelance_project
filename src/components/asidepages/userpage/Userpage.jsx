@@ -18,12 +18,18 @@ function Userpage() {
   const userToken = localStorage.getItem('user_token');
   const [employees, setEmployees] = useState([]);
   const [searchWay, setSearchWay] = useState("ID");
+  const [searchValue, setSearchValue] = useState("");
+  const [updateMode, setUpdateMode] = useState(false);
+  const [updateEmpID, setUpdateEmpID] = useState("");
+  
+  
   const Naviagate = useNavigate();
   const handleUnauthenticated = () => {
     alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");
     Naviagate("/Login");
     localStorage.removeItem("user_token");
   };
+  
   useEffect(() => {
     fetchEmployees();
   }, []);
@@ -41,12 +47,10 @@ function Userpage() {
           handleUnauthenticated();
           return;
         }
-        console.log("emp", response.data.data);
         setEmployees(response.data.data);
       })
       .catch(function (error) {
-        console.error("Error fetching branches:", error);
-        handleUnauthenticated();
+        console.error("Error:", error);
       })
       .finally(() => {
         setLoader(false);
@@ -114,6 +118,8 @@ function Userpage() {
       })
   }
   const updateEmp = (id) => {
+    setUpdateEmpID(id);
+    setUpdateMode(true);
     const updatedEmployee = employees.find((employee) => employee.id === id);
     if (updatedEmployee) {
       setEmployeeName(updatedEmployee.name);
@@ -124,6 +130,61 @@ function Userpage() {
       setBranchNumber(updatedEmployee.branch_id);
     }
   };
+  const handleEmpUpdate = () => {
+    setLoader(true);
+    
+    axios
+      .post(
+        `${baseUrl}employees/${updateEmpID}`,
+        {
+          name: employeeName,
+          email: employeeMail,
+          password: employeePassword,
+          password_confirmation: employeePasswordConfirm,
+          phone_number: employeePhone,
+          branch_id: branchNumber,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(function (response) {
+        console.log("emp", response);
+        fetchEmployees();
+        setUpdateMode(false);
+      })
+      .catch(function (error) {
+        console.error("Error fetching", error.response.data.message);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }
+  const handleSearch = (e) => {
+e.preventDefault();
+    setLoader(true);
+    let searchUrl;
+    if (searchWay === "ID") {
+      searchUrl = `${baseUrl}employees/${searchValue}`;
+    } else {
+      searchUrl = `${baseUrl}employees/${searchValue}/branch`;
+    }
+    axios
+      .get(searchUrl, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        }
+      }).then(function (response) {
+        console.log("search", response.data.data);
+        setEmployees([response.data.data]);
+      }).catch(function (error) {
+        console.error("Error fetching", error.response.data.message);
+      }).finally(() => { 
+        setLoader(false);
+      })
+  }
 
   return (
     <div>
@@ -224,13 +285,23 @@ function Userpage() {
             </div>
 
             <div>
-              <button
-                onClick={(e) => handleEmpRegister(e)}
-                disabled={loader}
-                className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-              >
-                تسجيل عميل جديد
-              </button>
+              {updateMode ? (
+                <button
+                  onClick={handleEmpUpdate}
+                  disabled={loader}
+                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                >
+                  تحديث المستخدم
+                </button>
+              ) : (
+                <button
+                  onClick={(e) => handleEmpRegister(e)}
+                  disabled={loader}
+                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                >
+                  تسجيل مستخدم جديد
+                </button>
+              )}
             </div>
           </form>
         </div>
@@ -247,12 +318,14 @@ function Userpage() {
               type="search"
               id="default-search"
               className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder= {`ابحث بـ ${searchWay}`}
+              placeholder={`ابحث بـ ${searchWay}`}
               required
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
             />
             <button
               type="submit"
-              onClick={(e) => e.preventDefault()}
+              onClick={(e) => handleSearch(e)}
               className="text-white absolute end-32 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               بحث{" "}
