@@ -17,9 +17,8 @@ function Branchpage() {
   const [loader, setLoader] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
   const Naviagate = useNavigate();
-  const storedUser = localStorage.getItem('user');
-  const retrievedUser = JSON.parse(storedUser);
-  const token = retrievedUser.access_token;
+  const userToken = localStorage.getItem('user_token');
+ 
   // branch inputs 
   const [branchName , setBranchName] = useState("");
   const [branchLocation , setbBranchLocation ] = useState("");
@@ -35,7 +34,7 @@ useEffect(() => {
 const fetchBranches = () => {
   axios.get(`${baseUrl}branches`, {
     headers: {
-      'Authorization': `Bearer ${token}`
+      'Authorization': `Bearer ${userToken}`
     }
   })
   .then(function (response) {
@@ -59,6 +58,10 @@ const handleUnauthenticated = () => {
   localStorage.removeItem('user');
 };
 
+ 
+
+
+//
 // store branch
 const handelStorebranch = (e) => {
     e.preventDefault();

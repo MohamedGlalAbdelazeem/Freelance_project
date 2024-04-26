@@ -7,12 +7,9 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
  function Asidebar() {
   
     const Navigate = useNavigate()
-    const storedUser = localStorage.getItem('user');
-    const retrievedUser = JSON.parse(storedUser);
-    const userName = retrievedUser.user.name
 function handelLogout() {
-        if (localStorage.getItem('user')) {
-            localStorage.removeItem("user")
+        if (localStorage.getItem('user_token')) {
+            localStorage.removeItem("user_token")
             Navigate("/Login")
         } else {
             return null;
@@ -34,9 +31,7 @@ function handelLogout() {
             <div className="w-14 rounded-full">
                < AccountCircleOutlinedIcon sx={{ fontSize: 55 }}/>
              </div>
-        </div>
-          <h4 className="mx-2 mt-2 font-medium text-gray-800 dark:text-gray-200">أهلا بك </h4>
-          <p className="mx-2 mt-1 text-sm font-medium text-white">{userName}</p>
+        </div>         
     </div>
 
 

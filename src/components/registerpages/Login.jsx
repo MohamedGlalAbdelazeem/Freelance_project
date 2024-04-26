@@ -2,15 +2,12 @@ import React from 'react'
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import "./register.css"
- 
- 
+import axios from 'axios';
+
 function Login() {
-     
-    
-     const Navigate = useNavigate();
+    const Navigate = useNavigate();
     const [email , setEmail ] = useState("");
     const [password , setPassword ] = useState("");
-    // when user first click 
     const [accept , setAccetp] = useState(false);
     const [errorMessage, setErrorMessage] = useState(false);
     const [successMess , setSuccessMess] = useState(false);
@@ -21,32 +18,23 @@ const submitForm = async (e) => {
     e.preventDefault();
     setAccetp(true);
     if (email === "" || password.length < 5) {
-        // Invalid input, no need to proceed with the API call
         return;
     }
-    // Show loader
     setLoader(true);
     try {
-        // Make API call
         const res = await axios.post(`http://127.0.0.1:8000/api/login`, {
             email: email,
             password: password
         });
-        // Hide loader
         setLoader(false);
-
-        // Handle success
-        setSuccessMess(true);
+       
         if (res.status === 200) {
-            const apiRes = JSON.stringify(res.data)
-           localStorage.setItem("user",apiRes);
-           Navigate("/Mainpage")
+            localStorage.setItem("user_token",res.data.access_token);
+            Navigate("/Mainpage")
+            setSuccessMess(true);
         }
     } catch (error) {
-        // Hide loader
         setLoader(false);
-
-        // Handle error
         setErrorMessage(true);
         setTimeout(() => {
             window.location.reload();
@@ -104,7 +92,6 @@ const submitForm = async (e) => {
                 {loader && <div className="spinner"></div>}
             </div>
         </section>
-   
     </>
   )
 }

@@ -4,48 +4,45 @@ import { useState , useEffect } from 'react';
 
 function Userprofilepage() {
 
-    const storedUser = localStorage.getItem('user');
-    const retrievedUser = JSON.parse(storedUser);
-    const [userProfile, setUserprofile] = useState([]);
-    const [loader , setLoader ] = useState(true)
-    // useEffect to fetch data when component mounts
-    useEffect(() => {
-      const storedUser = localStorage.getItem('user');
-      const retrievedUser = JSON.parse(storedUser);
-      const token = retrievedUser.access_token;
-      axios.get('http://127.0.0.1:8000/api/refresh', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      .then(function (response) {
-        if (response.status === 401) {
-            handleUnauthenticated();
-          } else {
-            setLoader(false)
-           setUserprofile(response.data.Admin);
-          }
+    // const [userProfile, setUserprofile] = useState([]);
+    // const [loader , setLoader ] = useState(true)
+    // useEffect(() => {
+      // const storedUser = localStorage.getItem('user');
+      // const retrievedUser = JSON.parse(storedUser);
+      // const token = retrievedUser.access_token;
+    //   axios.get('http://127.0.0.1:8000/api/refresh', {
+    //     headers: {
+    //       'Authorization': `Bearer ${token}`
+    //     }
+    //   })
+    //   .then(function (response) {
+    //     if (response.status === 401) {
+    //         handleUnauthenticated();
+    //       } else {
+    //         setLoader(false)
+    //        setUserprofile(response.data.Admin);
+    //       }
         
-      })
-      .catch(function (error) {
-        alert(error);
-        setLoader(true);
-        handleUnauthenticated();
-      })
-    }, []);
+    //   })
+    //   .catch(function (error) {
+    //     alert(error);
+    //     setLoader(true);
+    //     handleUnauthenticated();
+    //   })
+    // }, []);
 
-    // hande unuthenticated
-const handleUnauthenticated = () => {
-    alert('يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية');
-    Naviagate("/Login");
-    localStorage.removeItem('user');
-  };
-    const userName = userProfile.name
-    const userEmail = userProfile.email
-    const userRole = userProfile.role_name
-    const userPhone = userProfile.phone_number
-    const userRoleID = userProfile.role_id
-    const userTime = userProfile.created_at
+//     // hande unuthenticated
+// const handleUnauthenticated = () => {
+//     alert('يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية');
+//     Naviagate("/Login");
+//     localStorage.removeItem('user');
+//   };
+    // const userName = userProfile.name
+    // const userEmail = userProfile.email
+    // const userRole = userProfile.role_name
+    // const userPhone = userProfile.phone_number
+    // const userRoleID = userProfile.role_id
+    // const userTime = userProfile.created_at
  
     return (
         <div className="flex bg-slate-700 rounded-3xl">
@@ -60,7 +57,7 @@ const handleUnauthenticated = () => {
                                     <AccountCircleIcon sx={{ fontSize: "8rem" }} />
                                 </div>
                             </div>
-                        </div>
+                        {/* </div>
                         {loader && <div className="spinner"></div>}
                         <div className="mt-20 text-center border-b pb-12">
                             <h1 className="text-4xl text-gray-700 font-bold">{userName}</h1>
@@ -68,7 +65,7 @@ const handleUnauthenticated = () => {
                             <p className="font-bold  text-red-600 mt-3 text-xl">Role_ID : {userRoleID}</p>
                             <p className="font-bold  text-red-500 mt-3 text-xl"> الوقت / التاريخ : {userTime}</p>
                             <p className="mt-2 text-gray-500">{userEmail}</p>
-                            <p className="mt-2 text-gray-500">{userPhone}</p>
+                            <p className="mt-2 text-gray-500">{userPhone}</p> */}
                         </div>
                         <div className="divider divider-info">تعديل المعلومات الشخصية</div>
                         <div className="mt-12 flex flex-col justify-center">

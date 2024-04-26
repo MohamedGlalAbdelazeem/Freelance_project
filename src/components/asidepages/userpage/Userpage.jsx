@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 function Userpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
+  const [loader, setLoader] = useState(true);
   const [inputsMessage, setInputsMessage] = useState(false);
   const [employeeName, setEmployeeName] = useState("");
   const [employeeMail, setEmployeeMail] = useState("");
@@ -11,17 +12,14 @@ function Userpage() {
   const [employeePasswordConfirm, setEmployeePasswordConfirm] = useState("");
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
-  const storedUser = localStorage.getItem("user");
-  const retrievedUser = JSON.parse(storedUser);
-  const token = retrievedUser.access_token;
-  const [loader, setLoader] = useState(true);
+  const userToken = localStorage.getItem('user_token');
 
   const Naviagate = useNavigate();
 
   const handleUnauthenticated = () => {
     alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");
     Naviagate("/Login");
-    localStorage.removeItem("user");
+    localStorage.removeItem("user_token");
   };
   useEffect(() => {
     fetchEmployees();
@@ -31,7 +29,7 @@ function Userpage() {
     axios
       .get(`${baseUrl}employees`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${userToken}`,
         },
       })
       .then(function (response) {
