@@ -76,10 +76,11 @@ const handelStorebranch = (e) => {
         to: timeTo,
         hot_line: branchHotline,
         status: branchStatus,
-      }, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+    }, {
+      headers: {
+        'Authorization': `Bearer ${userToken}`
+      }
+    }
       )
       .then(function (response) {
         if (
