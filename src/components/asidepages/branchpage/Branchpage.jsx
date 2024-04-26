@@ -7,9 +7,9 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Switch } from '@mui/material';
-
-
+import "./branchpage.css"
 import axios from 'axios';
+
 
 function Branchpage() {
   const baseUrl = 'http://127.0.0.1:8000/api/';
@@ -95,6 +95,7 @@ const handelStorebranch = (e) => {
         }
       });
 };
+
 
 // handel delete
 function deleteBranch(id) {
