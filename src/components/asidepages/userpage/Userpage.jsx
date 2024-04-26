@@ -13,7 +13,6 @@ function Userpage() {
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
   const userToken = localStorage.getItem('user_token');
-
   const Naviagate = useNavigate();
 
   const handleUnauthenticated = () => {
