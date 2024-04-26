@@ -1,6 +1,9 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import SearchIcon from "@mui/icons-material/Search";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 
 function Userpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
@@ -13,8 +16,12 @@ function Userpage() {
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
   const userToken = localStorage.getItem('user_token');
+<<<<<<< HEAD
+=======
+  const [employees, setEmployees] = useState([]);
+  const [searchWay, setSearchWay] = useState("ID");
+>>>>>>> 9a296346640da77bc2299defcd4c0f7c79cf574e
   const Naviagate = useNavigate();
-
   const handleUnauthenticated = () => {
     alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");
     Naviagate("/Login");
@@ -23,6 +30,7 @@ function Userpage() {
   useEffect(() => {
     fetchEmployees();
   }, []);
+  
   const fetchEmployees = () => {
     setLoader(true);
     axios
@@ -34,8 +42,10 @@ function Userpage() {
       .then(function (response) {
         if (response.status === 401) {
           handleUnauthenticated();
+          return;
         }
-        console.log("emps", response.data.data);
+        console.log("emp", response.data.data);
+        setEmployees(response.data.data);
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
@@ -75,7 +85,7 @@ function Userpage() {
     axios
       .post(`${baseUrl}employees`, employeeData, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${userToken}`,
           "Content-Type": "multipart/form-data",
         },
       })
@@ -90,10 +100,38 @@ function Userpage() {
         setLoader(false);
       });
   };
+  const deleteEmp = (id) => { 
+    setLoader(true);
+    axios
+      .delete(`${baseUrl}employees/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        console.log("emp", response);
+        fetchEmployees();
+      })
+      .catch(function (error) {
+        console.error("Error fetching", error);
+      })
+  }
+  const updateEmp = (id) => {
+    const updatedEmployee = employees.find((employee) => employee.id === id);
+    if (updatedEmployee) {
+      setEmployeeName(updatedEmployee.name);
+      setEmployeeMail(updatedEmployee.email);
+      setEmployeePassword(updatedEmployee.password);
+      setEmployeePasswordConfirm(updatedEmployee.password_confirmation);
+      setEmployeePhone(updatedEmployee.phone_number);
+      setBranchNumber(updatedEmployee.branch_id);
+    }
+  };
 
   return (
     <div>
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
+        {/* register & update users */}
         <div className="mx-auto w-full ">
           <form className=" space-y-3">
             <div className=" flex flex-wrap gap-3">
@@ -106,7 +144,9 @@ function Userpage() {
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {inputsMessage && (
-                  <p className="text-red-600 py-1 px-1">ادخل اسم العميل</p>
+                  <p className="text-red-300 py-1 text-sm px-1">
+                    ادخل اسم العميل
+                  </p>
                 )}
               </div>
               <div className="flex-grow">
@@ -118,7 +158,7 @@ function Userpage() {
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {inputsMessage && (
-                  <p className="text-red-600 py-1 px-1">
+                  <p className="text-red-300 text-sm py-1 px-1">
                     ادخل البريد الالكترونى
                   </p>
                 )}
@@ -134,7 +174,9 @@ function Userpage() {
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {inputsMessage && (
-                  <p className="text-red-600 py-1 px-1">ادخل كلمة المرور</p>
+                  <p className="text-red-300 text-sm py-1 px-1">
+                    ادخل كلمة المرور
+                  </p>
                 )}
               </div>
               <div className="flex-grow ">
@@ -146,7 +188,7 @@ function Userpage() {
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {inputsMessage && (
-                  <p className="text-red-600 py-1 px-1">
+                  <p className="text-red-300 text-sm py-1 px-1">
                     كلمتى المرور غير متطابقتين
                   </p>
                 )}
@@ -163,7 +205,9 @@ function Userpage() {
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {inputsMessage && (
-                  <p className="text-red-600 py-1 px-1">أدخل رقم هاتف صحيح</p>
+                  <p className="text-red-300 text-sm py-1 px-1">
+                    أدخل رقم هاتف صحيح
+                  </p>
                 )}
               </div>
               <div className="flex-grow ">
@@ -175,7 +219,9 @@ function Userpage() {
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {inputsMessage && (
-                  <p className="text-red-600 py-1 px-1">أدخل رقم الفرع</p>
+                  <p className="text-red-300 text-sm py-1 px-1">
+                    أدخل رقم الفرع
+                  </p>
                 )}
               </div>
             </div>
@@ -192,6 +238,138 @@ function Userpage() {
           </form>
         </div>
       </div>
+
+      {/* Search input form */}
+      <div className="my-3">
+        <form className="w-full">
+          <div className="relative">
+            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <SearchIcon className="text-white" />
+            </div>
+            <input
+              type="search"
+              id="default-search"
+              className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder= {`ابحث بـ ${searchWay}`}
+              required
+            />
+            <button
+              type="submit"
+              onClick={(e) => e.preventDefault()}
+              className="text-white absolute end-32 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+            >
+              بحث{" "}
+            </button>
+            <div className="absolute end-2.5 bottom-2">
+              <select
+                id="select"
+                onChange={(e) => setSearchWay(e.target.value)}
+                className="py-2 px-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="ID" className="bg-zinc-900">
+                  ID
+                </option>
+                <option value="branch ID" className="bg-zinc-900">
+                  Branch ID
+                </option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+      {/* Table to display branch data */}
+      <table className="border-collapse w-full">
+        <thead>
+          <tr>
+            {[
+              "",
+              "الترتيب",
+              "الاسم",
+              "البريد",
+              "ID",
+              "رقم الهاتف",
+              "رقم الفرع",
+              "الدور",
+              "تاريخ الانشاء",
+              "التعديل",
+            ].map((header, index) => (
+              <th
+                key={index}
+                className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
+              >
+                {header}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {/* Mapping branches data to table rows */}
+          {employees.map((emp, index) => {
+            return (
+              <tr
+                key={emp.id}
+                className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
+              >
+                <td className="w-full lg:w-auto p-0 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
+                  <input type="checkbox" />
+                </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
+                  {index + 1}
+                </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  px-2 text-xs font-bold">
+                    {emp.name}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {emp.email}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {emp.id}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {emp.phone_number}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {emp.branch_id}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {emp.role_name}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  px-1  text-xs font-bold">
+                    {emp.created_at}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <button
+                    onClick={() => updateEmp(emp.id)}
+                    className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
+                  >
+                    <DriveFileRenameOutlineIcon />
+                  </button>
+                  <button
+                    onClick={() => deleteEmp(emp.id)}
+                    className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
+                  >
+                    <DeleteForeverIcon />
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 }
