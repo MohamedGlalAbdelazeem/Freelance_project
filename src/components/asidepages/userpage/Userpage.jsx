@@ -16,12 +16,12 @@ function Userpage() {
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
   const userToken = localStorage.getItem('user_token');
-<<<<<<< HEAD
-=======
+
   const [employees, setEmployees] = useState([]);
   const [searchWay, setSearchWay] = useState("ID");
->>>>>>> 9a296346640da77bc2299defcd4c0f7c79cf574e
   const Naviagate = useNavigate();
+
+// hande unuthenticated
   const handleUnauthenticated = () => {
     alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");
     Naviagate("/Login");
@@ -31,6 +31,7 @@ function Userpage() {
     fetchEmployees();
   }, []);
   
+  // fetch employees
   const fetchEmployees = () => {
     setLoader(true);
     axios
@@ -55,6 +56,7 @@ function Userpage() {
         setLoader(false);
       });
   };
+// handle employee register
   const handleEmpRegister = (e) => {
     setLoader(true);
     e.preventDefault();
@@ -100,6 +102,8 @@ function Userpage() {
         setLoader(false);
       });
   };
+
+  // delete employee
   const deleteEmp = (id) => { 
     setLoader(true);
     axios
@@ -116,6 +120,8 @@ function Userpage() {
         console.error("Error fetching", error);
       })
   }
+
+  
   const updateEmp = (id) => {
     const updatedEmployee = employees.find((employee) => employee.id === id);
     if (updatedEmployee) {

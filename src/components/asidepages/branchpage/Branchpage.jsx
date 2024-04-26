@@ -18,7 +18,7 @@ function Branchpage() {
   const [showMessage, setShowMessage] = useState(false);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem('user_token');
-  console.log();
+
   // branch inputs 
   const [branchName , setBranchName] = useState("");
   const [branchLocation , setbBranchLocation ] = useState("");
@@ -27,6 +27,7 @@ function Branchpage() {
   const [branchHotline , setBranchHotline] = useState("");
   const [branchStatus , setBranchStatus] = useState("");
   const [inputsMessage , setInputsmessage] = useState(false);
+
 // handel show branch 
 useEffect(() => {
   fetchBranches();
@@ -58,10 +59,7 @@ const handleUnauthenticated = () => {
   localStorage.removeItem('user');
 };
 
- 
 
-
-//
 // store branch
 const handelStorebranch = (e) => {
     e.preventDefault();
@@ -78,17 +76,11 @@ const handelStorebranch = (e) => {
         status: branchStatus,
       }, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${userToken}`
         }
-      )
+      })
       .then(function (response) {
-        if (
-          response.status === 422 &&
-          response.data &&
-          response.data.errors &&
-          response.data.errors.to &&
-          response.data.errors.to[0] === "To must be greter than from"
-        ) {
+        if (response.status === 422 && response.data && response.data.errors && response.data.errors.to && response.data.errors.to[0] === "To must be greter than from") {
           alert("يجب أن يكون الوقت 'To' أكبر من الوقت 'From'");
         } else {
           console.log("Branch created successfully:", response.data);
@@ -96,12 +88,8 @@ const handelStorebranch = (e) => {
         }
       })
       .catch(function (error) {
-        console.error("Error creating branch:", error);
-        if (
-          error.response &&
-          error.response.status === 401 &&
-          error.response.data.message === "Unauthenticated"
-        ) {
+        console.error('Error creating branch:', error);
+        if (error.response && error.response.status === 401 && error.response.data.message === "Unauthenticated") {
           alert("يجب عليك التسجيل مرة اخري لانتهاء وقت الصلاحية");
         } else {
           console.log("Error creating branch:", error);
@@ -109,58 +97,78 @@ const handelStorebranch = (e) => {
       });
 };
 
-
 // handel delete
 function deleteBranch(id) {
-  axios
-    .delete(`${baseUrl}branches/${id}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      if (response.status === 401) {
-        setShowMessage(true);
-        setLoader(true);
-        alert("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية");
-        setTimeout(() => {
-          setShowMessage(false);
-        }, 2000);
-        Naviagate("/Login");
-      } else if (response.status === 204) {
-        setLoader(false);
-        setBranches((prevBranches) =>
-          prevBranches.filter((branch) => branch.id !== id)
-        );
-        setShowMessage(true);
-        setTimeout(() => {
-          setShowMessage(false);
-        }, 1000);
-      } else {
-        console.error("Unexpected response status:", response.status);
-        alert("من فضلك اعمل ريفريش للمتصفح ");
-        setLoader(true);
-      }
-    })
-    .catch(function (error) {
-      console.error("Error deleting branch:", error);
-      setLoader(true);
-      if (
-        error.response &&
-        error.response.status === 401 &&
-        error.response.data.message === "Unauthenticated"
-      ) {
-        // Handle "Unauthenticated" error
-        alert("يجب عليك التسجيل مرة اخري لانتهاء وقت الصلاحية");
-      } else {
-        // Handle other errors
-        console.log("Error deleting branch:", error);
-      }
-    });
+  axios.delete(`${baseUrl}branches/${id}`, {
+    headers: {
+      'Authorization': `Bearer ${userToken}`
+    }
+  })
+  .then(function (response) {
+    if (response.status === 401) {
+      setShowMessage(true);
+      setLoader(true); 
+      alert('يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية');
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 2000);
+      Naviagate("/Login");
+    } else if (response.status === 204) {
+      setLoader(false); 
+      setBranches(prevBranches => prevBranches.filter(branch => branch.id !== id));
+      setShowMessage(true);
+      setTimeout(() => {
+        setShowMessage(false);
+      }, 1000);
+    } else {
+      console.error('Unexpected response status:', response.status);
+      alert("من فضلك اعمل ريفريش للمتصفح ")
+      setLoader(true); 
+    }
+  })
+  .catch(function (error) {
+    console.error('Error deleting branch:', error);
+    setLoader(true); 
+    if (error.response && error.response.status === 401 && error.response.data.message === "Unauthenticated") {
+      // Handle "Unauthenticated" error
+      alert("يجب عليك التسجيل مرة اخري لانتهاء وقت الصلاحية");
+    } else {
+      // Handle other errors
+      console.log("Error deleting branch:", error);
+    }
+  });
 }
 
 
- 
+// handle update branch 
+async function handleUpdate(id) {
+  const updatedBranch = branches.find((branch) => branch.id === id);
+  if (updatedBranch) {
+    try {
+      const url = `http://127.0.0.1:8000/api/branches/${id}?_method=PUT`;
+      const response = await axios.post(url, {
+        branchName: updatedBranch.name,
+        branchLocation: updatedBranch.location,
+        timeFrom: updatedBranch.from,
+        timeTo: updatedBranch.to,
+        branchHotline: updatedBranch.hotLine,
+        branchStatus: updatedBranch.status,
+      });
+      if (response.status === 200) {
+        console.log('Branch updated successfully');
+        // Optionally, perform further actions after successful update
+      } else {
+        console.error('Failed to update branch');
+        // Optionally, handle failure cases
+      }
+    } catch (error) {
+      console.error('Error occurred while updating branch:', error);
+      // Optionally, handle errors
+    }
+  }
+}
+
+
 return (
     <main className='branchTable'>
        {/* add branch form */}
@@ -318,7 +326,7 @@ return (
                 <span className="rounded  px-1  text-xs font-bold">{branch.created_at}</span>
               </td>
               <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                <button className='bg-green-700 text-white p-2 rounded hover:bg-green-500'>
+                <button  onClick={() => handelUpdate(branch.id)} className='bg-green-700 text-white p-2 rounded hover:bg-green-500'>
                   <DriveFileRenameOutlineIcon/>
                 </button>
                 <button onClick={()=>deleteBranch(branch.id)} className='bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500'>
