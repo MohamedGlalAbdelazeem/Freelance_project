@@ -15,22 +15,24 @@ function Userpage() {
   const [employeePasswordConfirm, setEmployeePasswordConfirm] = useState("");
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
-  const userToken = localStorage.getItem('user_token');
-<<<<<<< HEAD
-=======
+  const userToken = localStorage.getItem("user_token");
   const [employees, setEmployees] = useState([]);
   const [searchWay, setSearchWay] = useState("ID");
+  const [searchValue, setSearchValue] = useState("");
+  const [updateMode, setUpdateMode] = useState(false);
+  const [updateEmpID, setUpdateEmpID] = useState("");
+
   const Naviagate = useNavigate();
   const handleUnauthenticated = () => {
     alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");
     Naviagate("/Login");
     localStorage.removeItem("user_token");
   };
-  
+
   useEffect(() => {
     fetchEmployees();
   }, []);
-  
+
   const fetchEmployees = () => {
     setLoader(true);
     axios
@@ -98,7 +100,7 @@ function Userpage() {
         setLoader(false);
       });
   };
-  const deleteEmp = (id) => { 
+  const deleteEmp = (id) => {
     setLoader(true);
     axios
       .delete(`${baseUrl}employees/${id}`, {
@@ -112,8 +114,8 @@ function Userpage() {
       })
       .catch(function (error) {
         console.error("Error fetching", error);
-      })
-  }
+      });
+  };
   const updateEmp = (id) => {
     setUpdateEmpID(id);
     setUpdateMode(true);
@@ -129,7 +131,7 @@ function Userpage() {
   };
   const handleEmpUpdate = () => {
     setLoader(true);
-    
+
     axios
       .post(
         `${baseUrl}employees/${updateEmpID}`,
@@ -158,9 +160,9 @@ function Userpage() {
       .finally(() => {
         setLoader(false);
       });
-  }
+  };
   const handleSearch = (e) => {
-e.preventDefault();
+    e.preventDefault();
     setLoader(true);
     let searchUrl;
     if (searchWay === "ID") {
@@ -172,16 +174,19 @@ e.preventDefault();
       .get(searchUrl, {
         headers: {
           Authorization: `Bearer ${userToken}`,
-        }
-      }).then(function (response) {
+        },
+      })
+      .then(function (response) {
         console.log("search", response.data.data);
         setEmployees([response.data.data]);
-      }).catch(function (error) {
-        console.error("Error fetching", error.response.data.message);
-      }).finally(() => { 
-        setLoader(false);
       })
-  }
+      .catch(function (error) {
+        console.error("Error fetching", error.response.data.message);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
   return (
     <div>
