@@ -16,13 +16,10 @@ function Userpage() {
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
   const userToken = localStorage.getItem('user_token');
+<<<<<<< HEAD
+=======
   const [employees, setEmployees] = useState([]);
   const [searchWay, setSearchWay] = useState("ID");
-  const [searchValue, setSearchValue] = useState("");
-  const [updateMode, setUpdateMode] = useState(false);
-  const [updateEmpID, setUpdateEmpID] = useState("");
-  
-  
   const Naviagate = useNavigate();
   const handleUnauthenticated = () => {
     alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");

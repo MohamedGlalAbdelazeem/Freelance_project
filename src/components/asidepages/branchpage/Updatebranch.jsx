@@ -62,7 +62,6 @@ function Updatebranch() {
       }
     })
       .then(function (response) {
-        console.log("Branch updated successfully:", response.data);
         navigate("/Mainpage/Branchpage");
       })
       .catch(function (error) {

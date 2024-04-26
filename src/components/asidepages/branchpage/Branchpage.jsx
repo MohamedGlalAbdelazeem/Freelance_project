@@ -18,7 +18,7 @@ function Branchpage() {
   const [showMessage, setShowMessage] = useState(false);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem('user_token');
- 
+  console.log();
   // branch inputs 
   const [branchName , setBranchName] = useState("");
   const [branchLocation , setbBranchLocation ] = useState("");
@@ -69,21 +69,16 @@ const handelStorebranch = (e) => {
       setInputsmessage(true);
       return;
     }
-    axios
-      .post(
-        `${baseUrl}branches`,
-        {
-          name: branchName,
-          location: branchLocation,
-          from: timeFrom,
-          to: timeTo,
-          hot_line: branchHotline,
-          status: branchStatus,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
+    axios.post(`${baseUrl}branches`, {
+        name: branchName,
+        location: branchLocation,
+        from: timeFrom,
+        to: timeTo,
+        hot_line: branchHotline,
+        status: branchStatus,
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
       )
       .then(function (response) {
