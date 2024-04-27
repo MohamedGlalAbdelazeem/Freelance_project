@@ -6,6 +6,7 @@ import Userpage from "./components/asidepages/userpage/Userpage"
 import Branchpage from "./components/asidepages/branchpage/Branchpage"
 import Userprofilepage from "./components/header/Userprofilepage"
 import ClientPage from "./components/asidepages/clientPage/ClientPage"
+import Categoriespage from "./components/asidepages/categoriespage/Categoriespage"
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="Userpage" element={<Userpage />} />
           <Route path="clientpage" element={<ClientPage />} />
           <Route path="Branchpage" element={<Branchpage />} />
+          <Route path="Categoriespage" element={<Categoriespage />} />
           <Route path="Userprofilepage" element={<Userprofilepage />} />
         </Route>
     </Routes>

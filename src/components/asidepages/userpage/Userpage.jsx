@@ -15,12 +15,12 @@ function Userpage() {
   const [employeePasswordConfirm, setEmployeePasswordConfirm] = useState("");
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
+  const [updateMode, setUpdateMode] = useState(false);
+  const [searchValue , setSearchValue] = useState("");
   const userToken = localStorage.getItem('user_token');
-<<<<<<< HEAD
-=======
+
   const [employees, setEmployees] = useState([]);
   const [searchWay, setSearchWay] = useState("ID");
->>>>>>> 9a296346640da77bc2299defcd4c0f7c79cf574e
   const Naviagate = useNavigate();
 
 // hande unuthenticated
@@ -133,7 +133,6 @@ function Userpage() {
   };
   const handleEmpUpdate = () => {
     setLoader(true);
-
     axios
       .post(
         `${baseUrl}employees/${updateEmpID}`,
@@ -163,6 +162,7 @@ function Userpage() {
         setLoader(false);
       });
   };
+  
   const handleSearch = (e) => {
     e.preventDefault();
     setLoader(true);

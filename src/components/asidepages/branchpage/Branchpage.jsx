@@ -18,6 +18,8 @@ function Branchpage() {
   const [showMessage, setShowMessage] = useState(false);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem('user_token');
+  const [searchValue , setSearchValue] = useState("");
+  
 
   // branch inputs 
   const [branchName , setBranchName] = useState("");
@@ -76,15 +78,21 @@ const handelStorebranch = (e) => {
         status: branchStatus,
       }, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${userToken}`
         }
-      )
+      })
       .then(function (response) {
         if (response.status === 422 && response.data && response.data.errors && response.data.errors.to && response.data.errors.to[0] === "To must be greter than from") {
           alert("يجب أن يكون الوقت 'To' أكبر من الوقت 'From'");
         } else {
-          console.log("Branch created successfully:", response.data);
-          window.location.reload();
+          setLoader(true);
+          fetchBranches();
+          setBranchName("");
+          setbBranchLocation("");
+          setTimeFrom("");
+          setTimeTo("");
+          setBranchHotline("");
+          setBranchStatus("0");
         }
       })
       .catch(function (error) {
@@ -140,33 +148,39 @@ function deleteBranch(id) {
 }
 
 
-// handle update branch 
-async function handleUpdate(id) {
-  const updatedBranch = branches.find((branch) => branch.id === id);
-  if (updatedBranch) {
-    try {
-      const url = `http://127.0.0.1:8000/api/branches/${id}?_method=PUT`;
-      const response = await axios.post(url, {
-        branchName: updatedBranch.name,
-        branchLocation: updatedBranch.location,
-        timeFrom: updatedBranch.from,
-        timeTo: updatedBranch.to,
-        branchHotline: updatedBranch.hotLine,
-        branchStatus: updatedBranch.status,
-      });
-      if (response.status === 200) {
-        console.log('Branch updated successfully');
-        // Optionally, perform further actions after successful update
-      } else {
-        console.error('Failed to update branch');
-        // Optionally, handle failure cases
-      }
-    } catch (error) {
-      console.error('Error occurred while updating branch:', error);
-      // Optionally, handle errors
-    }
-  }
-}
+// handle update branch import axios from 'axios';
+
+
+// async function handleUpdate(id) {
+//   const updatedBranch = branches.find((branch) => branch.id === id);
+//   if (updatedBranch) {
+//     try {
+//       const url = `http://127.0.0.1:8000/api/branches/${id}`;
+//       const response = await axios.post(url, {
+//         branchName: updatedBranch.name,
+//         branchLocation: updatedBranch.location,
+//         timeFrom: updatedBranch.from,
+//         timeTo: updatedBranch.to,
+//         branchHotline: updatedBranch.hotLine,
+//         branchStatus: updatedBranch.status,
+//       }, {
+//         headers: {
+//           'Authorization': `Bearer ${userToken}`
+//       }
+//       });
+//       if (response.status === 200) {
+//         console.log('Branch updated successfully');
+//         // Optionally, perform further actions after successful update
+//       } else {
+//         console.error('Failed to update branch');
+//         // Optionally, handle failure cases
+//       }
+//     } catch (error) {
+//       console.error('Error occurred while updating branch:', error);
+//       // Optionally, handle errors
+//     }
+//   }
+// }
 
 
 return (
@@ -277,15 +291,14 @@ return (
       <table className="border-collapse w-full">
         <thead>
           <tr>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"><input type="checkbox" /></th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">الترتيب</th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">الاسم</th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">الحالة</th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">ID</th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">الموقع</th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">الخط الساخن </th>  
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">الحالة</th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">إظهار العميل</th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">من</th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">إلي </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">الخط الساخن </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"> التاريخ/الوقت </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">التعديل</th>
           </tr>
@@ -295,38 +308,37 @@ return (
           {branches.map((branch , index)=>{
             return(
               <tr key={branch.id} className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0">
-              <td className="w-full lg:w-auto p-0 text-gray-800 text-center border border-b block lg:table-cell relative lg:static"> 
-                <input type="checkbox" />
-              </td>
               <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                 {index+1}
               </td>
               <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded  px-2 text-xs font-bold">{branch.name}</span>
               </td>
+              <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <span className="rounded  py-1 px-3 text-xs font-bold">{branch.location}</span>
+              </td>
+              <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <span className="rounded  py-1 px-3 text-xs font-bold">{branch.hotLine}</span>
+              </td>
               <td className="w-full lg:w-auto  text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                 {branch.status === "مفعل" ?<div className='bg-green-500 text-white text-sm rounded-md'>مفعل</div> : <div className='bg-red-500 text-white rounded-md text-sm'>غير مفعل</div>}
               </td>
               <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                <span className="rounded  py-1 px-3 text-xs font-bold">{branch.id}</span>
+              {branch.show_client === "مفعل" ?<div className='bg-green-500 text-white text-sm rounded-md'>مفعل</div> : <div className='bg-red-500 text-white rounded-md text-sm'>غير مفعل</div>}
               </td>
-              <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                <span className="rounded  py-1 px-3 text-xs font-bold">{branch.location}</span>
-              </td>
+             
               <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded  py-1 px-3 text-xs font-bold">{branch.from}</span>
               </td>
               <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded  py-1 px-3 text-xs font-bold">{branch.to}</span>
               </td>
-              <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                <span className="rounded  py-1 px-3 text-xs font-bold">{branch.hotLine}</span>
-              </td>
+            
               <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded  px-1  text-xs font-bold">{branch.created_at}</span>
               </td>
               <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                <button  onClick={() => handelUpdate(branch.id)} className='bg-green-700 text-white p-2 rounded hover:bg-green-500'>
+                <button  onClick={() => handleUpdate(branch.id)} className='bg-green-700 text-white p-2 rounded hover:bg-green-500'>
                   <DriveFileRenameOutlineIcon/>
                 </button>
                 <button onClick={()=>deleteBranch(branch.id)} className='bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500'>

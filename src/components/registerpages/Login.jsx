@@ -30,6 +30,7 @@ const submitForm = async (e) => {
        
         if (res.status === 200) {
             localStorage.setItem("user_token",res.data.access_token);
+            const roleNameUser = res.data.user.role_name 
             Navigate("/Mainpage")
             setSuccessMess(true);
         }
