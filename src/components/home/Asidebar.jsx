@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import AddHomeWorkOutlinedIcon from '@mui/icons-material/AddHomeWorkOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
-
+import CategoryIcon from '@mui/icons-material/Category';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 
  function Asidebar() {
@@ -23,7 +23,7 @@ function handelLogout() {
       {text:"إدارة الفروع", path:"/Mainpage/Branchpage" , icon:<AddHomeWorkOutlinedIcon sx={{ fontSize: 35 }}/>},
      { text: "إدارة المستخدمين", path: "/Mainpage/Userpage", icon: <GroupAddOutlinedIcon sx={{ fontSize: 35 }} /> },
      { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
-     { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> }, 
+     { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <CategoryIcon sx={{ fontSize: 35 }} /> }, 
     ];
 
   return (
