@@ -3,7 +3,10 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import "./register.css"
 import axios from 'axios';
+import { createContext } from 'react';
 
+
+export  const userRole = createContext()
 function Login() {
     const Navigate = useNavigate();
     const [email , setEmail ] = useState("");
@@ -11,7 +14,9 @@ function Login() {
     const [accept , setAccetp] = useState(false);
     const [errorMessage, setErrorMessage] = useState(false);
     const [successMess , setSuccessMess] = useState(false);
-    const [loader , setLoader ] = useState(false)
+    const [loader , setLoader ] = useState(false);
+     
+    
 
 // submit login form 
 const submitForm = async (e) => {
@@ -30,6 +35,7 @@ const submitForm = async (e) => {
        
         if (res.status === 200) {
             localStorage.setItem("user_token",res.data.access_token);
+            localStorage.setItem("user_role_name",res.data.user.role_name );
             Navigate("/Mainpage")
             setSuccessMess(true);
         }
@@ -41,8 +47,8 @@ const submitForm = async (e) => {
         }, 1500);
     }
 };     
+
   return (
-    <>
         <section className="bg-white dark:bg-gray-900">
             <div className="container flex items-center justify-center min-h-screen px-6 mx-auto">               
             { 
@@ -92,8 +98,6 @@ const submitForm = async (e) => {
                 {loader && <div className="spinner"></div>}
             </div>
         </section>
-    </>
-  )
-}
+  )}
 
 export default Login

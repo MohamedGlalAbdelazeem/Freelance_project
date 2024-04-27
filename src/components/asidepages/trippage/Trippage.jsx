@@ -5,21 +5,22 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 
-function Userpage() {
+function Trippage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [loader, setLoader] = useState(true);
   const [inputsMessage, setInputsMessage] = useState(false);
-  const [employeeName, setEmployeeName] = useState("");
-  const [employeeMail, setEmployeeMail] = useState("");
-  const [employeePassword, setEmployeePassword] = useState("");
-  const [employeePasswordConfirm, setEmployeePasswordConfirm] = useState("");
-  const [employeePhone, setEmployeePhone] = useState("");
+  const [tripName, settripName] = useState("");
+  const [tripTime, settriptripTime] = useState("");
+  const [tripMail, settripMail] = useState("");
+  const [tripPassword, settripPassword] = useState("");
+  const [tripPasswordConfirm, settripPasswordConfirm] = useState("");
+  const [tripPhone, settripPhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
   const [searchValue , setSearchValue] = useState("");
   const userToken = localStorage.getItem('user_token');
 
-  const [employees, setEmployees] = useState([]);
+  const [trips, settrips] = useState([]);
   const [searchWay, setSearchWay] = useState("ID");
   const Naviagate = useNavigate();
 
@@ -31,13 +32,13 @@ function Userpage() {
   };
 
   useEffect(() => {
-    fetchEmployees();
+    fetchtrips();
   }, []);
   
-  const fetchEmployees = () => {
+  const fetchtrips = () => {
     setLoader(true);
     axios
-      .get(`${baseUrl}employees`, {
+      .get(`${baseUrl}trips`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -47,7 +48,7 @@ function Userpage() {
           handleUnauthenticated();
           return;
         }
-        setEmployees(response.data.data);
+        settrips(response.data.data);
       })
       .catch(function (error) {
         console.error("Error:", error);
@@ -56,36 +57,38 @@ function Userpage() {
         setLoader(false);
       });
   };
-// handle employee register
+
+
+// handle trip register
   const handleEmpRegister = (e) => {
     setLoader(true);
     e.preventDefault();
     if (
-      employeeName === "" ||
-      employeeMail === "" ||
-      employeePassword === "" ||
-      employeePasswordConfirm === "" ||
-      employeePhone === "" ||
+      tripName === "" ||
+      tripMail === "" ||
+      tripPassword === "" ||
+      tripPasswordConfirm === "" ||
+      tripPhone === "" ||
       branchNumber === ""
     ) {
       setInputsMessage(true);
       return;
     }
-    if (employeePassword !== employeePasswordConfirm) {
+    if (tripPassword !== tripPasswordConfirm) {
       setInputsMessage(true);
       return;
     }
     setInputsMessage(false);
-    const employeeData = {
-      name: employeeName,
-      email: employeeMail,
-      password: employeePassword,
-      password_confirmation: employeePasswordConfirm,
-      phone_number: employeePhone,
+    const tripData = {
+      name: tripName,
+      email: tripMail,
+      password: tripPassword,
+      password_confirmation: tripPasswordConfirm,
+      phone_number: tripPhone,
       branch_id: branchNumber,
     };
     axios
-      .post(`${baseUrl}employees`, employeeData, {
+      .post(`${baseUrl}trips`, tripData, {
         headers: {
           Authorization: `Bearer ${userToken}`,
           "Content-Type": "multipart/form-data",
@@ -93,7 +96,7 @@ function Userpage() {
       })
       .then(function (response) {
         console.log("emp", response);
-        fetchEmployees();
+        fetchtrips();
       })
       .catch(function (error) {
         console.error("Error fetching", error);
@@ -105,14 +108,14 @@ function Userpage() {
   const deleteEmp = (id) => { 
     setLoader(true);
     axios
-      .delete(`${baseUrl}employees/${id}`, {
+      .delete(`${baseUrl}trips/${id}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       })
       .then(function (response) {
         console.log("emp", response);
-        fetchEmployees();
+        fetchtrips();
       })
       .catch(function (error) {
         console.error("Error fetching", error);
@@ -121,27 +124,27 @@ function Userpage() {
   const updateEmp = (id) => {
     setUpdateEmpID(id);
     setUpdateMode(true);
-    const updatedEmployee = employees.find((employee) => employee.id === id);
-    if (updatedEmployee) {
-      setEmployeeName(updatedEmployee.name);
-      setEmployeeMail(updatedEmployee.email);
-      setEmployeePassword(updatedEmployee.password);
-      setEmployeePasswordConfirm(updatedEmployee.password_confirmation);
-      setEmployeePhone(updatedEmployee.phone_number);
-      setBranchNumber(updatedEmployee.branch_id);
+    const updatedtrip = trips.find((trip) => trip.id === id);
+    if (updatedtrip) {
+      settripName(updatedtrip.name);
+      settripMail(updatedtrip.email);
+      settripPassword(updatedtrip.password);
+      settripPasswordConfirm(updatedtrip.password_confirmation);
+      settripPhone(updatedtrip.phone_number);
+      setBranchNumber(updatedtrip.branch_id);
     }
   };
   const handleEmpUpdate = () => {
     setLoader(true);
     axios
       .post(
-        `${baseUrl}employees/${updateEmpID}`,
+        `${baseUrl}trips/${updateEmpID}`,
         {
-          name: employeeName,
-          email: employeeMail,
-          password: employeePassword,
-          password_confirmation: employeePasswordConfirm,
-          phone_number: employeePhone,
+          name: tripName,
+          email: tripMail,
+          password: tripPassword,
+          password_confirmation: tripPasswordConfirm,
+          phone_number: tripPhone,
           branch_id: branchNumber,
         },
         {
@@ -152,7 +155,7 @@ function Userpage() {
       )
       .then(function (response) {
         console.log("emp", response);
-        fetchEmployees();
+        fetchtrips();
         setUpdateMode(false);
       })
       .catch(function (error) {
@@ -168,9 +171,9 @@ function Userpage() {
     setLoader(true);
     let searchUrl;
     if (searchWay === "ID") {
-      searchUrl = `${baseUrl}employees/${searchValue}`;
+      searchUrl = `${baseUrl}trips/${searchValue}`;
     } else {
-      searchUrl = `${baseUrl}employees/${searchValue}/branch`;
+      searchUrl = `${baseUrl}trips/${searchValue}/branch`;
     }
     axios
       .get(searchUrl, {
@@ -180,7 +183,7 @@ function Userpage() {
       })
       .then(function (response) {
         console.log("search", response.data.data);
-        setEmployees([response.data.data]);
+        settrips([response.data.data]);
       })
       .catch(function (error) {
         console.error("Error fetching", error.response.data.message);
@@ -200,72 +203,67 @@ function Userpage() {
               <div className="flex-grow ">
                 <input
                   type="text"
-                  value={employeeName}
-                  onChange={(e) => setEmployeeName(e.target.value)}
-                  placeholder="اسم العميل "
+                  value={tripName}
+                  onChange={(e) => settripName(e.target.value)}
+                  placeholder="اسم الرحلة "
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {inputsMessage && (
                   <p className="text-red-300 py-1 text-sm px-1">
-                    ادخل اسم العميل
+                    ادخل اسم الرحلة 
                   </p>
                 )}
               </div>
               <div className="flex-grow">
                 <input
                   type="email"
-                  value={employeeMail}
-                  onChange={(e) => setEmployeeMail(e.target.value)}
-                  placeholder="البريد الإلكترونى"
+                  value={tripMail}
+                  onChange={(e) => settripMail(e.target.value)}
+                  placeholder="تكلفة الرحلة "
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {inputsMessage && (
                   <p className="text-red-300 text-sm py-1 px-1">
-                    ادخل البريد الالكترونى
+                    ادخل تكلفة الرحلة  
                   </p>
                 )}
               </div>
             </div>
-            <div className=" flex flex-wrap gap-3">
+            <div className=" flex flex-wrap gap-2">
+             
+            <div className="w-full px-3 sm:w-1/2">
+                        <div className="mb-5">
+                            <label  className="mb-3 block text-base font-medium text-white ">
+                                   وقت الإقلاع  
+                            </label>
+                            <input type="time"  value={tripTime} onChange={(e)=> settriptripTime(e.target.value)}
+                                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                                {inputsMessage&& <p className='text-red-600 py-1 px-1'>ادخل وقت الإقلاع</p>}
+                        </div>
+                    </div>
               <div className="flex-grow ">
+              <label  className="mb-3 block text-base font-medium text-white ">
+                                      وصف عن الرحلة (إختياري)  
+                 </label>
                 <input
                   type="text"
-                  value={employeePassword}
-                  onChange={(e) => setEmployeePassword(e.target.value)}
-                  placeholder="كلمة المرور"
+                  value={tripPasswordConfirm}
+                  onChange={(e) => settripPasswordConfirm(e.target.value)}
+                  placeholder="وصف عن رحلتك"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    ادخل كلمة المرور
-                  </p>
-                )}
-              </div>
-              <div className="flex-grow ">
-                <input
-                  type="text"
-                  value={employeePasswordConfirm}
-                  onChange={(e) => setEmployeePasswordConfirm(e.target.value)}
-                  placeholder="تأكيد كلمة المرور"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    كلمتى المرور غير متطابقتين
-                  </p>
-                )}
               </div>
             </div>
             <div className=" flex flex-wrap gap-3">
               <div className="flex-grow ">
-                <input
-                  type="tel"
-                  value={employeePhone}
-                  onChange={(e) => setEmployeePhone(e.target.value)}
-                  placeholder="رقم الهاتف"
-                  dir="rtl"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
+              <label  className="mb-3 block text-base font-medium text-white "> من دولة  </label>
+                        <select id="countries" className=" border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option >اختار اسم الدولة</option>
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="FR">France</option>
+                            <option value="DE">Germany</option>
+                        </select>
                 {inputsMessage && (
                   <p className="text-red-300 text-sm py-1 px-1">
                     أدخل رقم هاتف صحيح
@@ -273,39 +271,33 @@ function Userpage() {
                 )}
               </div>
               <div className="flex-grow ">
-                <input
-                  type="text"
-                  value={branchNumber}
-                  onChange={(e) => setBranchNumber(e.target.value)}
-                  placeholder=" رقم الفرع"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
+              <label  className="mb-3 block text-base font-medium text-white "> إلي دولة  </label>
+                        <select id="countries" className=" border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5  dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                            <option >اختار اسم الدولة</option>
+                            <option value="US">United States</option>
+                            <option value="CA">Canada</option>
+                            <option value="FR">France</option>
+                            <option value="DE">Germany</option>
+                        </select>
                 {inputsMessage && (
                   <p className="text-red-300 text-sm py-1 px-1">
-                    أدخل رقم الفرع
+                    أدخل رقم هاتف صحيح
                   </p>
                 )}
               </div>
+               
             </div>
 
             <div>
-              {updateMode ? (
-                <button
-                  onClick={handleEmpUpdate}
-                  disabled={loader}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-                >
-                  تحديث المستخدم
-                </button>
-              ) : (
+           
                 <button
                   onClick={(e) => handleEmpRegister(e)}
                   disabled={loader}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تسجيل مستخدم جديد
+                    إنشاء
                 </button>
-              )}
+          
             </div>
           </form>
         </div>
@@ -378,7 +370,7 @@ function Userpage() {
         </thead>
         <tbody>
           {/* Mapping branches data to table rows */}
-          {employees.map((emp, index) => {
+          {trips.map((emp, index) => {
             return (
               <tr
                 key={emp.id}
@@ -448,4 +440,4 @@ function Userpage() {
   );
 }
 
-export default Userpage;
+export default Trippage;
