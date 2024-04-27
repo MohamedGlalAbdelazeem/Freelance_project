@@ -47,14 +47,11 @@ function ClientPage() {
         },
       })
       .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-          return;
-        }
         setClients(response.data.data);
       })
       .catch(function (error) {
         console.error("Error:", error);
+        handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
@@ -129,6 +126,9 @@ function ClientPage() {
       setClientMail(updatedClient.email);
       setClientPhone(updatedClient.phone_number);
       setBranchNumber(updatedClient.branch_id);
+      setCountriesNumber(updatedClient.countries_id);
+      setClientImage(updatedClient.image);
+      setClientNotes(updatedClient.notes);
     }
   };
   const handleClientUpdate = () => {
@@ -328,7 +328,12 @@ function ClientPage() {
                           : "SVG, PNG, JPG or GIF (MAX. 800x400px)"}
                       </p>
                     </div>
-                    <input id="dropzone-file" type="file" className="hidden" />
+                    <input
+                      id="dropzone-file"
+                      type="file"
+                      className="hidden"
+                      onChange={(e) => setClientImage(e.target.files[0].name)}
+                    />
                   </label>
                 </div>
 
@@ -408,7 +413,6 @@ function ClientPage() {
         <thead>
           <tr>
             {[
-              "",
               "الترتيب",
               "الاسم",
               "البريد",
@@ -436,9 +440,7 @@ function ClientPage() {
                 key={client.id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
-                <td className="w-full lg:w-auto p-0 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-                  <input type="checkbox" />
-                </td>
+                
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
                   {index + 1}
                 </td>

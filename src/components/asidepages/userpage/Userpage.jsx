@@ -16,14 +16,15 @@ function Userpage() {
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
-  const [searchValue , setSearchValue] = useState("");
-  const userToken = localStorage.getItem('user_token');
+  const [searchValue, setSearchValue] = useState("");
+  const userToken = localStorage.getItem("user_token");
+  const [updateEmpID, setUpdateEmpID] = useState("");
 
   const [employees, setEmployees] = useState([]);
   const [searchWay, setSearchWay] = useState("ID");
   const Naviagate = useNavigate();
 
-// hande unuthenticated
+  // handle Unauthenticated
   const handleUnauthenticated = () => {
     alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");
     Naviagate("/Login");
@@ -33,7 +34,7 @@ function Userpage() {
   useEffect(() => {
     fetchEmployees();
   }, []);
-  
+
   const fetchEmployees = () => {
     setLoader(true);
     axios
@@ -56,7 +57,7 @@ function Userpage() {
         setLoader(false);
       });
   };
-// handle employee register
+  // handle employee register
   const handleEmpRegister = (e) => {
     setLoader(true);
     e.preventDefault();
@@ -102,7 +103,7 @@ function Userpage() {
         setLoader(false);
       });
   };
-  const deleteEmp = (id) => { 
+  const deleteEmp = (id) => {
     setLoader(true);
     axios
       .delete(`${baseUrl}employees/${id}`, {
@@ -116,8 +117,8 @@ function Userpage() {
       })
       .catch(function (error) {
         console.error("Error fetching", error);
-      })
-  }
+      });
+  };
   const updateEmp = (id) => {
     setUpdateEmpID(id);
     setUpdateMode(true);
@@ -162,7 +163,7 @@ function Userpage() {
         setLoader(false);
       });
   };
-  
+
   const handleSearch = (e) => {
     e.preventDefault();
     setLoader(true);
@@ -356,7 +357,6 @@ function Userpage() {
         <thead>
           <tr>
             {[
-              "",
               "الترتيب",
               "الاسم",
               "البريد",
@@ -384,9 +384,6 @@ function Userpage() {
                 key={emp.id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
-                <td className="w-full lg:w-auto p-0 text-gray-800 text-center border border-b block lg:table-cell relative lg:static">
-                  <input type="checkbox" />
-                </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
                   {index + 1}
                 </td>
