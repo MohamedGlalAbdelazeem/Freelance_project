@@ -15,10 +15,12 @@ function Userpage() {
   const [employeePasswordConfirm, setEmployeePasswordConfirm] = useState("");
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
+  
   const [updateMode, setUpdateMode] = useState(false);
+  const [updateEmpID, setUpdateEmpID] = useState("");
+  
   const [searchValue, setSearchValue] = useState("");
   const userToken = localStorage.getItem("user_token");
-  const [updateEmpID, setUpdateEmpID] = useState("");
 
   const [employees, setEmployees] = useState([]);
   const [searchWay, setSearchWay] = useState("ID");

@@ -6,6 +6,9 @@
 link{
     text-decoration: none;
 }
+html{
+    scroll-behavior: smooth;
+}
 /* width */
 ::-webkit-scrollbar {
     width: 7px;

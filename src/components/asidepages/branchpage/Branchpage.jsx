@@ -3,7 +3,6 @@ import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrow
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
@@ -13,16 +12,19 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
+import { ScrollUp } from "../../ScrollUp";
 
 function Branchpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [branches, setBranches] = useState([]);
   const [loader, setLoader] = useState(true);
-  const [showMessage, setShowMessage] = useState(false);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem("user_token");
   const [branchStatus, setBranchStatus] = useState(false);
+  const [updateMode, setUpdateMode] = useState(false);
+  const [updateBranchID, setUpdateBranchID] = useState("");
   const [searchValue, setSearchValue] = useState("");
+
   const schema = z.object({
     branchName: z.string().min(1, { message: "ادخل اسم الفرع" }),
     branchLocation: z.string().min(1, { message: "ادخل عنوان الفرع" }),
@@ -34,14 +36,16 @@ function Branchpage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    setValue,
+    getValues,
+    formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
-
-  // handel show branch
+  
   useEffect(() => {
     fetchBranches();
   }, []);
+
   const fetchBranches = () => {
     axios
       .get(`${baseUrl}branches`, {
@@ -63,7 +67,6 @@ function Branchpage() {
       });
   };
 
-  // handle unuthenticated
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
       type: "error",
@@ -82,47 +85,46 @@ function Branchpage() {
     hotline,
   }) => {
     setLoader(true);
-      if (timeTo <= timeFrom) {
-        toast("عدل الوقت ينجم", { type: "error" })
-        return;
-      }
-      await axios
-        .post(
-          `${baseUrl}branches`,
-          {
-            name: branchName,
-            location: branchLocation,
-            from: timeFrom,
-            to: timeTo,
-            hot_line: hotline,
-            status: branchStatus,
+    if (timeTo <= timeFrom) {
+      toast("عدل الوقت ينجم", { type: "error" });
+      return;
+    }
+    await axios
+      .post(
+        `${baseUrl}branches`,
+        {
+          name: branchName,
+          location: branchLocation,
+          from: timeFrom,
+          to: timeTo,
+          hot_line: hotline,
+          status: branchStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
           },
-          {
-            headers: {
-              Authorization: `Bearer ${userToken}`,
-            },
-          }
-        )
-        .then(() => {
-          toast("تم إنشاء الفرع بنجاح", { type: "success" })
-          fetchBranches();
-        })
-        .catch((response) => {
-          if (response.response.data.message == "Already_exist") {
-            toast("هذا الفرع موجود بالفعل", { type: "error" })
-          }
-          if (response.response.data.message == "Unauthenticated") {
-            handleUnauthenticated();
-          }
-        }).finally(() => {
-          setLoader(false);
-        
-        })
-    
+        }
+      )
+      .then(() => {
+        toast("تم إنشاء الفرع بنجاح", { type: "success" });
+        fetchBranches();
+      })
+      .catch((response) => {
+        if (response.response.data.message == "Already_exist") {
+          toast("هذا الفرع موجود بالفعل", { type: "error" });
+        }
+        // if (response.response.data.message == "Unauthenticated") {
+        //   handleUnauthenticated();
+        // }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
   };
 
-  // handel delete
   function deleteBranch(id) {
+    setLoader(true);
     axios
       .delete(`${baseUrl}branches/${id}`, {
         headers: {
@@ -131,26 +133,13 @@ function Branchpage() {
       })
       .then(function (response) {
         if (response.status === 401) {
-          setShowMessage(true);
-          setLoader(true);
-          alert("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية");
-          setTimeout(() => {
-            setShowMessage(false);
-          }, 2000);
-          Naviagate("/Login");
+          handleUnauthenticated();
         } else if (response.status === 204) {
-          setLoader(false);
-          setBranches((prevBranches) =>
-            prevBranches.filter((branch) => branch.id !== id)
-          );
-          setShowMessage(true);
-          setTimeout(() => {
-            setShowMessage(false);
-          }, 1000);
+          toast.success("تم حذف الفرع بنجاح");
+          fetchBranches();
         } else {
           console.error("Unexpected response status:", response.status);
-          alert("من فضلك اعمل ريفريش للمتصفح ");
-          setLoader(true);
+          toast.warning("حدث خطأ غير متوقع");
         }
       })
       .catch(function (error) {
@@ -161,54 +150,73 @@ function Branchpage() {
           error.response.status === 401 &&
           error.response.data.message === "Unauthenticated"
         ) {
-          // Handle "Unauthenticated" error
-          alert("يجب عليك التسجيل مرة اخري لانتهاء وقت الصلاحية");
+          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+            type: "error",
+          });
         } else {
-          // Handle other errors
           console.log("Error deleting branch:", error);
         }
       });
+    setLoader(false);
   }
 
-  // handle update branch import axios from 'axios';
+  const updateBranch = async () => {
+    setLoader(true);
+    await axios
+      .post(
+        `${baseUrl}branches/${updateBranchID}`,
+        {
+          name: getValues("branchName"),
+          location: getValues("branchLocation"),
+          from: getValues("timeFrom"),
+          to: getValues("timeTo"),
+          hot_line: getValues("hotline"),
+          status: branchStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(() => {
+        toast("تم تحديث الفرع بنجاح", { type: "success" });
+        fetchBranches();
+      })
+      .catch((response) => {
+        if (response.response.data.message == "Already_exist") {
+          toast("هذا الفرع موجود بالفعل", { type: "error" });
+        }
+        console.log("Error updating branch:", response.response.data.message);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
-  // async function handleUpdate(id) {
-  //   const updatedBranch = branches.find((branch) => branch.id === id);
-  //   if (updatedBranch) {
-  //     try {
-  //       const url = `http://127.0.0.1:8000/api/branches/${id}`;
-  //       const response = await axios.post(url, {
-  //         branchName: updatedBranch.name,
-  //         branchLocation: updatedBranch.location,
-  //         timeFrom: updatedBranch.from,
-  //         timeTo: updatedBranch.to,
-  //         branchHotline: updatedBranch.hotLine,
-  //         branchStatus: updatedBranch.status,
-  //       }, {
-  //         headers: {
-  //           'Authorization': `Bearer ${userToken}`
-  //       }
-  //       });
-  //       if (response.status === 200) {
-  //         console.log('Branch updated successfully');
-  //         // Optionally, perform further actions after successful update
-  //       } else {
-  //         console.error('Failed to update branch');
-  //         // Optionally, handle failure cases
-  //       }
-  //     } catch (error) {
-  //       console.error('Error occurred while updating branch:', error);
-  //       // Optionally, handle errors
-  //     }
-  //   }
-  // }
+  const handleSearch = (e) => {
+    setLoader(true)
+    e.preventDefault();
+    axios.get(`${baseUrl}branches/${searchValue}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    }).then((response) => {
+      setBranches([response.data.data]);
+    }).catch((error) => { 
+      console.error("Error fetching branches:", error);
+      toast(error.response.data.message)
+    }).finally(() => {
+      setLoader(false);
+    })
+  };
 
   return (
     <main className="branchTable">
       {/* add branch form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
-          <form onSubmit={handleSubmit(storeBranch)}>
+          <form>
             <div className="mb-5">
               <input
                 type="text"
@@ -305,36 +313,30 @@ function Branchpage() {
             </div>
 
             <div>
-              <button
-                type="submit"
-                className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-              >
-                إنشاء فرع جديد
-              </button>
+              {updateMode ? (
+                <button
+                  type="submit"
+                  onClick={handleSubmit(updateBranch)}
+                  disabled={isSubmitting}
+                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                >
+                  تحديث الفرع
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  onClick={handleSubmit(storeBranch)}
+                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                >
+                  تسجيل فرع جديد
+                </button>
+              )}
             </div>
           </form>
         </div>
       </div>
       <div className="divider"></div>
-
-      {/* show message for any modify in branch */}
-      {showMessage && (
-        <div className="fixed z-50 flex w-full max-w-sm overflow-hidden bg-white rounded-lg shadow-md dark:bg-gray-800">
-          <div className="flex items-center justify-center w-12 bg-emerald-500 text-white">
-            <CheckCircleIcon />
-          </div>
-          <div className="px-4 py-2 -mx-3">
-            <div className="mx-3">
-              <span className="font-semibold text-emerald-500 dark:text-emerald-400">
-                Success
-              </span>
-              <p className="text-sm text-gray-600 dark:text-gray-200">
-                تم حذف الفرع بنجاح
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Search input form */}
       <div className="my-3">
@@ -346,12 +348,15 @@ function Branchpage() {
             <input
               type="search"
               id="default-search"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
               className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="البحث من عن طريق ID "
               required
             />
             <button
               type="submit"
+              onClick={handleSearch}
               className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               بحث{" "}
@@ -400,9 +405,20 @@ function Branchpage() {
         <tbody>
           {/* Mapping branches data to table rows */}
           {branches.map((branch, index) => {
+            const {
+              name,
+              id,
+              location,
+              hotLine,
+              status,
+              show_client,
+              from,
+              to,
+              created_at,
+            } = branch;
             return (
               <tr
-                key={branch.id}
+                key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -410,21 +426,21 @@ function Branchpage() {
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
-                    {branch.name}
+                    {name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {branch.location}
+                    {location}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {branch.hotLine}
+                    {hotLine}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
-                  {branch.status === "مفعل" ? (
+                  {status === "مفعل" ? (
                     <div className="bg-green-500 text-white text-sm rounded-md">
                       مفعل
                     </div>
@@ -435,7 +451,7 @@ function Branchpage() {
                   )}
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  {branch.show_client === "مفعل" ? (
+                  {show_client === "مفعل" ? (
                     <div className="bg-green-500 text-white text-sm rounded-md">
                       مفعل
                     </div>
@@ -448,29 +464,39 @@ function Branchpage() {
 
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {branch.from}
+                    {from}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {branch.to}
+                    {to}
                   </span>
                 </td>
 
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
-                    {branch.created_at}
+                    {created_at}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <button
-                    onClick={() => handleUpdate(branch.id)}
+                    onClick={() => {
+                      ScrollUp();
+                      setUpdateBranchID(id);
+                      setUpdateMode(true);
+                      setValue("branchName", name);
+                      setValue("branchLocation", location);
+                      setValue("timeFrom", from);
+                      setValue("timeTo", to);
+                      setValue("hotline", hotLine);
+                      setBranchStatus(status === "مفعل" ? true : false);
+                    }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >
                     <DriveFileRenameOutlineIcon />
                   </button>
                   <button
-                    onClick={() => deleteBranch(branch.id)}
+                    onClick={() => deleteBranch(id)}
                     className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
                   >
                     <DeleteForeverIcon />
