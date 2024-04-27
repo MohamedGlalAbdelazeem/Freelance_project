@@ -25,14 +25,21 @@ function Asidebar() {
     if (userrolename === "admin") {
         asidebarItems = [
             { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
-            { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> }
-        ];
+            { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الراحلات", path: "/Mainpage/", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/Categoriespage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+
+
+          ];
     } else if (userrolename === "super_admin") {
         asidebarItems = [
             { text: "إدارة الفروع", path: "/Mainpage/Branchpage", icon: <AddHomeWorkOutlinedIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة المستخدمين", path: "/Mainpage/Userpage", icon: <GroupAddOutlinedIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
             { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الراحلات", path: "/Mainpage/", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/Categoriespage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+
         ];
     }
 
