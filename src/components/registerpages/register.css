@@ -9,34 +9,19 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
 }
  
-.spinner {
-    position: fixed;
-    width: 300px;
-    height: 300px;
-    display: grid;
-    animation: spinner-plncf9 4s infinite;
-    top: 40%;
-    left: 36%;
-    z-index:99999;
- }
- .spinner::before,
- .spinner::after {
-    content: "";
-    grid-area: 1/1;
-    border: 35px dashed;
-    border-radius: 50%;
-    border-color: #474bff #474bff #0000 #0000;
-    mix-blend-mode: darken;
-    animation: spinner-plncf9 1s infinite linear;
- }
- 
- .spinner::after {
-    border-color: #0000 #0000 #dbdcef #dbdcef;
-    animation-direction: reverse;
- }
- 
- @keyframes spinner-plncf9 {
-    100% {
-       transform: rotate(1turn);
-    }
+#loading-spinner{
+   animation: loading-spinner .5s linear infinite;
+   position: absolute;
+   top: 45%;
+   left: 45%;
+   transform: translate(-50%, -50%);
+}
+
+@keyframes loading-spinner {
+   from {
+     transform: rotate(0deg);
+   }
+   to {
+     transform: rotate(360deg);
+   }
  }
