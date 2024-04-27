@@ -247,8 +247,8 @@ function ClientPage() {
               <div className="flex-grow ">
                 <input
                   type="text"
-                  value={branchNumber}
-                  onChange={(e) => setBranchNumber(e.target.value)}
+                  value={clientAddress}
+                  onChange={(e) => setClientAddress(e.target.value)}
                   placeholder="العنوان"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
@@ -261,8 +261,8 @@ function ClientPage() {
               <div className="flex-grow ">
                 <input
                   type="text"
-                  value={clientPhone}
-                  onChange={(e) => setClientPhone(e.target.value)}
+                  value={branchNumber}
+                  onChange={(e) => setBranchNumber(e.target.value)}
                   placeholder="رقم الفرع"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
@@ -275,8 +275,8 @@ function ClientPage() {
               <div className="flex-grow ">
                 <input
                   type="text"
-                  value={branchNumber}
-                  onChange={(e) => setBranchNumber(e.target.value)}
+                  value={countriesNumber}
+                  onChange={(e) => setCountriesNumber(e.target.value)}
                   placeholder="رمز المدينة"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
@@ -290,8 +290,8 @@ function ClientPage() {
             <div className=" flex flex-wrap gap-3">
               <div className="flex-grow ">
                 <textarea
-                  value={clientPhone}
-                  onChange={(e) => setClientPhone(e.target.value)}
+                  value={clientNotes}
+                  onChange={(e) => setClientNotes(e.target.value)}
                   placeholder="ملاحظات"
                   className="w-full min-h-36 rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
