@@ -4,18 +4,20 @@ import AddHomeWorkOutlinedIcon from '@mui/icons-material/AddHomeWorkOutlined';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
+import { toast } from "react-toastify";
 
 function Asidebar() {
     const Navigate = useNavigate();
 
     function handelLogout() {
-        if (localStorage.getItem('user_token')) {
-            localStorage.removeItem("user_role_name");
-            localStorage.removeItem("user_token");
-            Navigate("/Login");
-        } else {
-            return null;
-        }
+      if (localStorage.getItem("user_token")) {
+        localStorage.removeItem("user_token");
+        localStorage.removeItem("user_role_name");
+        Navigate("/Login");
+        toast("تم تسجيل الخروج بنجاح", { type: "success" });
+      } else {
+        return null;
+      }
     }
 
     const userrolename = localStorage.getItem('user_role_name');

@@ -7,15 +7,18 @@ import { useNavigate , Link } from 'react-router-dom';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
  
 import "./home.css"
+import { toast } from 'react-toastify';
  
 function Header() {
     const Navigate = useNavigate();
     
     //handel logout 
     function handelLogout() {
-      if (localStorage.getItem('user')) {
-          localStorage.removeItem("user")
-          Navigate("/Login")
+      if (localStorage.getItem('user_token')) {
+        localStorage.removeItem("user_token");
+        localStorage.removeItem("user_role_name");
+        Navigate("/Login")
+        toast("تم تسجيل الخروج بنجاح", { type: "success"});
       } else {
           return null;
       }

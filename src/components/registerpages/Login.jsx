@@ -1,51 +1,47 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import "./register.css"
-import axios from 'axios';
-import { createContext } from 'react';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./register.css";
+import axios from "axios";
+import { createContext } from "react";
+import { toast } from "react-toastify";
 
-
-export  const userRole = createContext()
+export const userRole = createContext();
 function Login() {
-    const Navigate = useNavigate();
-    const [email , setEmail ] = useState("");
-    const [password , setPassword ] = useState("");
-    const [accept , setAccetp] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(false);
-    const [successMess , setSuccessMess] = useState(false);
-    const [loader , setLoader ] = useState(true);
-     
-    
+  const Navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [accept, setAccetp] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(false);
+  const [successMess, setSuccessMess] = useState(false);
+  const [loader, setLoader] = useState(false);
 
-// submit login form 
-const submitForm = async (e) => {
+
+  // submit login form
+  const submitForm = async (e) => {
     e.preventDefault();
     setAccetp(true);
     if (email === "" || password.length < 5) {
-        return;
+      return;
     }
     setLoader(true);
     try {
-        const res = await axios.post(`http://127.0.0.1:8000/api/login`, {
-            email: email,
-            password: password
-        });
-        setLoader(false);
-       
-        if (res.status === 200) {
-            localStorage.setItem("user_token",res.data.access_token);
-            localStorage.setItem("user_role_name",res.data.user.role_name );
-            Navigate("/Mainpage")
-            setSuccessMess(true);
-        }
+      const res = await axios.post(`http://127.0.0.1:8000/api/login`, {
+        email: email,
+        password: password,
+      });
+      setLoader(false);
+
+      if (res.status === 200) {
+        localStorage.setItem("user_token", res.data.access_token);
+        localStorage.setItem("user_role_name", res.data.user.role_name);
+        Navigate("/Mainpage");
+        toast("تم تسجيل الدخول بنجاح", { type: "success"});
+      }
     } catch (error) {
-        setLoader(false);
-        setErrorMessage(true);
-        setTimeout(() => {
-            window.location.reload();
-        }, 1500);
+      setLoader(false);
+      toast("خطأ فى تسجيل الدخول", { type: "error"});
     }
-};     
+  };
 
   return (
     <section className="bg-white dark:bg-gray-900">
@@ -182,6 +178,7 @@ const submitForm = async (e) => {
         )}
       </div>
     </section>
-  );}
+  );
+}
 
-export default Login
+export default Login;

@@ -8,13 +8,16 @@ import Userprofilepage from "./components/header/Userprofilepage"
 import ClientPage from "./components/asidepages/clientPage/ClientPage"
 import Categoriespage from "./components/asidepages/categoriespage/Categoriespage"
 import Trippage from "./components/asidepages/trippage/Trippage"
+  import { ToastContainer } from "react-toastify";
+
+  import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   
 
   return (
     <>
-    <Routes>
+      <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/Forgetpasssword" element={<Forgetpasssword />} />
@@ -26,10 +29,10 @@ function App() {
           <Route path="Trippage" element={<Trippage />} />
           <Route path="Userprofilepage" element={<Userprofilepage />} />
         </Route>
-    </Routes>
-
+      </Routes>
+        <ToastContainer />
     </>
-  )
+  );
 }
 
 export default App

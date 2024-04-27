@@ -12,15 +12,14 @@ aside li{
 }
 
 @media (max-width:600px) {
-    #asidebar:hover{
-    transition: 1s ease-in-out;
-      width: 40%;
-    }
    #admin{
     display: none;
    }
     #logout{
         display: none;
+    }
+    #asidebar{
+        width: 70px;
     }
 
 }
