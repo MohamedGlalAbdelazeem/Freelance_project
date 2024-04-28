@@ -1,5 +1,3 @@
-import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
@@ -7,13 +5,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 import axios from "axios";
-import { useForm ,  } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
-import ReactPaginate from 'react-paginate';
-
 
 function Categoriespage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
@@ -28,6 +24,7 @@ function Categoriespage() {
 
   const schema = z.object({
     categoryName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
+
   });
 
   const {
@@ -37,26 +34,22 @@ function Categoriespage() {
     reset,
     getValues,
     formState: { errors, isSubmitting },
-   
   } = useForm({ resolver: zodResolver(schema) });
-
-
 
   useEffect(() => {
     fetchData();
   }, []);
 
   // Pagination
-  const items =8
-  const [current , setcurrent] = useState(1)
-  const NbPage = Math.ceil(branches.length / items)
-  const offset = (current - 1) * items
-  const startIndex =  (current - 1) * items
-  const endIndex = startIndex + items
-  const DataPerPage = branches.slice(startIndex , endIndex)
-  
+  const items = 8;
+  const [current, setcurrent] = useState(1);
+  const NbPage = Math.ceil(branches.length / items);
+  const offset = (current - 1) * items;
+  const startIndex = (current - 1) * items;
+  const endIndex = startIndex + items;
+  const DataPerPage = branches.slice(startIndex, endIndex);
 
-// fetch data from api
+  // fetch data from api
   const fetchData = () => {
     setLoader(true);
     axios
@@ -74,14 +67,13 @@ function Categoriespage() {
         }
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
+        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
         handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
       });
   };
-
 
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
@@ -93,15 +85,13 @@ function Categoriespage() {
     localStorage.removeItem("user_role_name");
   };
 
-  const storecategory = async ({
-    categoryName,
-  }) => {
+  const storeCategory = async () => {
     setLoader(true);
     await axios
       .post(
         `${baseUrl}categories`,
         {
-          name: categoryName,
+          name: getValues("categoryName"),
         },
         {
           headers: {
@@ -109,8 +99,8 @@ function Categoriespage() {
           },
         }
       )
-      .then((res) => {
-        toast("تم إنشاء الرحلة  بنجاح", { type: "success" });
+      .then(() => {
+        toast.success("تم إنشاء الرحلة  بنجاح");
         reset();
         fetchData();
       })
@@ -161,15 +151,14 @@ function Categoriespage() {
     setLoader(false);
   }
 
- 
-  const updateBranch = async () => {
+  const updateBranch = () => {
     setLoader(true);
-    await axios
+    axios
       .post(
         `${baseUrl}categories/${updateBranchID}`,
         {
           name: getValues("categoryName"),
-          status: branchStatus,
+          status: branchStatus ? "1" : "0",
         },
         {
           headers: {
@@ -177,9 +166,10 @@ function Categoriespage() {
           },
         }
       )
-      .then(() => {
+      .then((response) => {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
         fetchData();
+        console.log(response.data.data);
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
@@ -189,10 +179,9 @@ function Categoriespage() {
       })
       .finally(() => {
         setLoader(false);
-       setUpdateMode(false);
-       reset();
+        setUpdateMode(false);
+        reset();
       });
-     
   };
 
   const handleSearch = (e) => {
@@ -214,9 +203,9 @@ function Categoriespage() {
       .finally(() => {
         setLoader(false);
       });
-};
+  };
 
-return (
+  return (
     <main className="branchTable">
       {/* add branch form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
@@ -237,40 +226,41 @@ return (
             </div>
             <div className="mb-5 pt-3">
               <div className="-mx-3 flex flex-wrap">
-               
-                   {
-                    updateMode &&
-                    <div className="w-full px-3 sm:w-1/2">
-                              <label className="text-white">تفعيل الرحلة أو إلفاء تفعيل الرحلة  ؟</label>
-                              <div className="mb-5">
-                                <Switch
-                                checked={branchStatus === true} 
-                                onChange={(e) =>
-                                  setBranchStatus(e.target.checked ? true : false)}color="success"/>
-                            </div>
-                      </div>
-                   }
+                {updateMode && (
+                  <div className="w-full px-3 sm:w-1/2">
+                    <label className="text-white">
+                      تفعيل الرحلة أو إلفاء تفعيل الرحلة ؟
+                    </label>
+                    <div className="mb-5">
+                      <Switch
+                        checked={branchStatus}
+                        onChange={(e) => {
+                          setBranchStatus(e.target.checked);
+                        }}
+                        color="success"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
             <div>
               {updateMode ? (
                 <button
-                  type="submit"
-                  onClick={()=>{handleSubmit(updateBranch)}}
+                  onClick={handleSubmit(updateBranch)}
                   disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تحديث الرحلة 
+                  تحديث الرحلة
                 </button>
               ) : (
                 <button
-                  type="submit"
                   disabled={isSubmitting}
-                  onClick={handleSubmit(storecategory)}
+                  onClick={handleSubmit(storeCategory)}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  إنشاء الرحلة 
+                  إنشاء الرحلة
                 </button>
               )}
             </div>
@@ -305,7 +295,7 @@ return (
           </div>
         </form>
       </div>
-          
+
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
         <thead>
@@ -331,12 +321,7 @@ return (
         <tbody>
           {/* Mapping branches data to table rows */}
           {branches.map((branch, index) => {
-            const {
-              name,
-              id,
-              status,
-              created_at,
-            } = branch;
+            const { name, id, status, created_at } = branch;
             return (
               <tr
                 key={id}
@@ -367,7 +352,6 @@ return (
                   </span>
                 </td>
 
-
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <button
                     onClick={() => {
@@ -393,58 +377,58 @@ return (
           })}
         </tbody>
       </table>
-            {/* loader */}
-            {loader && (
-                          <svg
-                            id="loading-spinner"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="100"
-                            height="100"
-                            viewBox="0 0 48 48"
-                          >
-                            <g fill="none">
-                              <path
-                                id="track"
-                                fill="#C6CCD2"
-                                d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
-                              />
-                              <path
-                                id="section"
-                                fill="#3F4850"
-                                d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
-                              />
-                            </g>
-                          </svg>
-                        )}
+      {/* loader */}
+      {loader && (
+        <svg
+          id="loading-spinner"
+          xmlns="http://www.w3.org/2000/svg"
+          width="100"
+          height="100"
+          viewBox="0 0 48 48"
+        >
+          <g fill="none">
+            <path
+              id="track"
+              fill="#C6CCD2"
+              d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
+            />
+            <path
+              id="section"
+              fill="#3F4850"
+              d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
+            />
+          </g>
+        </svg>
+      )}
       {/* Pagination */}
-              <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
+      <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
+        <div className="flex justify-center">
+          <nav className="flex space-x-2" aria-label="Pagination">
+            <a
+              href="#"
+              className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
+            >
+              Previous
+            </a>
+            {Array.from({ length: NbPage }, (_, i) => i + 1).map((page) => (
+              <a
+                key={page} // Make sure to include a unique key for each element in the array
+                href="#"
+                className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
+              >
+                {page}
+              </a>
+            ))}
 
-                  <div className="flex justify-center">
-                      <nav className="flex space-x-2" aria-label="Pagination">
-                          <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
-                              Previous
-                          </a>
-                          {Array.from({ length: NbPage }, (_, i) => i + 1).map((page) => (
-                            <a
-                              key={page} // Make sure to include a unique key for each element in the array
-                              href="#"
-                              className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
-                            >
-                              {page}
-                            </a>
-                          ))}
-
-                        
-                          <a   href="#" className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
-                              Next
-                          </a>
-                      </nav>
-                  </div>
-              </div>
-    
-                
-
-
+            <a
+              href="#"
+              className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
+            >
+              Next
+            </a>
+          </nav>
+        </div>
+      </div>
     </main>
   );
 }
