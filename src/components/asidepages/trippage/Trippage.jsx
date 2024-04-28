@@ -21,7 +21,7 @@ function Trippage() {
   const userToken = localStorage.getItem("user_token");
   const [branchStatus, setBranchStatus] = useState(false);
   const [updateMode, setUpdateMode] = useState(false);
-  const [updateBranchID, setUpdateBranchID] = useState("");
+  const [updateTripsID, setupdateTripsID] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
 
@@ -230,14 +230,19 @@ function deleteTrips(id) {
   }
 
  
-  const updateBranch = async () => {
+  const updateTrips = async () => {
     setLoader(true);
     await axios
       .post(
-        `${baseUrl}categories/${updateBranchID}`,
+        `${baseUrl}trips/${updateTripsID}`,
         {
-          name: getValues("categoryName"),
-          status: branchStatus,
+          name: getValues("tirpName"),
+          cost: getValues("tirpCost"),
+          take_off: getValues("tirpDate"),
+          from_countries_id: getValues("tripFrom"),
+          to_countries_id: getValues("tirpDescription"),
+          description: getValues("categoryName"),
+          category_id: getValues("category_id"),
         },
         {
           headers: {
@@ -245,7 +250,7 @@ function deleteTrips(id) {
           },
         }
       )
-      .then(() => {
+      .then((res) => {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
         fetchData();
       })
@@ -330,7 +335,7 @@ return (
                 <textarea
                  rows="1"
                 {...register("tirpDescription")}
-                placeholder="وصف بسيط عن الرجلة  "
+                placeholder="وصف بسيط عن الرحلة  "
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
             </div>
@@ -409,7 +414,7 @@ return (
               {updateMode ? (
                 <button
                   type="submit"
-                  onClick={()=>{handleSubmit(updateBranch)}}
+                  onClick={handleSubmit(updateTrips)}
                   disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
@@ -570,9 +575,15 @@ return (
                   <button
                     onClick={() => {
                       ScrollUp();
-                      setUpdateBranchID(id);
+                      setupdateTripsID(id);
                       setUpdateMode(true);
-                      setValue("categoryName", name);
+                      setValue("tirpName", name);
+                      setValue("tripCost", cost);
+                      setValue("tripDescription", description);
+                      setValue("tripStatus", status === "مفعل" ? true : false);
+                      setValue("tripFrom", from.en_short_name);
+                      setValue("tripTo", to.en_short_name);
+                      setValue("category_id", to.category_id);
                       setBranchStatus(status === "مفعل" ? true : false);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
