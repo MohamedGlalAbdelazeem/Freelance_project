@@ -160,7 +160,7 @@ function fetchcategories() {
     setLoader(true);
     await axios
       .post(
-        `${baseUrl}categories`,
+        `${baseUrl}trips`,
         {
           name: tirpName,
           cost: tirpCost,
@@ -178,8 +178,8 @@ function fetchcategories() {
       )
       .then((res) => {
         toast("تم إنشاء الرحلة  بنجاح", { type: "success" });
-        reset();
         fetchData();
+        reset(); 
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
