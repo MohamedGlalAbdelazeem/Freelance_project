@@ -24,8 +24,19 @@ function Trippage() {
   const [updateBranchID, setUpdateBranchID] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
+
+  // show and hide more 
+  
+
+
   const schema = z.object({
-    categoryName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
+    tirpName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
+    tirpCost: z.string().min(1, { message: "ادخل تكلفة الرحلة" }),
+    tirpDate: z.string().min(1, { message: "ادخل تاريخ الرحلة" }),
+    tripFrom: z.string().min(1, { message: "ادخل المنطقة من" }),
+    tripTo: z.string().min(1, { message: "ادخل المنطقة الي" }),
+    tirpDescription: z.string().min(1, { message: "ادخل وصف الرحلة" }),
+    categoryName: z.string().min(1, { message: "ادخل نوع الرحلة" }),
   });
 
   const {
@@ -38,10 +49,16 @@ function Trippage() {
   } = useForm({ resolver: zodResolver(schema) });
 
 
+ 
+
 
   useEffect(() => {
     fetchData();
+    fetchcountries();
+    fetchcategories();
   }, []);
+
+
 
   // Pagination
   const items =8
@@ -51,7 +68,47 @@ function Trippage() {
   const startIndex =  (current - 1) * items
   const endIndex = startIndex + items
   const DataPerPage = trips.slice(startIndex , endIndex)
-  
+
+
+
+
+
+const [showCouncountries, setShowCountries] = useState([]);
+const [showcategories, setShowcategories] = useState([]);
+function fetchcountries() {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}countries`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setShowCountries(response.data.data);
+    })
+    .catch(function (error) {
+      console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
+      handleUnauthenticated();
+    })
+}
+ 
+function fetchcategories() {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}categories/selection/id-name`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setShowcategories(response.data.data);
+    })
+    .catch(function (error) {
+      console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
+      handleUnauthenticated();
+    })
+}
+ 
 
 // fetch data from api
   const fetchData = () => {
@@ -68,7 +125,6 @@ function Trippage() {
         } else {
           setLoader(false);
           settrips(response.data.data);
-          console.log(response.data.data);
         }
       })
       .catch(function (error) {
@@ -78,8 +134,7 @@ function Trippage() {
       .finally(() => {
         setLoader(false);
       });
-  };
-
+}
 
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
@@ -91,7 +146,7 @@ function Trippage() {
     localStorage.removeItem("user_role_name");
   };
 
-  const storecategory = async ({
+  const storeTrips = async ({
     categoryName,
   }) => {
     setLoader(true);
@@ -99,7 +154,13 @@ function Trippage() {
       .post(
         `${baseUrl}categories`,
         {
-          name: categoryName,
+          name: tirpName,
+          cost: tirpCost,
+          take_off : tirpDate,
+          from_countries_id: tripFrom,
+          to_countries_id: tripTo,
+          description: tirpDescription,
+          category_id: categoryName,
         },
         {
           headers: {
@@ -122,10 +183,11 @@ function Trippage() {
       });
   };
 
-  function deleteBranch(id) {
+// delete trip 
+function deleteTrips(id) {
     setLoader(true);
     axios
-      .delete(`${baseUrl}categories/${id}`, {
+      .delete(`${baseUrl}trips/${id}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -134,7 +196,7 @@ function Trippage() {
         if (response.status === 401) {
           handleUnauthenticated();
         } else if (response.status === 204) {
-          toast.success("تم حذف الفرع بنجاح");
+          toast.success("تم حذف الرحلة بنجاح");
           fetchData();
         } else {
           console.error("Unexpected response status:", response.status);
@@ -220,22 +282,106 @@ return (
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
           <form>
-            <div className="mb-5">
-              <input
+            <div className="mb-5 flex w-full gap-4	">
+             <div className="flex-grow w-full">
+             <input
                 type="text"
-                {...register("categoryName")}
+                {...register("tirpName")}
                 placeholder="اسم الرحلة"
+                className="w-full flex-grow rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+              /><br/>
+              {errors && (
+                <span className="text-red-500 text-sm">
+                  {errors.tirpName?.message}
+                </span>)}
+             </div> 
+              <div className="flex-grow w-full">
+              <input
+                type="number"
+                {...register("tirpCost")}
+                placeholder="تكلفة الرحلة "
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                 />
+              {errors && (
+                <span className="text-red-500 text-sm">
+                  {errors.tirpCost?.message}
+                </span>)}
+              </div >
+            </div>
+            <div className="mb-5 flex gap-3">
+              <input
+                type="date"
+                {...register("tirpDate")}
+                placeholder="تاريخ إقلاع الرحلة "
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
               {errors && (
                 <span className="text-red-500 text-sm">
-                  {errors.categoryName?.message}
-                </span>
-              )}
+                  {errors.tirpDate?.message}
+                </span>)}
+                <textarea
+                 rows="1"
+                {...register("tirpDescription")}
+                placeholder="وصف بسيط عن الرجلة  "
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+              />
             </div>
+
+            <div className="mb-5 flex gap-2">
+            <select id="countries" className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <option >اختار اسم الدولة من</option>
+                {
+                  showCouncountries.map((trip , index)=>{
+                    return (
+                       <option key={index}  {...register("tripFrom")} value={trip.id}>{trip.en_short_name}</option>
+                    );
+                  })
+                }
+               
+              </select>
+              {errors && (
+                <span className="text-red-500 text-sm">
+                  {errors.tripFrom?.message}
+                </span>)}
+
+                <select id="countries" className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <option >اختار اسم الدولة من</option>
+                {
+                  showCouncountries.map((trip , index)=>{
+                    return (
+                       <option key={index} {...register("tripTo")} value={trip.id}>{trip.en_short_name}</option>
+                    );
+                  })
+                }
+               
+              </select>
+              {errors && (
+                <span className="text-red-500 text-sm">
+                  {errors.tripTo?.message}
+                </span>)}
+
+                <select id="countries" className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <option >اختار نوع الرحلة </option>
+                {
+                  showcategories.map((categories , index)=>{
+                    return (
+                       <option key={index} {...register("categoryName")} value={categories.id}>{categories.name}</option>
+                    );
+                  })
+                }
+               
+              </select>
+              {errors && (
+                <span className="text-red-500 text-sm">
+                  {errors.categoryName?.message}
+                </span>)}
+
+
+            </div>
+
+
             <div className="mb-5 pt-3">
               <div className="-mx-3 flex flex-wrap">
-               
                    {
                     updateMode &&
                     <div className="w-full px-3 sm:w-1/2">
@@ -265,7 +411,7 @@ return (
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  onClick={handleSubmit(storecategory)}
+                  onClick={handleSubmit(storeTrips)}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
                   إنشاء الرحلة 
@@ -312,7 +458,7 @@ return (
               الترتيب
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الاسم
+              نوع الرحلة 
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               وقت الإقلاع
@@ -352,8 +498,9 @@ return (
               cost,
               description,
               status,
-              en_short_name,
               created_at,
+              from, 
+              to    
             } = trip;
             return (
               <tr
@@ -364,22 +511,22 @@ return (
                   {index + 1}
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  px-2 text-xs font-bold">
+                  <span className="rounded  px-1 text-xs font-bold">
                     {name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  px-2 text-xs font-bold">
+                  <span className="rounded  px-1 text-xs font-bold">
                     {takeOff}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  px-2 text-xs font-bold">
+                  <span className="rounded  px-1 text-xs font-bold">
                     {cost}
                   </span>
                 </td>
                 <td className="p-0 text-gray-800  text-sm  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  line-clamp-32  px-1 text-xs font-bold">
+                  <span className="rounded   px-1 text-xs font-bold">
                     {description}
                   </span>
                 </td>
@@ -396,12 +543,12 @@ return (
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
-                    {en_short_name}
+                  {from.en_short_name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
-                    {en_short_name}
+                  {to.en_short_name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -425,7 +572,7 @@ return (
                     <DriveFileRenameOutlineIcon />
                   </button>
                   <button
-                    onClick={() => deleteBranch(id)}
+                    onClick={() => deleteTrips(id)}
                     className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500">
                     <DeleteForeverIcon />
                   </button>
@@ -459,6 +606,8 @@ return (
                             </g>
                           </svg>
             )}
+    
+    
     {/* Pagination */}
       <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
           <div className="flex justify-center">
