@@ -21,7 +21,7 @@ function Userpage() {
   const userToken = localStorage.getItem("user_token");
 
   const [employees, setEmployees] = useState([]);
-  const [searchWay, setSearchWay] = useState("ID");
+  const [branches, setBranches] = useState([]);
   const Naviagate = useNavigate();
 
   const handleUnauthenticated = () => {
@@ -84,6 +84,21 @@ function Userpage() {
       .catch(function (error) {
         console.error("Error fetching branches:", error);
         handleUnauthenticated();
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+    axios
+      .get(`${baseUrl}branches/select-name-id`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then((response) => {
+        setBranches(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching branches:", error);
       })
       .finally(() => {
         setLoader(false);
@@ -193,27 +208,20 @@ function Userpage() {
   const handleSearch = (e) => {
     e.preventDefault();
     setLoader(true);
-    let searchUrl;
-    if (searchWay === "ID") {
-      searchUrl = `${baseUrl}employees/${searchValue}`;
-    } else {
-      searchUrl = `${baseUrl}employees/${searchValue}/branch`;
+
+    if (!searchValue.trim()) {
+      fetchEmployees();
+      return;
     }
-    axios
-      .get(searchUrl, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setEmployees([response.data.data]);
-      })
-      .catch(function (error) {
-        toast.error("Error fetching", error.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
+    let allEmp = [...employees];
+    let filteredEmp = [];
+    allEmp.forEach((emp) => {
+      if (emp.name.toLowerCase().includes(searchValue.toLowerCase())) {
+        filteredEmp.push(emp);
+      }
+    });
+    setEmployees(filteredEmp);
+    setLoader(false);
   };
 
   return (
@@ -227,7 +235,7 @@ function Userpage() {
                 <input
                   type="text"
                   {...register("name")}
-                  placeholder="اسم الموظف "
+                  placeholder="اسم الموظف"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {errors && (
@@ -294,12 +302,16 @@ function Userpage() {
                 )}
               </div>
               <div className="w-[49%] flex-grow">
-                <input
-                  type="text"
+                <select
                   {...register("branch_id")}
-                  placeholder=" رقم الفرع"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
+                  onChange={(e) => console.log(e.target.value)}
+                  className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                >
+                  {branches.map((branch) => {
+                    const { id, name } = branch;
+                    return <option key={id} value={id} label={name} />;
+                  })}
+                </select>
                 {errors && (
                   <span className="text-red-500 text-sm">
                     {errors.branch_id?.message}
@@ -342,19 +354,19 @@ function Userpage() {
               type="search"
               id="default-search"
               className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder={`ابحث بـ ${searchWay}`}
+              placeholder={`ابحث عن موظف بالاسم`}
               required
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyUp={(e) => handleSearch(e)}
             />
             <button
-              type="submit"
               onClick={(e) => handleSearch(e)}
-              className="text-white absolute end-32 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
-              بحث{" "}
+              بحث
             </button>
-            <div className="absolute end-2.5 bottom-2">
+            {/* <div className="absolute end-2.5 bottom-2">
               <select
                 id="select"
                 onChange={(e) => setSearchWay(e.target.value)}
@@ -367,7 +379,7 @@ function Userpage() {
                   Branch ID
                 </option>
               </select>
-            </div>
+            </div> */}
           </div>
         </form>
       </div>
@@ -379,9 +391,8 @@ function Userpage() {
               "الترتيب",
               "الاسم",
               "البريد",
-              "ID",
               "رقم الهاتف",
-              "رقم الفرع",
+              "الفرع",
               "الدور",
               "تاريخ الانشاء",
               "التعديل",
@@ -427,17 +438,12 @@ function Userpage() {
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {id}
-                  </span>
-                </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  py-1 px-3 text-xs font-bold">
                     {phone_number}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {branch_id}
+                    {branches.find((branch) => branch.id === branch_id)?.name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -459,7 +465,10 @@ function Userpage() {
                       setValue("name", name);
                       setValue("email", email);
                       setValue("phone_number", phone_number);
-                      setValue("branch_id", branch_id);
+                      setValue(
+                        "branch_id",
+                        branches.find((branch) => branch.id === branch_id)?.id
+                      );
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >
