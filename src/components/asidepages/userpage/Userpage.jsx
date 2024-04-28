@@ -4,6 +4,11 @@ import { useNavigate } from "react-router-dom";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { ScrollUp } from "../../ScrollUp";
 
 function Userpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
@@ -15,10 +20,10 @@ function Userpage() {
   const [employeePasswordConfirm, setEmployeePasswordConfirm] = useState("");
   const [employeePhone, setEmployeePhone] = useState("");
   const [branchNumber, setBranchNumber] = useState("");
-  
+
   const [updateMode, setUpdateMode] = useState(false);
   const [updateEmpID, setUpdateEmpID] = useState("");
-  
+
   const [searchValue, setSearchValue] = useState("");
   const userToken = localStorage.getItem("user_token");
 
@@ -26,12 +31,42 @@ function Userpage() {
   const [searchWay, setSearchWay] = useState("ID");
   const Naviagate = useNavigate();
 
-  // handle Unauthenticated
   const handleUnauthenticated = () => {
-    alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
+    });
     Naviagate("/Login");
     localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
   };
+
+  const schema = z
+    .object({
+      name: z.string().min(1, "الاسم يجب ان يكون 3 احرف على الاقل"),
+      email: z
+        .string()
+        .min(1, { message: "البريد الالكترونى مطلوب" })
+        .email("البريد الالكترونى غير صحيح"),
+      password: z.string().min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"),
+      password_confirmation: z
+        .string()
+        .min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"),
+      phone_number: z.string().min(11, "رقم الهاتف يجب ان يكون 11 رقم"),
+      branch_id: z.string().min(1, "رقم الفرع مطلوب"),
+    })
+    .refine((data) => data.password === data.password_confirmation, {
+      message: "كلمة المرور غير متطابقة",
+      path: ["password_confirmation"],
+    });
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     fetchEmployees();
@@ -48,44 +83,30 @@ function Userpage() {
       .then(function (response) {
         if (response.status === 401) {
           handleUnauthenticated();
-          return;
+        } else {
+          setLoader(false);
+          setEmployees(response.data.data);
         }
-        setEmployees(response.data.data);
       })
       .catch(function (error) {
-        console.error("Error:", error);
+        console.error("Error fetching branches:", error);
+        handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
       });
   };
-  // handle employee register
-  const handleEmpRegister = (e) => {
+
+  const storeEmployee = () => {
     setLoader(true);
-    e.preventDefault();
-    if (
-      employeeName === "" ||
-      employeeMail === "" ||
-      employeePassword === "" ||
-      employeePasswordConfirm === "" ||
-      employeePhone === "" ||
-      branchNumber === ""
-    ) {
-      setInputsMessage(true);
-      return;
-    }
-    if (employeePassword !== employeePasswordConfirm) {
-      setInputsMessage(true);
-      return;
-    }
     setInputsMessage(false);
     const employeeData = {
-      name: employeeName,
-      email: employeeMail,
-      password: employeePassword,
-      password_confirmation: employeePasswordConfirm,
-      phone_number: employeePhone,
-      branch_id: branchNumber,
+      name: getValues("name"),
+      email: getValues("email"),
+      password: getValues("password"),
+      password_confirmation: getValues("password_confirmation"),
+      phone_number: getValues("phone_number"),
+      branch_id: getValues("branch_id"),
     };
     axios
       .post(`${baseUrl}employees`, employeeData, {
@@ -105,6 +126,7 @@ function Userpage() {
         setLoader(false);
       });
   };
+
   const deleteEmp = (id) => {
     setLoader(true);
     axios
@@ -114,38 +136,48 @@ function Userpage() {
         },
       })
       .then(function (response) {
-        console.log("emp", response);
-        fetchEmployees();
+        if (response.status === 401) {
+          handleUnauthenticated();
+        } else if (response.status === 204) {
+          toast.success("تم حذف الفرع بنجاح");
+          fetchEmployees();
+        } else {
+          console.error("Unexpected response status:", response.status);
+          toast.warning("حدث خطأ غير متوقع");
+        }
       })
       .catch(function (error) {
-        console.error("Error fetching", error);
+        console.error("Error deleting branch:", error);
+        setLoader(true);
+        if (
+          error.response &&
+          error.response.status === 401 &&
+          error.response.data.message === "Unauthenticated"
+        ) {
+          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+            type: "error",
+          });
+        } else {
+          console.log("Error deleting branch:", error);
+        }
+      })
+      .finally(() => {
+        setLoader(false);
       });
   };
-  const updateEmp = (id) => {
-    setUpdateEmpID(id);
-    setUpdateMode(true);
-    const updatedEmployee = employees.find((employee) => employee.id === id);
-    if (updatedEmployee) {
-      setEmployeeName(updatedEmployee.name);
-      setEmployeeMail(updatedEmployee.email);
-      setEmployeePassword(updatedEmployee.password);
-      setEmployeePasswordConfirm(updatedEmployee.password_confirmation);
-      setEmployeePhone(updatedEmployee.phone_number);
-      setBranchNumber(updatedEmployee.branch_id);
-    }
-  };
+
   const handleEmpUpdate = () => {
     setLoader(true);
     axios
       .post(
         `${baseUrl}employees/${updateEmpID}`,
         {
-          name: employeeName,
-          email: employeeMail,
-          password: employeePassword,
-          password_confirmation: employeePasswordConfirm,
-          phone_number: employeePhone,
-          branch_id: branchNumber,
+          name: getValues("name"),
+          email: getValues("email"),
+          password: getValues("password"),
+          password_confirmation: getValues("password_confirmation"),
+          phone_number: getValues("phone_number"),
+          branch_id: getValues("branch_id"),
         },
         {
           headers: {
@@ -153,13 +185,13 @@ function Userpage() {
           },
         }
       )
-      .then(function (response) {
-        console.log("emp", response);
+      .then(function () {
+        toast.success("تم تحديث البيانات بنجاح");
         fetchEmployees();
         setUpdateMode(false);
       })
       .catch(function (error) {
-        console.error("Error fetching", error.response.data.message);
+        toast.error(error.response.data.message);
       })
       .finally(() => {
         setLoader(false);
@@ -182,11 +214,10 @@ function Userpage() {
         },
       })
       .then(function (response) {
-        console.log("search", response.data.data);
         setEmployees([response.data.data]);
       })
       .catch(function (error) {
-        console.error("Error fetching", error.response.data.message);
+        toast.error("Error fetching", error.response.data.message);
       })
       .finally(() => {
         setLoader(false);
@@ -200,93 +231,87 @@ function Userpage() {
         <div className="mx-auto w-full ">
           <form className=" space-y-3">
             <div className=" flex flex-wrap gap-3">
-              <div className="flex-grow ">
+              <div className="w-[49%] flex-grow">
                 <input
                   type="text"
-                  value={employeeName}
-                  onChange={(e) => setEmployeeName(e.target.value)}
+                  {...register("name")}
                   placeholder="اسم العميل "
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 py-1 text-sm px-1">
-                    ادخل اسم العميل
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.name?.message}
+                  </span>
                 )}
               </div>
-              <div className="flex-grow">
+              <div className="w-[49%] flex-grow">
                 <input
                   type="email"
-                  value={employeeMail}
-                  onChange={(e) => setEmployeeMail(e.target.value)}
+                  {...register("email")}
                   placeholder="البريد الإلكترونى"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    ادخل البريد الالكترونى
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.email?.message}
+                  </span>
                 )}
               </div>
             </div>
             <div className=" flex flex-wrap gap-3">
-              <div className="flex-grow ">
+              <div className="w-[49%] flex-grow">
                 <input
                   type="text"
-                  value={employeePassword}
-                  onChange={(e) => setEmployeePassword(e.target.value)}
+                  {...register("password")}
                   placeholder="كلمة المرور"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    ادخل كلمة المرور
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.password?.message}
+                  </span>
                 )}
               </div>
-              <div className="flex-grow ">
+              <div className="w-[49%] flex-grow">
                 <input
                   type="text"
-                  value={employeePasswordConfirm}
-                  onChange={(e) => setEmployeePasswordConfirm(e.target.value)}
+                  {...register("password_confirmation")}
                   placeholder="تأكيد كلمة المرور"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    كلمتى المرور غير متطابقتين
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.password_confirmation?.message}
+                  </span>
                 )}
               </div>
             </div>
             <div className=" flex flex-wrap gap-3">
-              <div className="flex-grow ">
+              <div className="w-[49%] flex-grow">
                 <input
                   type="tel"
-                  value={employeePhone}
-                  onChange={(e) => setEmployeePhone(e.target.value)}
+                  {...register("phone_number")}
                   placeholder="رقم الهاتف"
                   dir="rtl"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    أدخل رقم هاتف صحيح
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.phone_number?.message}
+                  </span>
                 )}
               </div>
-              <div className="flex-grow ">
+              <div className="w-[49%] flex-grow">
                 <input
                   type="text"
-                  value={branchNumber}
-                  onChange={(e) => setBranchNumber(e.target.value)}
+                  {...register("branch_id")}
                   placeholder=" رقم الفرع"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    أدخل رقم الفرع
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.branch_id?.message}
+                  </span>
                 )}
               </div>
             </div>
@@ -294,19 +319,19 @@ function Userpage() {
             <div>
               {updateMode ? (
                 <button
-                  onClick={handleEmpUpdate}
-                  disabled={loader}
+                  onClick={handleSubmit(handleEmpUpdate)}
+                  disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تحديث المستخدم
+                  تحديث الموظف
                 </button>
               ) : (
                 <button
-                  onClick={(e) => handleEmpRegister(e)}
-                  disabled={loader}
+                  onClick={handleSubmit(storeEmployee)}
+                  disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تسجيل مستخدم جديد
+                  تسجيل موظف جديد
                 </button>
               )}
             </div>
@@ -381,9 +406,18 @@ function Userpage() {
         <tbody>
           {/* Mapping branches data to table rows */}
           {employees.map((emp, index) => {
+            const {
+              id,
+              name,
+              email,
+              phone_number,
+              branch_id,
+              role_name,
+              created_at,
+            } = emp;
             return (
               <tr
-                key={emp.id}
+                key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
@@ -391,48 +425,56 @@ function Userpage() {
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
-                    {emp.name}
+                    {name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {emp.email}
+                    {email}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {emp.id}
+                    {id}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {emp.phone_number}
+                    {phone_number}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {emp.branch_id}
+                    {branch_id}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {emp.role_name}
+                    {role_name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
-                    {emp.created_at}
+                    {created_at}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <button
-                    onClick={() => updateEmp(emp.id)}
+                    onClick={() => {
+                      ScrollUp();
+                      setUpdateEmpID(id);
+                      setUpdateMode(true);
+                      setValue("name", name);
+                      setValue("email", email);
+                      setValue("phone_number", phone_number);
+                      setValue("branch_id", branch_id);
+                    }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >
                     <DriveFileRenameOutlineIcon />
                   </button>
                   <button
-                    onClick={() => deleteEmp(emp.id)}
+                    onClick={() => deleteEmp(id)}
                     className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
                   >
                     <DeleteForeverIcon />
