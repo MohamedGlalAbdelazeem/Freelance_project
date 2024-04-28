@@ -46,7 +46,7 @@ function Userpage() {
         .string()
         .min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"),
       phone_number: z.string().min(11, "رقم الهاتف يجب ان يكون 11 رقم"),
-      branch_id: z.string().min(1, "رقم الفرع مطلوب"),
+      branch_id: z.number().min(1, "رقم الفرع مطلوب"),
     })
     .refine((data) => data.password === data.password_confirmation, {
       message: "كلمة المرور غير متطابقة",
@@ -57,6 +57,7 @@ function Userpage() {
     register,
     handleSubmit,
     setValue,
+    reset,
     getValues,
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
@@ -122,9 +123,10 @@ function Userpage() {
           "Content-Type": "multipart/form-data",
         },
       })
-      .then(function (response) {
-        console.log("emp", response);
+      .then(function () {
+        toast.success("تم تسجيل الموظف بنجاح");
         fetchEmployees();
+        reset();
       })
       .catch(function (error) {
         console.error("Error fetching", error);
@@ -304,9 +306,11 @@ function Userpage() {
               <div className="w-[49%] flex-grow">
                 <select
                   {...register("branch_id")}
-                  onChange={(e) => console.log(e.target.value)}
                   className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 >
+                  <option value="" disabled selected>
+                    اختر الفرع
+                  </option>
                   {branches.map((branch) => {
                     const { id, name } = branch;
                     return <option key={id} value={id} label={name} />;
