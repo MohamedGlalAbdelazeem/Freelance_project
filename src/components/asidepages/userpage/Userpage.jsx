@@ -46,7 +46,7 @@ function Userpage() {
         .string()
         .min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"),
       phone_number: z.string().min(11, "رقم الهاتف يجب ان يكون 11 رقم"),
-      branch_id: z.number().min(1, "رقم الفرع مطلوب"),
+      branch_id: z.string().min(1, "رقم الفرع مطلوب"),
     })
     .refine((data) => data.password === data.password_confirmation, {
       message: "كلمة المرور غير متطابقة",
@@ -114,7 +114,7 @@ function Userpage() {
       password: getValues("password"),
       password_confirmation: getValues("password_confirmation"),
       phone_number: getValues("phone_number"),
-      branch_id: getValues("branch_id"),
+      branch_id: getValues("branch_id").toString(),
     };
     axios
       .post(`${baseUrl}employees`, employeeData, {
@@ -186,7 +186,7 @@ function Userpage() {
           password: getValues("password"),
           password_confirmation: getValues("password_confirmation"),
           phone_number: getValues("phone_number"),
-          branch_id: getValues("branch_id"),
+          branch_id: getValues("branch_id").toString(),
         },
         {
           headers: {
@@ -471,7 +471,9 @@ function Userpage() {
                       setValue("phone_number", phone_number);
                       setValue(
                         "branch_id",
-                        branches.find((branch) => branch.id === branch_id)?.id
+                        branches
+                          .find((branch) => branch.id === branch_id)
+                          ?.id.toString()
                       );
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
