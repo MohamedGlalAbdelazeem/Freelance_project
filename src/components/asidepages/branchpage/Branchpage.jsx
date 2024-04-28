@@ -57,7 +57,8 @@ function Branchpage() {
    
   } = useForm({ resolver: zodResolver(schema) });
 
- 
+
+  
   useEffect(() => {
     fetchBranches();
   }, []);
@@ -68,6 +69,7 @@ function Branchpage() {
   const [current , setcurrent] = useState(1)
   const NbPage = Math.ceil(branches.length / items)
   const fetchBranches = () => {
+    setLoader(true);
     axios
       .get(`${baseUrl}branches`, {
         headers: {
@@ -85,6 +87,9 @@ function Branchpage() {
       .catch(function (error) {
         console.error("Error fetching branches:", error);
         handleUnauthenticated();
+      })
+      .finally(() => {
+        setLoader(false);
       });
   };
 
@@ -219,20 +224,24 @@ function Branchpage() {
   };
 
   const handleSearch = (e) => {
-    setLoader(true)
+    setLoader(true);
     e.preventDefault();
-    axios.get(`${baseUrl}branches/${searchValue}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    }).then((response) => {
-      setBranches([response.data.data]);
-    }).catch((error) => { 
-      console.error("Error fetching branches:", error);
-      toast(error.response.data.message)
-    }).finally(() => {
-      setLoader(false);
-    })
+    axios
+      .get(`${baseUrl}branches/${searchValue}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then((response) => {
+        setBranches([response.data.data]);
+      })
+      .catch((error) => {
+        console.error("Error fetching branches:", error);
+        toast(error.response.data.message);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
   };
 
   return (
@@ -249,7 +258,7 @@ function Branchpage() {
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
               {errors && (
-                <span className="text-red-500 text-[12px]">
+                <span className="text-red-500 text-sm">
                   {errors.branchName?.message}
                 </span>
               )}
@@ -262,7 +271,7 @@ function Branchpage() {
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
               {errors && (
-                <span className="text-red-500 text-[12px]">
+                <span className="text-red-500 text-sm">
                   {errors.branchLocation?.message}
                 </span>
               )}
@@ -279,7 +288,7 @@ function Branchpage() {
                     className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   />
                   {errors && (
-                    <span className="text-red-500 text-[12px]">
+                    <span className="text-red-500 text-sm">
                       {errors.timeFrom?.message}
                     </span>
                   )}
@@ -296,7 +305,7 @@ function Branchpage() {
                     className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   />
                   {errors && (
-                    <span className="text-red-500 text-[12px]">
+                    <span className="text-red-500 text-sm">
                       {errors.timeTo?.message}
                     </span>
                   )}
@@ -315,7 +324,7 @@ function Branchpage() {
                       className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                     {errors && (
-                      <span className="text-red-500 text-[12px]">
+                      <span className="text-red-500 text-sm">
                         {errors.hotline?.message}
                       </span>
                     )}
