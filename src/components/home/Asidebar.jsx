@@ -1,13 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom"; 
 import AddHomeWorkOutlinedIcon from '@mui/icons-material/AddHomeWorkOutlined';
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices';
-import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports';
-import CategoryIcon from '@mui/icons-material/Category';
 import { toast } from "react-toastify";
 
 function Asidebar() {
@@ -30,21 +26,21 @@ function Asidebar() {
 
     if (userrolename === "admin") {
         asidebarItems = [
-            { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <ManageAccountsIcon sx={{ fontSize: 35 }} /> },
-            { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <CategoryIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <ConnectingAirportsIcon sx={{ fontSize: 55 }} /> },
-            { text: "إدارة الخدمات ", path: "/Mainpage/Services", icon: <MiscellaneousServicesIcon sx={{ fontSize: 40 }} /> },
+            { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/Services", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
 
 
           ];
     } else if (userrolename === "super_admin") {
         asidebarItems = [
             { text: "إدارة الفروع", path: "/Mainpage/Branchpage", icon: <AddHomeWorkOutlinedIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة المستخدمين", path: "/Mainpage/Userpage", icon: <GroupAddOutlinedIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <ManageAccountsIcon sx={{ fontSize: 35 }} /> },
-            { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <CategoryIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <ConnectingAirportsIcon sx={{ fontSize: 55 }} /> },
-            { text: "إدارة الخدمات ", path: "/Mainpage/", icon: <MiscellaneousServicesIcon sx={{ fontSize: 40 }} /> },
+            { text: "إدارة الموظفين", path: "/Mainpage/Userpage", icon: <GroupAddOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
         ];
     }
 

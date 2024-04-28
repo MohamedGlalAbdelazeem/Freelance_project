@@ -1,5 +1,4 @@
-import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
-import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
+
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
@@ -13,7 +12,6 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
-import ReactPaginate from 'react-paginate';
 
 
 function Branchpage() {
@@ -30,13 +28,6 @@ function Branchpage() {
   const [searchValue, setSearchValue] = useState("");
 
 
-
-  
-   
-
- 
- 
-
   const schema = z.object({
     branchName: z.string().min(1, { message: "ادخل اسم الفرع" }),
     branchLocation: z.string().min(1, { message: "ادخل عنوان الفرع" }),
@@ -51,8 +42,7 @@ function Branchpage() {
     setValue,
     reset,
     getValues,
-    formState: { errors, isSubmitting },
-   
+    formState: { errors, isSubmitting }
   } = useForm({ resolver: zodResolver(schema) });
 
 
