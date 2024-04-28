@@ -20,8 +20,6 @@ function Branchpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
 
 
-
-
   const [branches, setBranches] = useState([]);
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
@@ -58,16 +56,22 @@ function Branchpage() {
   } = useForm({ resolver: zodResolver(schema) });
 
 
-  
+
   useEffect(() => {
     fetchBranches();
   }, []);
 
-
   // Pagination
-  const items =5
+
+  const items =8
   const [current , setcurrent] = useState(1)
   const NbPage = Math.ceil(branches.length / items)
+  const offset = (current - 1) * items
+  const startIndex =  (current - 1) * items
+  const endIndex = startIndex + items
+  const DataPerPage = branches.slice(startIndex , endIndex)
+  
+
   const fetchBranches = () => {
     setLoader(true);
     axios
@@ -134,6 +138,7 @@ function Branchpage() {
       )
       .then(() => {
         toast("تم إنشاء الفرع بنجاح", { type: "success" });
+        reset();
         fetchBranches();
       })
       .catch((response) => {
@@ -552,15 +557,17 @@ function Branchpage() {
                           <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
                               Previous
                           </a>
-                          <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
-                              1
-                          </a>
-                          <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
-                              2
-                          </a>
-                          <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
-                              3
-                          </a>
+                          {Array.from({ length: NbPage }, (_, i) => i + 1).map((page) => (
+                            <a
+                              key={page} // Make sure to include a unique key for each element in the array
+                              href="#"
+                              className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
+                            >
+                              {page}
+                            </a>
+                          ))}
+
+                        
                           <a   href="#" className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
                               Next
                           </a>
