@@ -29,7 +29,7 @@ function Asidebar() {
             { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
             { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة الخدمات ", path: "/Mainpage/", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/Services", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
 
 
           ];

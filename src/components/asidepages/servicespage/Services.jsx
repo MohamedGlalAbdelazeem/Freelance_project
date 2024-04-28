@@ -15,8 +15,10 @@ import { ScrollUp } from "../../ScrollUp";
 import ReactPaginate from 'react-paginate';
 
 
-function Categoriespage() {
+function Branchpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
+
+
   const [branches, setBranches] = useState([]);
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
@@ -26,8 +28,20 @@ function Categoriespage() {
   const [updateBranchID, setUpdateBranchID] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
+
+
+  
+   
+
+ 
+ 
+
   const schema = z.object({
-    categoryName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
+    branchName: z.string().min(1, { message: "ادخل اسم الفرع" }),
+    branchLocation: z.string().min(1, { message: "ادخل عنوان الفرع" }),
+    timeFrom: z.string().min(1, { message: "ادخل الوقت من" }),
+    timeTo: z.string().min(1, { message: "ادخل الوقت الي" }),
+    hotline: z.string().min(1, { message: "ادخل الخط الساخن" }),
   });
 
   const {
@@ -43,10 +57,11 @@ function Categoriespage() {
 
 
   useEffect(() => {
-    fetchData();
+    fetchBranches();
   }, []);
 
   // Pagination
+
   const items =8
   const [current , setcurrent] = useState(1)
   const NbPage = Math.ceil(branches.length / items)
@@ -56,11 +71,10 @@ function Categoriespage() {
   const DataPerPage = branches.slice(startIndex , endIndex)
   
 
-// fetch data from api
-  const fetchData = () => {
+const fetchBranches = () => {
     setLoader(true);
     axios
-      .get(`${baseUrl}categories`, {
+      .get(`${baseUrl}branches`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -74,14 +88,13 @@ function Categoriespage() {
         }
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
+        console.error("Error fetching branches:", error);
         handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
       });
   };
-
 
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
@@ -93,15 +106,28 @@ function Categoriespage() {
     localStorage.removeItem("user_role_name");
   };
 
-  const storecategory = async ({
-    categoryName,
+  const storeBranch = async ({
+    branchName,
+    branchLocation,
+    timeFrom,
+    timeTo,
+    hotline,
   }) => {
     setLoader(true);
+    if (timeTo <= timeFrom) {
+      toast("عدل الوقت ينجم", { type: "error" });
+      return;
+    }
     await axios
       .post(
-        `${baseUrl}categories`,
+        `${baseUrl}branches`,
         {
-          name: categoryName,
+          name: branchName,
+          location: branchLocation,
+          from: timeFrom,
+          to: timeTo,
+          hot_line: hotline,
+          status: branchStatus,
         },
         {
           headers: {
@@ -109,15 +135,18 @@ function Categoriespage() {
           },
         }
       )
-      .then((res) => {
-        toast("تم إنشاء الرحلة  بنجاح", { type: "success" });
+      .then(() => {
+        toast("تم إنشاء الفرع بنجاح", { type: "success" });
         reset();
-        fetchData();
+        fetchBranches();
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
+          toast("هذا الفرع موجود بالفعل", { type: "error" });
         }
+        // if (response.response.data.message == "Unauthenticated") {
+        //   handleUnauthenticated();
+        // }
       })
       .finally(() => {
         setLoader(false);
@@ -127,7 +156,7 @@ function Categoriespage() {
   function deleteBranch(id) {
     setLoader(true);
     axios
-      .delete(`${baseUrl}categories/${id}`, {
+      .delete(`${baseUrl}branches/${id}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -137,7 +166,7 @@ function Categoriespage() {
           handleUnauthenticated();
         } else if (response.status === 204) {
           toast.success("تم حذف الفرع بنجاح");
-          fetchData();
+          fetchBranches();
         } else {
           console.error("Unexpected response status:", response.status);
           toast.warning("حدث خطأ غير متوقع");
@@ -161,14 +190,17 @@ function Categoriespage() {
     setLoader(false);
   }
 
- 
   const updateBranch = async () => {
     setLoader(true);
     await axios
       .post(
-        `${baseUrl}categories/${updateBranchID}`,
+        `${baseUrl}branches/${updateBranchID}`,
         {
-          name: getValues("categoryName"),
+          name: getValues("branchName"),
+          location: getValues("branchLocation"),
+          from: getValues("timeFrom"),
+          to: getValues("timeTo"),
+          hot_line: getValues("hotline"),
           status: branchStatus,
         },
         {
@@ -178,12 +210,12 @@ function Categoriespage() {
         }
       )
       .then(() => {
-        toast("تم تحديث الرحلة  بنجاح", { type: "success" });
-        fetchData();
+        toast("تم تحديث الفرع بنجاح", { type: "success" });
+        fetchBranches();
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
+          toast("هذا الفرع موجود بالفعل", { type: "error" });
         }
         console.log("Error updating branch:", response.response.data.message);
       })
@@ -192,14 +224,14 @@ function Categoriespage() {
        setUpdateMode(false);
        reset();
       });
-     
+      
   };
 
   const handleSearch = (e) => {
     setLoader(true);
     e.preventDefault();
     axios
-      .get(`${baseUrl}categories/${searchValue}`, {
+      .get(`${baseUrl}branches/${searchValue}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -214,9 +246,9 @@ function Categoriespage() {
       .finally(() => {
         setLoader(false);
       });
-};
+  };
 
-return (
+  return (
     <main className="branchTable">
       {/* add branch form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
@@ -225,31 +257,95 @@ return (
             <div className="mb-5">
               <input
                 type="text"
-                {...register("categoryName")}
-                placeholder="اسم الرحلة"
+                {...register("branchName")}
+                placeholder="اسم الفرع "
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
               {errors && (
                 <span className="text-red-500 text-sm">
-                  {errors.categoryName?.message}
+                  {errors.branchName?.message}
                 </span>
               )}
             </div>
+            <div className="mb-5">
+              <input
+                type="text"
+                {...register("branchLocation")}
+                placeholder="عنوان الفرع "
+                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+              />
+              {errors && (
+                <span className="text-red-500 text-sm">
+                  {errors.branchLocation?.message}
+                </span>
+              )}
+            </div>
+            <div className="-mx-3 flex flex-wrap">
+              <div className="w-full px-3 sm:w-1/2">
+                <div className="mb-5">
+                  <label className="mb-3 block text-base font-medium text-white">
+                    الوقت من
+                  </label>
+                  <input
+                    type="time"
+                    {...register("timeFrom")}
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.timeFrom?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="w-full px-3 sm:w-1/2">
+                <div className="mb-5">
+                  <label className="mb-3 block text-base font-medium text-white ">
+                    الوقت إلي
+                  </label>
+                  <input
+                    type="time"
+                    {...register("timeTo")}
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.timeTo?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="mb-5 pt-3">
               <div className="-mx-3 flex flex-wrap">
-               
-                   {
-                    updateMode &&
-                    <div className="w-full px-3 sm:w-1/2">
-                              <label className="text-white">تفعيل الرحلة أو إلفاء تفعيل الرحلة  ؟</label>
-                              <div className="mb-5">
-                                <Switch
-                                checked={branchStatus === true} 
-                                onChange={(e) =>
-                                  setBranchStatus(e.target.checked ? true : false)}color="success"/>
-                            </div>
-                      </div>
-                   }
+                <div className="w-full px-3 sm:w-1/2">
+                  <div className="mb-5">
+                    <input
+                      type="text"
+                      {...register("hotline")}
+                      placeholder="الخط الساخن"
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                    />
+                    {errors && (
+                      <span className="text-red-500 text-sm">
+                        {errors.hotline?.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div className="w-full px-3 sm:w-1/2">
+                  <label className="text-white">تفعيل الفرع أم لا ؟</label>
+                  <div className="mb-5">
+                    <Switch
+                      checked={branchStatus === true} // '1' is considered as 'on'
+                      onChange={(e) =>
+                        setBranchStatus(e.target.checked ? true : false)
+                      } // '1' for on, '0' for off
+                      color="success"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -257,20 +353,20 @@ return (
               {updateMode ? (
                 <button
                   type="submit"
-                  onClick={()=>{handleSubmit(updateBranch)}}
+                  onClick={handleSubmit(updateBranch)}
                   disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تحديث الرحلة 
+                  تحديث الفرع
                 </button>
               ) : (
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  onClick={handleSubmit(storecategory)}
+                  onClick={handleSubmit(storeBranch)}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  إنشاء الرحلة 
+                  تسجيل فرع جديد
                 </button>
               )}
             </div>
@@ -305,7 +401,7 @@ return (
           </div>
         </form>
       </div>
-          
+
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
         <thead>
@@ -317,7 +413,22 @@ return (
               الاسم
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              الموقع
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              الخط الساخن{" "}
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               الحالة
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              إظهار العميل
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              من
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              إلي{" "}
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               {" "}
@@ -334,7 +445,12 @@ return (
             const {
               name,
               id,
+              location,
+              hotLine,
               status,
+              show_client,
+              from,
+              to,
               created_at,
             } = branch;
             return (
@@ -350,6 +466,16 @@ return (
                     {name}
                   </span>
                 </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {location}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {hotLine}
+                  </span>
+                </td>
                 <td className="w-full lg:w-auto  text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                   {status === "مفعل" ? (
                     <div className="bg-green-500 text-white text-sm rounded-md">
@@ -361,20 +487,45 @@ return (
                     </div>
                   )}
                 </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  {show_client === "مفعل" ? (
+                    <div className="bg-green-500 text-white text-sm rounded-md">
+                      مفعل
+                    </div>
+                  ) : (
+                    <div className="bg-red-500 text-white rounded-md text-sm">
+                      غير مفعل
+                    </div>
+                  )}
+                </td>
+
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {from}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {to}
+                  </span>
+                </td>
+
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
                     {created_at}
                   </span>
                 </td>
-
-
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <button
                     onClick={() => {
                       ScrollUp();
                       setUpdateBranchID(id);
                       setUpdateMode(true);
-                      setValue("categoryName", name);
+                      setValue("branchName", name);
+                      setValue("branchLocation", location);
+                      setValue("timeFrom", from);
+                      setValue("timeTo", to);
+                      setValue("hotline", hotLine);
                       setBranchStatus(status === "مفعل" ? true : false);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
@@ -393,30 +544,11 @@ return (
           })}
         </tbody>
       </table>
-            {/* loader */}
-            {loader && (
-                          <svg
-                            id="loading-spinner"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="100"
-                            height="100"
-                            viewBox="0 0 48 48"
-                          >
-                            <g fill="none">
-                              <path
-                                id="track"
-                                fill="#C6CCD2"
-                                d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
-                              />
-                              <path
-                                id="section"
-                                fill="#3F4850"
-                                d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
-                              />
-                            </g>
-                          </svg>
-                        )}
+
+      {loader && <div className="spinner"></div>}
       {/* Pagination */}
+
+    
               <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
 
                   <div className="flex justify-center">
@@ -449,4 +581,4 @@ return (
   );
 }
 
-export default Categoriespage;
+export default Branchpage;
