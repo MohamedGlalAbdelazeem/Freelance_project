@@ -8,7 +8,6 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { toast } from "react-toastify";
 import CategoryIcon from '@mui/icons-material/Category';
 import LocalAirportIcon from '@mui/icons-material/LocalAirport';
-import MiscellaneousServicesIcon from '@mui/icons-material/MiscellaneousServices';
 
 function Asidebar() {
     const Navigate = useNavigate();
@@ -33,7 +32,7 @@ function Asidebar() {
             { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <GroupAddIcon sx={{ fontSize: 35 }} /> },
             { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <CategoryIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <LocalAirportIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة الخدمات ", path: "/Mainpage/Services", icon: <MiscellaneousServicesIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/Services", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
 
 
           ];
@@ -41,10 +40,10 @@ function Asidebar() {
         asidebarItems = [
             { text: "إدارة الفروع", path: "/Mainpage/Branchpage", icon: <AddHomeWorkOutlinedIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة الموظفين", path: "/Mainpage/Userpage", icon: <GroupAddOutlinedIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <CategoryIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <GroupAddIcon sx={{ fontSize: 35 }} /> },
             { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <CategoryIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <LocalAirportIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة الخدمات ", path: "/Mainpage/", icon: <MiscellaneousServicesIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
         ];
     }
 

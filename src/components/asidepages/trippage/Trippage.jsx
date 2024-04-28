@@ -146,7 +146,15 @@ function fetchcategories() {
     localStorage.removeItem("user_role_name");
   };
 
+
+  // sote trip
   const storeTrips = async ({
+    tirpName,
+    tirpCost,
+    tirpDate,
+    tripFrom,
+    tripTo,
+    tirpDescription,
     categoryName,
   }) => {
     setLoader(true);
