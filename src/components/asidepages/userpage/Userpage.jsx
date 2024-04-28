@@ -13,13 +13,6 @@ import { ScrollUp } from "../../ScrollUp";
 function Userpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [loader, setLoader] = useState(true);
-  const [inputsMessage, setInputsMessage] = useState(false);
-  const [employeeName, setEmployeeName] = useState("");
-  const [employeeMail, setEmployeeMail] = useState("");
-  const [employeePassword, setEmployeePassword] = useState("");
-  const [employeePasswordConfirm, setEmployeePasswordConfirm] = useState("");
-  const [employeePhone, setEmployeePhone] = useState("");
-  const [branchNumber, setBranchNumber] = useState("");
 
   const [updateMode, setUpdateMode] = useState(false);
   const [updateEmpID, setUpdateEmpID] = useState("");
@@ -485,6 +478,7 @@ function Userpage() {
           })}
         </tbody>
       </table>
+      {loader && <div className="spinner"></div>}
     </div>
   );
 }
