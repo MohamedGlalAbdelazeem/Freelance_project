@@ -379,7 +379,7 @@ return (
                   </span>
                 </td>
                 <td className="p-0 text-gray-800  text-sm  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  px-1 text-xs font-bold">
+                  <span className="rounded  line-clamp-32  px-1 text-xs font-bold">
                     {description}
                   </span>
                 </td>
