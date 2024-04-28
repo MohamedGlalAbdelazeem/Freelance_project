@@ -8,14 +8,20 @@ import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 import "./branchpage.css";
 import axios from "axios";
-import { useForm } from "react-hook-form";
+import { useForm ,  } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
+import ReactPaginate from 'react-paginate';
+
 
 function Branchpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
+
+
+
+
   const [branches, setBranches] = useState([]);
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
@@ -24,6 +30,14 @@ function Branchpage() {
   const [updateMode, setUpdateMode] = useState(false);
   const [updateBranchID, setUpdateBranchID] = useState("");
   const [searchValue, setSearchValue] = useState("");
+
+
+
+  
+   
+
+ 
+ 
 
   const schema = z.object({
     branchName: z.string().min(1, { message: "ادخل اسم الفرع" }),
@@ -37,15 +51,22 @@ function Branchpage() {
     register,
     handleSubmit,
     setValue,
+    reset,
     getValues,
     formState: { errors, isSubmitting },
+   
   } = useForm({ resolver: zodResolver(schema) });
 
-  
+ 
   useEffect(() => {
     fetchBranches();
   }, []);
 
+
+  // Pagination
+  const items =5
+  const [current , setcurrent] = useState(1)
+  const NbPage = Math.ceil(branches.length / items)
   const fetchBranches = () => {
     axios
       .get(`${baseUrl}branches`, {
@@ -191,7 +212,10 @@ function Branchpage() {
       })
       .finally(() => {
         setLoader(false);
+       setUpdateMode(false);
+       reset();
       });
+      
   };
 
   const handleSearch = (e) => {
@@ -510,38 +534,34 @@ function Branchpage() {
 
       {loader && <div className="spinner"></div>}
       {/* Pagination */}
-      <div className="flex mt-5">
-        <a
-          href="#"
-          className="px-4 py-2 mx-1 text-gray-500 capitalize bg-white rounded-md cursor-not-allowed "
-        >
-          <div className="flex items-center -mx-1">
-            <KeyboardDoubleArrowRightIcon />
-            <span className="mx-1">previous</span>
-          </div>
-        </a>
-        <a
-          href="#"
-          className="hidden px-4 py-2 mx-1 text-gray-700 transition-colors duration-300 transform bg-white rounded-md sm:inline   hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white dark:hover:text-gray-200"
-        >
-          1
-        </a>
-        <a
-          href="#"
-          className="hidden px-4 py-2 mx-1 text-gray-700 transition-colors duration-300 transform bg-white rounded-md sm:inline   hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white dark:hover:text-gray-200"
-        >
-          2
-        </a>
-        <a
-          href="#"
-          className="px-4 py-2 mx-1 text-gray-700 transition-colors duration-300 transform bg-white rounded-md   hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white dark:hover:text-gray-200"
-        >
-          <div className="flex items-center -mx-1">
-            <span className="mx-1">Next</span>
-            <KeyboardDoubleArrowLeftIcon />
-          </div>
-        </a>
-      </div>
+
+    
+              <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
+
+                  <div className="flex justify-center">
+                      <nav className="flex space-x-2" aria-label="Pagination">
+                          <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
+                              Previous
+                          </a>
+                          <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
+                              1
+                          </a>
+                          <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
+                              2
+                          </a>
+                          <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
+                              3
+                          </a>
+                          <a   href="#" className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
+                              Next
+                          </a>
+                      </nav>
+                  </div>
+              </div>
+    
+                
+
+
     </main>
   );
 }
