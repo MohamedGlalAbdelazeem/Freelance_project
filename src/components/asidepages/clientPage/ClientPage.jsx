@@ -4,35 +4,50 @@ import { useNavigate } from "react-router-dom";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import { toast } from "react-toastify";
+import { ScrollUp } from "../../ScrollUp";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 function ClientPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [loader, setLoader] = useState(true);
-  const [inputsMessage, setInputsMessage] = useState(false);
-  
-  const [clientName, setClientName] = useState("");
-  const [clientMail, setClientMail] = useState("");
-  const [clientPhone, setClientPhone] = useState("");
-  const [clientAddress, setClientAddress] = useState("");
-  const [branchNumber, setBranchNumber] = useState("");
-  const [countriesNumber, setCountriesNumber] = useState("");
-  const [clientImage, setClientImage] = useState("");
-  const [clientNotes, setClientNotes] = useState("");
-
   const userToken = localStorage.getItem("user_token");
-
   const [clients, setClients] = useState([]);
-  const [searchWay, setSearchWay] = useState("ID");
   const [searchValue, setSearchValue] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
   const [updateClientID, setUpdateClientID] = useState("");
+  const Navigate = useNavigate();
 
-  const Naviagate = useNavigate();
   const handleUnauthenticated = () => {
-    alert("يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية");
-    Naviagate("/Login");
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
+    });
+    Navigate("/Login");
     localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
   };
+
+  const schema = z.object({
+    name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
+    email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
+    phone_number: z.string().min(1, { message: "يجب ادخال رقم الهاتف" }),
+    address: z.string().min(1, { message: "يجب ادخال العنوان" }),
+    branch_id: z.string().min(1, { message: "يجب ادخال رقم الفرع" }),
+    country_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
+    image: z.string().min(1, { message: "يجب ادخال صورة العميل" }),
+    notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
+  });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
 
   useEffect(() => {
     fetchClients();
@@ -54,34 +69,21 @@ function ClientPage() {
         handleUnauthenticated();
       })
       .finally(() => {
+        console.log(clients);
         setLoader(false);
       });
   };
-  const handleClientRegister = (e) => {
+  const storeClient = () => {
     setLoader(true);
-    e.preventDefault();
-    if (
-      !clientName ||
-      !clientMail ||
-      !clientPhone ||
-      !clientAddress ||
-      !countriesNumber ||
-      !branchNumber ||
-      !clientImage 
-    ) {
-      setInputsMessage(true);
-      return;
-    }
-    setInputsMessage(false);
     const clientData = {
-      name: clientName,
-      email: clientMail,
-      address: clientAddress,
-      phone_number: clientPhone,
-      branch_id: branchNumber,
-      countries_id: countriesNumber,
-      image: clientImage,
-      notes: clientNotes,
+      name: getValues("name"),
+      email: getValues("email"),
+      phone_number: getValues("phone_number"),
+      address: getValues("address"),
+      branch_id: getValues("branch_id"),
+      countries_id: getValues("countries_id"),
+      image: getValues("image"),
+      notes: getValues("notes"),
     };
     axios
       .post(`${baseUrl}clients`, clientData, {
@@ -90,18 +92,20 @@ function ClientPage() {
           "Content-Type": "multipart/form-data",
         },
       })
-      .then(function (response) {
-        console.log("client", response);
+      .then(function () {
+        toast.success("تم تسجيل العميل بنجاح")
         fetchClients();
+        reset();
       })
       .catch(function (error) {
-        console.error("Error fetching", error);
+        console.log(error);
+        toast.error(error.response.data.message)
       })
       .finally(() => {
         setLoader(false);
       });
   };
-  const deleteClient = (id) => {
+  const deleteClient = (id) => {  
     setLoader(true);
     axios
       .delete(`${baseUrl}clients/${id}`, {
@@ -109,43 +113,28 @@ function ClientPage() {
           Authorization: `Bearer ${userToken}`,
         },
       })
-      .then(function (response) {
-        console.log("client", response);
+      .then(function () {
         fetchClients();
+        toast.success("تم حذف العميل بنجاح");
       })
       .catch(function (error) {
-        console.error("Error fetching", error);
+        toast.error(error.response.data.message);
       });
-  };
-  const updateClient = (id) => {
-    setUpdateClientID(id);
-    setUpdateMode(true);
-    const updatedClient = clients.find((client) => client.id === id);
-    if (updatedClient) {
-      setClientName(updatedClient.name);
-      setClientMail(updatedClient.email);
-      setClientPhone(updatedClient.phone_number);
-      setBranchNumber(updatedClient.branch_id);
-      setCountriesNumber(updatedClient.countries_id);
-      setClientImage(updatedClient.image);
-      setClientNotes(updatedClient.notes);
-    }
   };
   const handleClientUpdate = () => {
     setLoader(true);
-
     axios
       .post(
         `${baseUrl}clients/${updateClientID}`,
         {
-          name: clientName,
-          email: clientMail,
-          address: clientAddress,
-          phone_number: clientPhone,
-          branch_id: branchNumber,
-          countries_id: countriesNumber,
-          image: clientImage,
-          notes: clientNotes,
+          name: getValues("name"),
+          email: getValues("email"),
+          phone_number: getValues("phone_number"),
+          address: getValues("address"),
+          branch_id: getValues("branch_id"),
+          countries_id: getValues("countries_id"),
+          image: getValues("image"),
+          notes: getValues("notes"),
         },
         {
           headers: {
@@ -153,13 +142,14 @@ function ClientPage() {
           },
         }
       )
-      .then(function (response) {
-        console.log("client", response);
+      .then(function () {
+        toast.success("تم تحديث العميل بنجاح");
         fetchClients();
         setUpdateMode(false);
+        reset();
       })
       .catch(function (error) {
-        console.error("Error fetching", error.response.data.message);
+        toast.error(error.response.data.message);
       })
       .finally(() => {
         setLoader(false);
@@ -168,28 +158,21 @@ function ClientPage() {
   const handleSearch = (e) => {
     e.preventDefault();
     setLoader(true);
-    let searchUrl;
-    if (searchWay === "ID") {
-      searchUrl = `${baseUrl}clients/${searchValue}`;
-    } else {
-      searchUrl = `${baseUrl}clients/${searchValue}/branch`;
+
+    if (!searchValue.trim()) {
+      fetchClients();
+      return;
     }
-    axios
-      .get(searchUrl, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        console.log("search", response.data.data);
-        setClients([response.data.data]);
-      })
-      .catch(function (error) {
-        console.error("Error fetching", error.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
+    let allClients = [...clients];
+    let filteredClients = [];
+    allClients.forEach((client) => {
+      if (client.name.toLowerCase().includes(searchValue.toLowerCase())) {
+        filteredClients.push(client);
+      }
+    });
+    setClients(filteredClients);
+    setLoader(false);
+
   };
 
   return (
@@ -202,29 +185,27 @@ function ClientPage() {
               <div className="flex-grow ">
                 <input
                   type="text"
-                  value={clientName}
-                  onChange={(e) => setClientName(e.target.value)}
+                  {...register("name")}
                   placeholder="اسم العميل "
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 py-1 text-sm px-1">
-                    ادخل اسم العميل
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.name?.message}
+                  </span>
                 )}
               </div>
               <div className="flex-grow">
                 <input
                   type="email"
-                  value={clientMail}
-                  onChange={(e) => setClientMail(e.target.value)}
+                  {...register("email")}
                   placeholder="البريد الإلكترونى"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    ادخل البريد الالكترونى
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.email?.message}
+                  </span>
                 )}
               </div>
             </div>
@@ -232,28 +213,28 @@ function ClientPage() {
               <div className="flex-grow ">
                 <input
                   type="tel"
-                  value={clientPhone}
-                  onChange={(e) => setClientPhone(e.target.value)}
+                  {...register("phone_number")}
                   placeholder="رقم الهاتف"
                   dir="rtl"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    أدخل رقم هاتف صحيح
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.phone_number?.message}
+                  </span>
                 )}
               </div>
               <div className="flex-grow ">
                 <input
                   type="text"
-                  value={clientAddress}
-                  onChange={(e) => setClientAddress(e.target.value)}
+                  {...register("address")}
                   placeholder="العنوان"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">أدخل العنوان</p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.address?.message}
+                  </span>
                 )}
               </div>
             </div>
@@ -261,40 +242,42 @@ function ClientPage() {
               <div className="flex-grow ">
                 <input
                   type="text"
-                  value={branchNumber}
-                  onChange={(e) => setBranchNumber(e.target.value)}
+                  {...register("branch_id")}
                   placeholder="رقم الفرع"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    أدخل رقم الفرع
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.branch_id?.message}
+                  </span>
                 )}
               </div>
               <div className="flex-grow ">
                 <input
                   type="text"
-                  value={countriesNumber}
-                  onChange={(e) => setCountriesNumber(e.target.value)}
+                  {...register("countries_id")}
                   placeholder="رمز المدينة"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    أدخل رمز المدينة
-                  </p>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.countries_id?.message}
+                  </span>
                 )}
               </div>
             </div>
             <div className=" flex flex-wrap gap-3">
               <div className="flex-grow ">
                 <textarea
-                  value={clientNotes}
-                  onChange={(e) => setClientNotes(e.target.value)}
+                  {...register("notes")}
                   placeholder="ملاحظات"
                   className="w-full min-h-36 rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.notes?.message}
+                  </span>
+                )}
               </div>
               <div className="flex-grow ">
                 <div className="flex items-center justify-center w-full">
@@ -322,45 +305,40 @@ function ClientPage() {
                         <span className="font-semibold">اضغط للرفع</span> أو
                         استخدم السحب والافلات
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {/* <p className="text-xs text-gray-500 dark:text-gray-400">
                         {clientImage
                           ? clientImage
                           : "SVG, PNG, JPG or GIF (MAX. 800x400px)"}
-                      </p>
+                      </p> */}
                     </div>
                     <input
                       id="dropzone-file"
                       type="file"
                       className="hidden"
-                      onChange={(e) => setClientImage(e.target.files[0].name)}
+                      {...register("image")}
                     />
                   </label>
                 </div>
-
-                {inputsMessage && (
-                  <p className="text-red-300 text-sm py-1 px-1">
-                    برجاء رفع الصورة
-                  </p>
-                )}
               </div>
             </div>
 
             <div>
               {updateMode ? (
                 <button
-                  onClick={handleClientUpdate}
-                  disabled={loader}
+                  onClick={handleSubmit(handleClientUpdate)}
+                  disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تحديث المستخدم
+                  تحديث العميل
                 </button>
               ) : (
-                <button
-                  onClick={(e) => handleClientRegister(e)}
-                  disabled={loader}
+                  <button
+                  
+                  onClick={handleSubmit(storeClient)}
+                  disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تسجيل مستخدم جديد
+                  تسجيل عميل جديد
                 </button>
               )}
             </div>
@@ -379,19 +357,19 @@ function ClientPage() {
               type="search"
               id="default-search"
               className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder={`ابحث بـ ${searchWay}`}
+              placeholder={`ابحث عن عميل بالاسم`}
               required
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyUp={(e) => handleSearch(e)}
             />
             <button
-              type="submit"
               onClick={(e) => handleSearch(e)}
-              className="text-white absolute end-32 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
-              بحث{" "}
+              بحث
             </button>
-            <div className="absolute end-2.5 bottom-2">
+            {/* <div className="absolute end-2.5 bottom-2">
               <select
                 id="select"
                 onChange={(e) => setSearchWay(e.target.value)}
@@ -404,7 +382,7 @@ function ClientPage() {
                   Branch ID
                 </option>
               </select>
-            </div>
+            </div> */}
           </div>
         </form>
       </div>
@@ -415,11 +393,11 @@ function ClientPage() {
             {[
               "الترتيب",
               "الاسم",
-              "البريد",
-              "ID",
-              "رقم الهاتف",
-              "رقم الفرع",
-              "الدور",
+              "الجنسية",
+              "العنوان",
+              "البريد الالكترونى",
+              "رقم الموبايل",
+              "الفرع",
               "تاريخ الانشاء",
               "التعديل",
             ].map((header, index) => (
@@ -435,59 +413,78 @@ function ClientPage() {
         <tbody>
           {/* Mapping branches data to table rows */}
           {clients.map((client, index) => {
+            const {
+              id,
+              name,
+              address,
+              email,
+              phone_number,
+              branch,
+              nationality,
+              created_at,
+            } = client;
             return (
               <tr
-                key={client.id}
+                key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
-                
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
                   {index + 1}
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
-                    {client.name}
+                    {name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {client.email}
+                    {nationality.nationality}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {client.id}
+                    {address}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {client.phone_number}
+                    {email}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {client.branch_id}
+                    {phone_number}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {client.role_name}
+                    {branch.branch_name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
-                    {client.created_at}
+                    {created_at}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <button
-                    onClick={() => updateClient(client.id)}
+                    onClick={() => {
+                      ScrollUp();
+                      setUpdateClientID(id);
+                      setUpdateMode(true);
+                      setValue("name", name);
+                      setValue("address", address);
+                      setValue("email", email);
+                      setValue("phone_number", phone_number);
+                      setValue("branch_id", branch.branch_name);
+                      setValue("countries_id", nationality.id);
+                    }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >
                     <DriveFileRenameOutlineIcon />
                   </button>
                   <button
-                    onClick={() => deleteClient(client.id)}
+                    onClick={() => deleteClient(id)}
                     className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
                   >
                     <DeleteForeverIcon />
@@ -498,6 +495,7 @@ function ClientPage() {
           })}
         </tbody>
       </table>
+      {loader && <div className="spinner"></div>}
     </div>
   );
 }
