@@ -3,11 +3,33 @@ import { useState, useEffect } from 'react';
 import { toast } from "react-toastify";
 import userPhoto from './user.avif';
 import { useNavigate } from "react-router-dom";
+import { useForm, SubmitHandler } from "react-hook-form"
+
+
 
 function Userprofilepage() {
     const [userProfile, setUserprofile] = useState([]);
     const [loader, setLoader] = useState(true);
     const navigate = useNavigate(); // Renamed useNavigate to navigate to avoid confusion with component
+
+
+    const schema = z
+    .object({
+      password: z.string().min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"),
+      password_confirmation: z.string().min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"), })
+    .refine((data) => data.password === data.password_confirmation, {
+      message: "كلمة المرور غير متطابقة",
+      path: ["password_confirmation"],
+    });
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        reset,
+        getValues,
+        formState: { errors, isSubmitting },
+      } = useForm({ resolver: zodResolver(schema) });
 
     useEffect(() => {
         const userRoleName = localStorage.getItem('user_role_name');
@@ -50,7 +72,7 @@ function Userprofilepage() {
 
     return (
         <div className="items-center justify-center">
-            <div className="mx-auto w-full max-w-[550px] bg-white">
+            <div className="mx-auto w-full max-w-[750px] bg-white">
                 <form>
                     <div className="mb-2 pt-2">
                         <div>
@@ -76,15 +98,17 @@ function Userprofilepage() {
                     </div>
                 </form>
             </div>
-            <h3 className="flex items-center w-full">
-            <span className="flex-grow bg-gray-200 rounded h-1"></span>
-            <button className="mx-2 text-md font-medium  border-2 rounded-full hover:bg-gray-200">
-                تعديل البيانات الشخصية
-            </button>
-            <span className="flex-grow bg-gray-200 rounded h-1"></span>
-        </h3>
+                <h3 className="flex items-center w-full">
+                <span className="flex-grow bg-gray-200 rounded h-1"></span>
+                <button className="mx-2 text-md font-medium  border-2 rounded-full hover:bg-gray-200">
+                    تعديل البيانات الشخصية
+                </button>
+                <span className="flex-grow bg-gray-200 rounded h-1"></span>
+                </h3>
+
+                {/* change name  & phone  */}
             <div className="items-center justify-center p-12">
-                <div className="rounded-3xl mx-auto w-full max-w-[700px] bg-gray-700 text-white p-10">
+                <div className="rounded-3xl mx-auto w-full max-w-[750px] bg-gray-700 text-white p-10">
                     <form>
                         <div className="mb-5">
                             <label  className="mb-3 block text-base font-medium ">
@@ -100,7 +124,6 @@ function Userprofilepage() {
                             <input type="number"
                                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
                         </div>
-                      
                         <div>
                             <button
                                 className="hover:shadow-form rounded-md bg-success hover:bg-success/90 py-3 px-8 text-base font-semibold text-white outline-none">
@@ -111,16 +134,17 @@ function Userprofilepage() {
                 </div>
               </div>
 
-              <h3 className="flex items-center w-full">
-            <span className="flex-grow bg-gray-200 rounded h-1"></span>
-            <button className="mx-2 text-md font-medium  border-2 rounded-full hover:bg-gray-200">
-            تغيير كلمة السر
-            </button>
-            <span className="flex-grow bg-gray-200 rounded h-1"></span>
-        </h3>
+               {/* change passwrod  */}
+                <h3 className="flex items-center w-full">
+                <span className="flex-grow bg-gray-200 rounded h-1"></span>
+                <button className="mx-2 text-md font-medium  border-2 rounded-full hover:bg-gray-200">
+                تغيير كلمة السر
+                </button>
+                <span className="flex-grow bg-gray-200 rounded h-1"></span>
+                </h3>
             <div className="items-center justify-center p-12">
-                <div className="rounded-3xl mx-auto w-full max-w-[700px] bg-gray-700 text-white p-10">
-                    <form>
+                <div className="rounded-3xl mx-auto w-full max-w-[750px] bg-gray-700 text-white p-10">
+                    <form onSubmit={handleSubmit(onSubmit)}>
                         <div className="mb-5">
                             <label  className="mb-3 block text-base font-medium ">
                                  كلمة السر الحالية 
@@ -147,7 +171,7 @@ function Userprofilepage() {
                         <div>
                             <button
                                 className="hover:shadow-form rounded-md bg-success hover:bg-success/90 py-3 px-8 text-base font-semibold text-white outline-none">
-                                تعديل 
+                                تغيير 
                             </button>
                         </div>
                     </form>
