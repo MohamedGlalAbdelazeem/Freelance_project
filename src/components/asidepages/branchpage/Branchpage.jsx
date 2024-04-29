@@ -1,4 +1,3 @@
-
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
@@ -7,16 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 import "./branchpage.css";
 import axios from "axios";
-import { useForm ,  } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 
-
 function Branchpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
-
 
   const [branches, setBranches] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -26,7 +23,6 @@ function Branchpage() {
   const [updateMode, setUpdateMode] = useState(false);
   const [updateBranchID, setUpdateBranchID] = useState("");
   const [searchValue, setSearchValue] = useState("");
-
 
   const schema = z.object({
     branchName: z.string().min(1, { message: "ادخل اسم الفرع" }),
@@ -42,25 +38,12 @@ function Branchpage() {
     setValue,
     reset,
     getValues,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
-
-
 
   useEffect(() => {
     fetchBranches();
   }, []);
-
-  // Pagination
-
-  const items =8
-  const [current , setcurrent] = useState(1)
-  const NbPage = Math.ceil(branches.length / items)
-  const offset = (current - 1) * items
-  const startIndex =  (current - 1) * items
-  const endIndex = startIndex + items
-  const DataPerPage = branches.slice(startIndex , endIndex)
-  
 
   const fetchBranches = () => {
     setLoader(true);
@@ -106,7 +89,7 @@ function Branchpage() {
   }) => {
     setLoader(true);
     if (timeTo <= timeFrom) {
-      toast("عدل الوقت ينجم", { type: "error" });
+      toast.error("يجب أن تكون بداية الوقت اقل من نهاية الوقت");
       return;
     }
     await axios
@@ -133,11 +116,11 @@ function Branchpage() {
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
-          toast("هذا الفرع موجود بالفعل", { type: "error" });
+          toast.error("هذا الفرع موجود بالفعل");
         }
-        // if (response.response.data.message == "Unauthenticated") {
-        //   handleUnauthenticated();
-        // }
+        if (response.response.data.message == "To must be greter than from") {
+          toast.error("يجب أن تكون بداية الوقت اقل من نهاية الوقت");
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -203,19 +186,20 @@ function Branchpage() {
       .then(() => {
         toast("تم تحديث الفرع بنجاح", { type: "success" });
         fetchBranches();
+        reset();
+        setUpdateMode(false);
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
           toast("هذا الفرع موجود بالفعل", { type: "error" });
         }
-        console.log("Error updating branch:", response.response.data.message);
+        if (response.response.data.message == "To must be greter than from") {
+          toast.error("يجب أن تكون بداية الوقت اقل من نهاية الوقت");
+        }
       })
       .finally(() => {
         setLoader(false);
-       setUpdateMode(false);
-       reset();
       });
-      
   };
 
   const handleSearch = (e) => {
@@ -378,7 +362,7 @@ function Branchpage() {
               onChange={(e) => setSearchValue(e.target.value)}
               onKeyUp={(e) => handleSearch(e)}
               className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="البحث من عن طريق ID "
+              placeholder="ابحث عن فرع بالاسم"
               required
             />
             <button
@@ -536,36 +520,7 @@ function Branchpage() {
       </table>
 
       {loader && <div className="spinner"></div>}
-      {/* Pagination */}
-
-      <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
-        <div className="flex justify-center">
-          <nav className="flex space-x-2" aria-label="Pagination">
-            <a
-              href="#"
-              className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
-            >
-              Previous
-            </a>
-            {Array.from({ length: NbPage }, (_, i) => i + 1).map((page) => (
-              <a
-                key={page} // Make sure to include a unique key for each element in the array
-                href="#"
-                className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
-              >
-                {page}
-              </a>
-            ))}
-
-            <a
-              href="#"
-              className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
-            >
-              Next
-            </a>
-          </nav>
-        </div>
-      </div>
+ 
     </main>
   );
 }
