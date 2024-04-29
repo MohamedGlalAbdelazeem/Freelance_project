@@ -13,18 +13,17 @@ import { ScrollUp } from "../../ScrollUp";
 
 function Categoriespage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
-  const [branches, setBranches] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem("user_token");
-  const [branchStatus, setBranchStatus] = useState(false);
+  const [categoryStatus, setCategoryStatus] = useState(false);
   const [updateMode, setUpdateMode] = useState(false);
-  const [updateBranchID, setUpdateBranchID] = useState("");
+  const [updateCategoryID, setUpdateCategoryID] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
   const schema = z.object({
     categoryName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
-
   });
 
   const {
@@ -37,20 +36,11 @@ function Categoriespage() {
   } = useForm({ resolver: zodResolver(schema) });
 
   useEffect(() => {
-    fetchData();
+    fetchCategories();
   }, []);
 
-  // Pagination
-  const items = 8;
-  const [current, setcurrent] = useState(1);
-  const NbPage = Math.ceil(branches.length / items);
-  const offset = (current - 1) * items;
-  const startIndex = (current - 1) * items;
-  const endIndex = startIndex + items;
-  const DataPerPage = branches.slice(startIndex, endIndex);
-
   // fetch data from api
-  const fetchData = () => {
+  const fetchCategories = () => {
     setLoader(true);
     axios
       .get(`${baseUrl}categories`, {
@@ -63,7 +53,7 @@ function Categoriespage() {
           handleUnauthenticated();
         } else {
           setLoader(false);
-          setBranches(response.data.data);
+          setCategories(response.data.data);
         }
       })
       .catch(function (error) {
@@ -102,7 +92,7 @@ function Categoriespage() {
       .then(() => {
         toast.success("تم إنشاء الرحلة  بنجاح");
         reset();
-        fetchData();
+        fetchCategories();
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
@@ -114,7 +104,7 @@ function Categoriespage() {
       });
   };
 
-  function deleteBranch(id) {
+  function deleteCategory(id) {
     setLoader(true);
     axios
       .delete(`${baseUrl}categories/${id}`, {
@@ -127,14 +117,14 @@ function Categoriespage() {
           handleUnauthenticated();
         } else if (response.status === 204) {
           toast.success("تم حذف الفرع بنجاح");
-          fetchData();
+          fetchCategories();
         } else {
           console.error("Unexpected response status:", response.status);
           toast.warning("حدث خطأ غير متوقع");
         }
       })
       .catch(function (error) {
-        console.error("Error deleting branch:", error);
+        console.error("Error deleting category:", error);
         setLoader(true);
         if (
           error.response &&
@@ -145,20 +135,20 @@ function Categoriespage() {
             type: "error",
           });
         } else {
-          console.log("Error deleting branch:", error);
+          console.log("Error deleting category:", error);
         }
       });
     setLoader(false);
   }
 
-  const updateBranch = () => {
+  const updateCategory = () => {
     setLoader(true);
     axios
       .post(
-        `${baseUrl}categories/${updateBranchID}`,
+        `${baseUrl}categories/${updateCategoryID}`,
         {
           name: getValues("categoryName"),
-          status: branchStatus ? "1" : "0",
+          status: categoryStatus ? "1" : "0",
         },
         {
           headers: {
@@ -168,14 +158,14 @@ function Categoriespage() {
       )
       .then((response) => {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
-        fetchData();
+        fetchCategories();
         console.log(response.data.data);
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
           toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
         }
-        console.log("Error updating branch:", response.response.data.message);
+        console.log("Error updating category:", response.response.data.message);
       })
       .finally(() => {
         setLoader(false);
@@ -185,29 +175,27 @@ function Categoriespage() {
   };
 
   const handleSearch = (e) => {
-    setLoader(true);
     e.preventDefault();
-    axios
-      .get(`${baseUrl}categories/${searchValue}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then((response) => {
-        setBranches([response.data.data]);
-      })
-      .catch((error) => {
-        console.error("Error fetching branches:", error);
-        toast(error.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
+    setLoader(true);
+
+    if (!searchValue.trim()) {
+      fetchCategories();
+      return;
+    }
+    let allCategories = [...categories];
+    let filteredCategories = [];
+    allCategories.forEach((cat) => {
+      if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
+        filteredCategories.push(cat);
+      }
+    });
+    setCategories(filteredCategories);
+    setLoader(false);
   };
 
   return (
     <main className="branchTable">
-      {/* add branch form */}
+      {/* add category form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
           <form>
@@ -233,9 +221,9 @@ function Categoriespage() {
                     </label>
                     <div className="mb-5">
                       <Switch
-                        checked={branchStatus}
+                        checked={categoryStatus}
                         onChange={(e) => {
-                          setBranchStatus(e.target.checked);
+                          setCategoryStatus(e.target.checked);
                         }}
                         color="success"
                       />
@@ -248,7 +236,7 @@ function Categoriespage() {
             <div>
               {updateMode ? (
                 <button
-                  onClick={handleSubmit(updateBranch)}
+                  onClick={handleSubmit(updateCategory)}
                   disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
@@ -281,6 +269,7 @@ function Categoriespage() {
               id="default-search"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
+              onKeyUp={(e) => handleSearch(e)}
               className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="البحث من عن طريق ID "
               required
@@ -296,7 +285,7 @@ function Categoriespage() {
         </form>
       </div>
 
-      {/* Table to display branch data */}
+      {/* Table to display category data */}
       <table className="border-collapse w-full">
         <thead>
           <tr>
@@ -319,9 +308,9 @@ function Categoriespage() {
           </tr>
         </thead>
         <tbody>
-          {/* Mapping branches data to table rows */}
-          {branches.map((branch, index) => {
-            const { name, id, status, created_at } = branch;
+          {/* Mapping categories data to table rows */}
+          {categories.map((cat, index) => {
+            const { name, id, status, created_at } = cat;
             return (
               <tr
                 key={id}
@@ -356,17 +345,17 @@ function Categoriespage() {
                   <button
                     onClick={() => {
                       ScrollUp();
-                      setUpdateBranchID(id);
+                      setUpdateCategoryID(id);
                       setUpdateMode(true);
                       setValue("categoryName", name);
-                      setBranchStatus(status === "مفعل" ? true : false);
+                      setCategoryStatus(status === "مفعل" ? true : false);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >
                     <DriveFileRenameOutlineIcon />
                   </button>
                   <button
-                    onClick={() => deleteBranch(id)}
+                    onClick={() => deleteCategory(id)}
                     className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
                   >
                     <DeleteForeverIcon />
@@ -378,57 +367,7 @@ function Categoriespage() {
         </tbody>
       </table>
       {/* loader */}
-      {loader && (
-        <svg
-          id="loading-spinner"
-          xmlns="http://www.w3.org/2000/svg"
-          width="100"
-          height="100"
-          viewBox="0 0 48 48"
-        >
-          <g fill="none">
-            <path
-              id="track"
-              fill="#C6CCD2"
-              d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
-            />
-            <path
-              id="section"
-              fill="#3F4850"
-              d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
-            />
-          </g>
-        </svg>
-      )}
-      {/* Pagination */}
-      <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
-        <div className="flex justify-center">
-          <nav className="flex space-x-2" aria-label="Pagination">
-            <a
-              href="#"
-              className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
-            >
-              Previous
-            </a>
-            {Array.from({ length: NbPage }, (_, i) => i + 1).map((page) => (
-              <a
-                key={page} // Make sure to include a unique key for each element in the array
-                href="#"
-                className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
-              >
-                {page}
-              </a>
-            ))}
-
-            <a
-              href="#"
-              className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
-            >
-              Next
-            </a>
-          </nav>
-        </div>
-      </div>
+      {loader && <div className="spinner"></div>}
     </main>
   );
 }
