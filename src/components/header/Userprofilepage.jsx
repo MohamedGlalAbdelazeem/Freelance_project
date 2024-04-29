@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { toast } from "react-toastify";
 import userPhoto from './user.avif';
 import { useNavigate } from "react-router-dom";
-import { useForm, SubmitHandler } from "react-hook-form"
+import { toast } from "react-toastify";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 
 
@@ -11,27 +13,26 @@ function Userprofilepage() {
     const [userProfile, setUserprofile] = useState([]);
     const [loader, setLoader] = useState(true);
     const navigate = useNavigate(); // Renamed useNavigate to navigate to avoid confusion with component
-
-
+  
     const schema = z
     .object({
-      password: z.string().min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"),
-      password_confirmation: z.string().min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"), })
-    .refine((data) => data.password === data.password_confirmation, {
-      message: "كلمة المرور غير متطابقة",
-      path: ["password_confirmation"],
+      name: z.string().min(1, "الاسم يجب ان يكون 4 احرف على الاقل"),
+      phone_number: z.string().min( "ادخل رقم الهاتف"),
     });
 
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        reset,
-        getValues,
-        formState: { errors, isSubmitting },
-      } = useForm({ resolver: zodResolver(schema) });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
+ 
 
-    useEffect(() => {
+
+
+ useEffect(() => {
         const userRoleName = localStorage.getItem('user_role_name');
         const userToken = localStorage.getItem('user_token');
 
@@ -59,16 +60,43 @@ function Userprofilepage() {
             setLoader(false);
         });
     }, []);
-
-    const handleUnauthenticated = () => {
-        toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-            type: "error",
-            autoClose: 4000,
-        });
-        navigate("/Login"); // Changed Naviagate to navigate
-        localStorage.removeItem("user_token");
-        localStorage.removeItem("user_role_name");
-    };
+    const handleUpdate = () => {
+        setLoader(true);
+        axios
+          .post(
+            `${baseUrl}update`,
+            {
+                name: getValues("name"),
+                phone_number: getValues("phone_number"),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${userToken}`,
+              },
+            }
+          )
+          .then(function () {
+            toast.success("تم تحديث البيانات بنجاح");
+            fetchEmployees();
+            setUpdateMode(false);
+          })
+          .catch(function (error) {
+            toast.error(error.response.data.message);
+          })
+          .finally(() => {
+            setLoader(false);
+          });
+      };
+    
+const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+        type: "error",
+        autoClose: 4000,
+    });
+    navigate("/Login"); // Changed Naviagate to navigate
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+};
 
     return (
         <div className="items-center justify-center">
@@ -106,7 +134,7 @@ function Userprofilepage() {
                 <span className="flex-grow bg-gray-200 rounded h-1"></span>
                 </h3>
 
-                {/* change name  & phone  */}
+         {/* change name  & phone  */}
             <div className="items-center justify-center p-12">
                 <div className="rounded-3xl mx-auto w-full max-w-[750px] bg-gray-700 text-white p-10">
                     <form>
@@ -115,17 +143,20 @@ function Userprofilepage() {
                                  الاسم 
                             </label>
                             <input type="text" 
-                                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                              {...register("name")}
+                              className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
                         </div>
                         <div className="mb-5">
                             <label  className="mb-3 block text-base font-medium">
                                 رقم الهاتف
                             </label>
                             <input type="number"
+                              {...register("phone_number")}
                                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
                         </div>
                         <div>
                             <button
+                               onClick={handleSubmit(handleUpdate)}
                                 className="hover:shadow-form rounded-md bg-success hover:bg-success/90 py-3 px-8 text-base font-semibold text-white outline-none">
                                 تعديل 
                             </button>
@@ -144,7 +175,7 @@ function Userprofilepage() {
                 </h3>
             <div className="items-center justify-center p-12">
                 <div className="rounded-3xl mx-auto w-full max-w-[750px] bg-gray-700 text-white p-10">
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                    <form>
                         <div className="mb-5">
                             <label  className="mb-3 block text-base font-medium ">
                                  كلمة السر الحالية 
