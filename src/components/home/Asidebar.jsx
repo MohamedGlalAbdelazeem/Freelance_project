@@ -8,7 +8,7 @@ import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import { toast } from "react-toastify";
 import CategoryIcon from '@mui/icons-material/Category';
 import LocalAirportIcon from '@mui/icons-material/LocalAirport';
-
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 function Asidebar() {
     const Navigate = useNavigate();
 
@@ -32,7 +32,7 @@ function Asidebar() {
             { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <GroupAddIcon sx={{ fontSize: 35 }} /> },
             { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <CategoryIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <LocalAirportIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة الخدمات ", path: "/Mainpage/Services", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/Services", icon: <SettingsSuggestIcon sx={{ fontSize: 35 }} /> },
 
 
           ];
@@ -43,7 +43,7 @@ function Asidebar() {
             { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <GroupAddIcon sx={{ fontSize: 35 }} /> },
             { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <CategoryIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <LocalAirportIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة الخدمات ", path: "/Mainpage/", icon: <AccountCircleOutlinedIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/", icon: <SettingsSuggestIcon sx={{ fontSize: 35 }} /> },
         ];
     }
 
