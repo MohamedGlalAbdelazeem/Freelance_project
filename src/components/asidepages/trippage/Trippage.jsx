@@ -83,6 +83,9 @@ function Trippage() {
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
         handleUnauthenticated();
+      })
+      .finally(() => {
+        // console.log(showCategories.find((cat) => cat.id === 3)?.name);
       });
   }
 
@@ -99,9 +102,8 @@ function Trippage() {
         if (response.status === 401) {
           handleUnauthenticated();
         }
-          setLoader(false);
-          setTrips(response.data.data);
-        
+        setLoader(false);
+        setTrips(response.data.data);
       })
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
@@ -242,24 +244,22 @@ function Trippage() {
   };
 
   const handleSearch = (e) => {
-    setLoader(true);
     e.preventDefault();
-    axios
-      .get(`${baseUrl}categories/${searchValue}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then((response) => {
-        setTrips([response.data.data]);
-      })
-      .catch((error) => {
-        console.error("Error fetching trips:", error);
-        toast(error.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
+    setLoader(true);
+
+    if (!searchValue.trim()) {
+      fetchData();
+      return;
+    }
+    let allTrips = [...trips];
+    let filteredTrips = [];
+    allTrips.forEach((trip) => {
+      if (trip.name.toLowerCase().includes(searchValue.toLowerCase())) {
+        filteredTrips.push(trip);
+      }
+    });
+    setTrips(filteredTrips);
+    setLoader(false);
   };
 
   return (
@@ -326,7 +326,6 @@ function Trippage() {
             </div>
 
             <div className="flex gap-2">
-              
               <select
                 id="countries"
                 {...register("tripFrom")}
@@ -404,9 +403,7 @@ function Trippage() {
                     <div className="mb-5">
                       <Switch
                         checked={branchStatus}
-                        onChange={(e) =>
-                          setBranchStatus(e.target.checked)
-                        }
+                        onChange={(e) => setBranchStatus(e.target.checked)}
                         color="success"
                       />
                     </div>
@@ -452,7 +449,12 @@ function Trippage() {
               type="search"
               id="default-search"
               value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              onChange={(e) => {
+                setSearchValue(e.target.value)
+              }}
+              onKeyUp={(e) => {
+                handleSearch(e);
+              }}
               className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="البحث من عن طريق ID "
               required
@@ -522,7 +524,6 @@ function Trippage() {
               created_at,
               from,
               to,
-              category_id,
             } = trip;
             return (
               <tr
@@ -576,7 +577,7 @@ function Trippage() {
                 {/* toDo - نوع الرحلة */}
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
-                    {category_id}
+                    {/* {showCategories.find((cat) => cat.id === category_id)?.name} */}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -599,7 +600,7 @@ function Trippage() {
                       setValue("tripFrom", from.id);
                       setValue("tripTo", to.id);
                       // console.log("from", from.en_short_name);
-                      setValue("category_id", category_id);
+                      // setValue("category_id", category_id);
                       setBranchStatus(status === "مفعل" ? true : false);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"

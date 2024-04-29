@@ -19,27 +19,26 @@ function Services() {
   const [showCategories, setShowCategories] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const userToken = localStorage.getItem("user_token");
-
-  const [employees, setEmployees] = useState([]);
-  const [branches, setBranches] = useState([]);
+  const [services, setServices] = useState([]);
   const Naviagate = useNavigate();
 
-  // const handleUnauthenticated = () => {
-  //   toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-  //     type: "error",
-  //     autoClose: 4000,
-  //   });
-  //   Naviagate("/Login");
-  //   localStorage.removeItem("user_token");
-  //   localStorage.removeItem("user_role_name");
-  // };
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
+    });
+    Naviagate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
 
-  const schema = z
-    .object({
-      name: z.string().min(1, "ادخل اسم الخدمة"),
-      cost: z.string().min( "ادخل تكلفة الخدمة "),
-      category_id: z.string().min(1, "اختر تصنيف الخدمة"),
-    })
+  const schema = z.object({
+    name: z.string().min(1, "ادخل اسم الخدمة"),
+    cost: z.string().min(1, "ادخل تكلفة الخدمة "),
+    description: z.string().min(1, "ادخل وصف الخدمة"),
+    category_id: z.string().min(1, "اختر تصنيف الخدمة"),
+  });
+
   const {
     register,
     handleSubmit,
@@ -54,27 +53,23 @@ function Services() {
     fetchCategories();
   }, []);
 
-const [services , setServices] = useState([])
+  function fetchCategories() {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}categories/selection/id-name`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setShowCategories(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+        // handleUnauthenticated();
+      });
+  }
 
-// show category 
-function fetchCategories() {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}categories/selection/id-name`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setShowCategories(response.data.data);
-    })
-    .catch(function (error) {
-      console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-      // handleUnauthenticated();
-    });
-}
-
-// show services
   const fetchServices = () => {
     setLoader(true);
     axios
@@ -84,12 +79,12 @@ function fetchCategories() {
         },
       })
       .then(function (response) {
-          setLoader(false);
-          setServices(response.data.data);
+        setLoader(false);
+        setServices(response.data.data);
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
-        // handleUnauthenticated();
+        handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
@@ -124,8 +119,7 @@ function fetchCategories() {
       });
   };
 
-// handel delete 
-const deleteService = (id) => {
+  const deleteService = (id) => {
     setLoader(true);
     axios
       .delete(`${baseUrl}services/${id}`, {
@@ -136,46 +130,43 @@ const deleteService = (id) => {
       .then(function (response) {
         if (response.status === 401) {
           // handleUnauthenticated();
-        } else if (response.status === 204) {
-          toast.success("تم حذف الخدمة بنجاح");
-          fetchServices();
         } else {
           console.error("Unexpected response status:", response.status);
           toast.warning("حدث خطأ غير متوقع");
         }
+        toast.success("تم حذف الخدمة بنجاح");
+        fetchServices();
       })
       .catch(function (error) {
         console.error("Error deleting service:", error);
         setLoader(true);
-        // if (
-        //   error.response &&
-        //   error.response.status === 401 &&
-        //   error.response.data.message === "Unauthenticated"
-        // ) {
-        //   toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-        //     type: "error",
-        //   });
-        // } else {
-        //   console.log("Error deleting branch:", error);
-        // }
+        if (
+          error.response &&
+          error.response.status === 401 &&
+          error.response.data.message === "Unauthenticated"
+        ) {
+          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+            type: "error",
+          });
+        } else {
+          console.log("Error deleting branch:", error);
+        }
       })
       .finally(() => {
         setLoader(false);
       });
-};
+  };
 
-  const handleEmpUpdate = () => {
+  const handleSrvUpdate = () => {
     setLoader(true);
     axios
       .post(
         `${baseUrl}services/${updateEmpID}`,
         {
           name: getValues("name"),
-          email: getValues("email"),
-          password: getValues("password"),
-          password_confirmation: getValues("password_confirmation"),
-          phone_number: getValues("phone_number"),
-          branch_id: getValues("branch_id").toString(),
+          cost: getValues("cost"),
+          description: getValues("description"),
+          category_id: getValues("category_id"),
         },
         {
           headers: {
@@ -204,14 +195,14 @@ const deleteService = (id) => {
       fetchServices();
       return;
     }
-    let allEmp = [...employees];
-    let filteredEmp = [];
-    allEmp.forEach((emp) => {
-      if (emp.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredEmp.push(emp);
+    let allSrv = [...services];
+    let filteredSrv = [];
+    allSrv.forEach((srv) => {
+      if (srv.name.toLowerCase().includes(searchValue.toLowerCase())) {
+        filteredSrv.push(srv);
       }
     });
-    setEmployees(filteredEmp);
+    setServices(filteredSrv);
     setLoader(false);
   };
 
@@ -220,7 +211,7 @@ const deleteService = (id) => {
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         {/* register & update users */}
         <div className="mx-auto w-full ">
-          <form className=" space-y-3">
+          <form className="space-y-3">
             <div className=" flex flex-wrap gap-3">
               <div className="w-[49%] flex-grow">
                 <input
@@ -237,7 +228,7 @@ const deleteService = (id) => {
               </div>
               <div className="w-[49%] flex-grow">
                 <input
-                  type="text"
+                  type="number"
                   {...register("cost")}
                   placeholder="تكلفة الخدمة"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
@@ -249,58 +240,65 @@ const deleteService = (id) => {
                 )}
               </div>
             </div>
-            <div className=" flex flex-wrap gap-3">
+
+            <div className="flex gap-4">
               <div className="w-[49%] flex-grow">
-                <input
-                  type="text"
-                  {...register("description")}
-                  placeholder="وصف الخدمة "
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"/>
-              </div>
-               
-        {
-          updateMode && 
-          <div className="w-[49%] flex-grow">
-               <select
-                id="countries"
-                {...register("category_id")}
-                className=" border  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 mt-8   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="" disabled selected>
-                  نوع الرحلة
-                </option>
-                {showCategories.map((categories, index) => {
-                  return (
-                    <option key={index} value={categories.id}>
-                      {categories.name}
-                    </option>
-                  );
-                })}
+                <select
+                  id="countries"
+                  {...register("category_id")}
+                  className=" border  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  <option value="" disabled selected>
+                    نوع الرحلة
+                  </option>
+                  {showCategories.map((categories, index) => {
+                    return (
+                      <option key={index} value={categories.id}>
+                        {categories.name}
+                      </option>
+                    );
+                  })}
+                </select>
                 {errors && (
-                  <p className="text-red-500 text-sm">
+                  <span className="text-red-500 text-sm">
                     {errors.category_id?.message}
-                  </p>
+                  </span>
                 )}
-              </select>
-               </div>
-        }
-             
+              </div>
+              <div className="w-[49%] flex flex-wrap gap-3">
+                <div className="w-[49%] flex-grow">
+                  <textarea
+                    rows={1}
+                    type="text"
+                    {...register("description")}
+                    placeholder="وصف الخدمة "
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.description?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
             </div>
 
             <div>
               {updateMode ? (
                 <button
-                  onClick={handleSubmit(handleEmpUpdate)}
+                  onClick={handleSubmit(handleSrvUpdate)}
                   disabled={isSubmitting}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block">
-                     تحديث الخدمة 
-                  </button>
-                  ) : (
+                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                >
+                  تحديث الخدمة
+                </button>
+              ) : (
                 <button
                   onClick={handleSubmit(storeService)}
                   disabled={isSubmitting}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block">
-                    تسجيل خدمة جديد 
+                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                >
+                  تسجيل خدمة جديد
                 </button>
               )}
             </div>
@@ -428,12 +426,12 @@ const deleteService = (id) => {
                       setUpdateEmpID(id);
                       setUpdateMode(true);
                       setValue("name", name);
-                      setValue("cost", cost);
+                      setValue("cost", cost.toString());
                       setValue("description", description);
                       setValue(
                         "category_id",
-                        branches
-                          .find((branch) => branch.id === branch_id)
+                        showCategories
+                          .find((cat) => cat.id === branch_id)
                           ?.id.toString()
                       );
                     }}
