@@ -311,10 +311,8 @@ function Branchpage() {
                   <label className="text-white">تفعيل الفرع أم لا ؟</label>
                   <div className="mb-5">
                     <Switch
-                      checked={branchStatus === true} // '1' is considered as 'on'
-                      onChange={(e) =>
-                        setBranchStatus(e.target.checked ? true : false)
-                      } // '1' for on, '0' for off
+                      checked={branchStatus}
+                      onChange={(e) => setBranchStatus(e.target.checked)}
                       color="success"
                     />
                   </div>
@@ -520,7 +518,6 @@ function Branchpage() {
       </table>
 
       {loader && <div className="spinner"></div>}
- 
     </main>
   );
 }

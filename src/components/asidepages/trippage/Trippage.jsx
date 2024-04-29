@@ -1,4 +1,3 @@
-
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
@@ -6,37 +5,33 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 import axios from "axios";
-import { useForm ,  } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 
-
 function Trippage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
-  const [trips, settrips] = useState([]);
+  const [trips, setTrips] = useState([]);
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem("user_token");
   const [branchStatus, setBranchStatus] = useState(false);
   const [updateMode, setUpdateMode] = useState(false);
-  const [updateTripsID, setupdateTripsID] = useState("");
+  const [updateTripsID, setUpdateTripsID] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
-
-  // show and hide more 
-  
-
+  // show and hide more
 
   const schema = z.object({
-    tirpName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
-    tirpCost: z.string().min(1, { message: "ادخل تكلفة الرحلة" }),
-    tirpDate: z.string().min(1, { message: "ادخل تاريخ الرحلة" }),
+    tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
+    tripCost: z.string().min(1, { message: "رقم الرحلة خاطئ" }),
+    take_off: z.string().min(1, { message: "ادخل تاريخ الرحلة" }),
     tripFrom: z.string().min(1, { message: "ادخل المنطقة من" }),
     tripTo: z.string().min(1, { message: "ادخل المنطقة الي" }),
-    tirpDescription: z.string().min(1, { message: "ادخل وصف الرحلة" }),
-    categoryName: z.string().min(1, { message: "ادخل نوع الرحلة" }),
+    tripDescription: z.string().min(1, { message: "ادخل وصف الرحلة" }),
+    category_id: z.string().min(1, { message: "ادخل نوع الرحلة" }),
   });
 
   const {
@@ -48,69 +43,50 @@ function Trippage() {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
-
- 
-
-
   useEffect(() => {
     fetchData();
-    fetchcountries();
-    fetchcategories();
+    fetchCountries();
+    fetchCategories();
   }, []);
 
+  const [showCountCountries, setShowCountries] = useState([]);
+  const [showCategories, setShowCategories] = useState([]);
 
+  function fetchCountries() {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}countries`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setShowCountries(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
+        handleUnauthenticated();
+      });
+  }
 
-  // Pagination
-  const items =8
-  const [current , setcurrent] = useState(1)
-  const NbPage = Math.ceil(trips.length / items)
-  const offset = (current - 1) * items
-  const startIndex =  (current - 1) * items
-  const endIndex = startIndex + items
-  const DataPerPage = trips.slice(startIndex , endIndex)
+  function fetchCategories() {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}categories/selection/id-name`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setShowCategories(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+        handleUnauthenticated();
+      });
+  }
 
-
-
-
-
-const [showCouncountries, setShowCountries] = useState([]);
-const [showcategories, setShowcategories] = useState([]);
-function fetchcountries() {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}countries`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setShowCountries(response.data.data);
-    })
-    .catch(function (error) {
-      console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
-      handleUnauthenticated();
-    })
-}
- 
-function fetchcategories() {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}categories/selection/id-name`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setShowcategories(response.data.data);
-    })
-    .catch(function (error) {
-      console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
-      handleUnauthenticated();
-    })
-}
- 
-
-// fetch data from api
+  // fetch data from api
   const fetchData = () => {
     setLoader(true);
     axios
@@ -122,10 +98,10 @@ function fetchcategories() {
       .then(function (response) {
         if (response.status === 401) {
           handleUnauthenticated();
-        } else {
-          setLoader(false);
-          settrips(response.data.data);
         }
+          setLoader(false);
+          setTrips(response.data.data);
+        
       })
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
@@ -134,7 +110,7 @@ function fetchcategories() {
       .finally(() => {
         setLoader(false);
       });
-}
+  };
 
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
@@ -146,29 +122,20 @@ function fetchcategories() {
     localStorage.removeItem("user_role_name");
   };
 
-
-  // sote trip
-  const storeTrips = async ({
-    tirpName,
-    tirpCost,
-    tirpDate,
-    tripFrom,
-    tripTo,
-    tirpDescription,
-    categoryName,
-  }) => {
+  // store trip
+  const storeTrips = async () => {
     setLoader(true);
     await axios
       .post(
         `${baseUrl}trips`,
         {
-          name: tirpName,
-          cost: tirpCost,
-          take_off : tirpDate,
-          from_countries_id: tripFrom,
-          to_countries_id: tripTo,
-          description: tirpDescription,
-          category_id: categoryName,
+          name: getValues("tripName"),
+          cost: getValues("tripCost").toString(),
+          take_off: getValues("take_off"),
+          from_countries_id: getValues("tripFrom"),
+          to_countries_id: getValues("tripTo"),
+          description: getValues("tripDescription"),
+          category_id: getValues("category_id"),
         },
         {
           headers: {
@@ -176,23 +143,31 @@ function fetchcategories() {
           },
         }
       )
-      .then((res) => {
+      .then(() => {
         toast("تم إنشاء الرحلة  بنجاح", { type: "success" });
         fetchData();
-        reset(); 
+        reset();
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
           toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
         }
+        if (
+          response.response.data.message ==
+          "The take off must be a date after now."
+        ) {
+          toast.error("يجب أن يكون وقت الإقلاع بعد الآن");
+        }
+        console.log("Error creating branch:", response);
+        // toast.warning(response.response.data.message);
       })
       .finally(() => {
         setLoader(false);
       });
   };
 
-// delete trip 
-function deleteTrips(id) {
+  // delete trip
+  function deleteTrips(id) {
     setLoader(true);
     axios
       .delete(`${baseUrl}trips/${id}`, {
@@ -229,19 +204,18 @@ function deleteTrips(id) {
     setLoader(false);
   }
 
- 
   const updateTrips = async () => {
     setLoader(true);
     await axios
       .post(
         `${baseUrl}trips/${updateTripsID}`,
         {
-          name: getValues("tirpName"),
-          cost: getValues("tirpCost"),
-          take_off: getValues("tirpDate"),
+          name: getValues("tripName"),
+          cost: getValues("tripCost").toString(),
+          take_off: getValues("take_off"),
           from_countries_id: getValues("tripFrom"),
-          to_countries_id: getValues("tirpDescription"),
-          description: getValues("categoryName"),
+          to_countries_id: getValues("tripTo"),
+          description: getValues("tripDescription"),
           category_id: getValues("category_id"),
         },
         {
@@ -250,7 +224,7 @@ function deleteTrips(id) {
           },
         }
       )
-      .then((res) => {
+      .then(() => {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
         fetchData();
       })
@@ -262,10 +236,9 @@ function deleteTrips(id) {
       })
       .finally(() => {
         setLoader(false);
-       setUpdateMode(false);
-       reset();
+        setUpdateMode(false);
+        reset();
       });
-     
   };
 
   const handleSearch = (e) => {
@@ -278,7 +251,7 @@ function deleteTrips(id) {
         },
       })
       .then((response) => {
-        settrips([response.data.data]);
+        setTrips([response.data.data]);
       })
       .catch((error) => {
         console.error("Error fetching trips:", error);
@@ -287,126 +260,158 @@ function deleteTrips(id) {
       .finally(() => {
         setLoader(false);
       });
-};
+  };
 
-return (
+  return (
     <main className="branchTable">
       {/* add branch form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
-          <form>
-            <div className="mb-5 flex w-full gap-4	">
-             <div className="flex-grow w-full">
-             <input
-                type="text"
-                {...register("tirpName")}
-                placeholder="اسم الرحلة"
-                className="w-full flex-grow rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-              /><br/>
-              {errors && (
-                <span className="text-red-500 text-sm">
-                  {errors.tirpName?.message}
-                </span>)}
-             </div> 
+          <form className=" space-y-3">
+            <div className="flex gap-4	">
               <div className="flex-grow w-full">
-              <input
-                type="number"
-                {...register("tirpCost")}
-                placeholder="تكلفة الرحلة "
-                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                 />
-              {errors && (
-                <span className="text-red-500 text-sm">
-                  {errors.tirpCost?.message}
-                </span>)}
-              </div >
+                <input
+                  type="text"
+                  {...register("tripName")}
+                  placeholder="اسم الرحلة"
+                  className="w-full flex-grow rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                />
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.tripName?.message}
+                  </span>
+                )}
+              </div>
+              <div className="flex-grow w-full">
+                <input
+                  type="number"
+                  {...register("tripCost")}
+                  placeholder="تكلفة الرحلة "
+                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                />
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.tripCost?.message}
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="mb-5 flex gap-3">
-              <input
-                type="date"
-                {...register("tirpDate")}
-                placeholder="تاريخ إقلاع الرحلة "
-                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-              />
-              {errors && (
-                <span className="text-red-500 text-sm">
-                  {errors.tirpDate?.message}
-                </span>)}
+            <div className="flex gap-4 ">
+              <div className="w-full">
+                <input
+                  type="date"
+                  {...register("take_off")}
+                  placeholder="تاريخ إقلاع الرحلة "
+                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                />
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.take_off?.message}
+                  </span>
+                )}
+              </div>
+              <div className="w-full">
                 <textarea
-                 rows="1"
-                {...register("tirpDescription")}
-                placeholder="وصف بسيط عن الرحلة  "
-                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-              />
+                  rows="1"
+                  {...register("tripDescription")}
+                  placeholder="وصف بسيط عن الرحلة"
+                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                />
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.tripDescription?.message}
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="mb-5 flex gap-2">
-            <select id="countries" className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <option >اختار اسم الدولة من</option>
-                {
-                  showCouncountries.map((trip , index)=>{
-                    return (
-                       <option key={index}  {...register("tripFrom")} value={trip.id}>{trip.en_short_name}</option>
-                    );
-                  })
-                }
-               
+            <div className="flex gap-2">
+              
+              <select
+                id="countries"
+                {...register("tripFrom")}
+                className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="" disabled selected>
+                  من
+                </option>
+                {showCountCountries.map((trip, index) => {
+                  return (
+                    <option key={index} value={trip.id}>
+                      {trip.en_short_name}
+                    </option>
+                  );
+                })}
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.tripFrom?.message}
+                  </span>
+                )}
               </select>
-              {errors && (
-                <span className="text-red-500 text-sm">
-                  {errors.tripFrom?.message}
-                </span>)}
 
-                <select id="countries" className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <option >اختار اسم الدولة من</option>
-                {
-                  showCouncountries.map((trip , index)=>{
-                    return (
-                       <option key={index} {...register("tripTo")} value={trip.id}>{trip.en_short_name}</option>
-                    );
-                  })
-                }
-               
+              <select
+                id="countries"
+                {...register("tripTo")}
+                className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="" disabled selected>
+                  إلى
+                </option>
+                {showCountCountries.map((trip, index) => {
+                  return (
+                    <option key={index} value={trip.id}>
+                      {trip.en_short_name}
+                    </option>
+                  );
+                })}
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.tripTo?.message}
+                  </span>
+                )}
               </select>
-              {errors && (
-                <span className="text-red-500 text-sm">
-                  {errors.tripTo?.message}
-                </span>)}
 
-                <select id="countries" className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                <option >اختار نوع الرحلة </option>
-                {
-                  showcategories.map((categories , index)=>{
-                    return (
-                       <option key={index} {...register("categoryName")} value={categories.id}>{categories.name}</option>
-                    );
-                  })
-                }
-               
+              <select
+                id="countries"
+                {...register("category_id")}
+                className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="" disabled selected>
+                  نوع الرحلة
+                </option>
+                {showCategories.map((categories, index) => {
+                  return (
+                    <option key={index} value={categories.id}>
+                      {categories.name}
+                    </option>
+                  );
+                })}
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.category_id?.message}
+                  </span>
+                )}
               </select>
-              {errors && (
-                <span className="text-red-500 text-sm">
-                  {errors.categoryName?.message}
-                </span>)}
-
-
             </div>
 
-
-            <div className="mb-5 pt-3">
+            <div className="pt-3">
               <div className="-mx-3 flex flex-wrap">
-                   {
-                    updateMode &&
-                    <div className="w-full px-3 sm:w-1/2">
-                              <label className="text-white">تفعيل الرحلة أو إلفاء تفعيل الرحلة  ؟</label>
-                              <div className="mb-5">
-                                <Switch
-                                checked={branchStatus === true} 
-                                onChange={(e) =>
-                                  setBranchStatus(e.target.checked ? true : false)}color="success"/>
-                            </div>
-                      </div>
-                   }
+                {updateMode && (
+                  <div className="w-full px-3 sm:w-1/2">
+                    <label className="text-white">
+                      تفعيل الرحلة أو إلفاء تفعيل الرحلة ؟
+                    </label>
+                    <div className="mb-5">
+                      <Switch
+                        checked={branchStatus}
+                        onChange={(e) =>
+                          setBranchStatus(e.target.checked)
+                        }
+                        color="success"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -418,7 +423,7 @@ return (
                   disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تحديث الرحلة 
+                  تحديث الرحلة
                 </button>
               ) : (
                 <button
@@ -427,7 +432,7 @@ return (
                   onClick={handleSubmit(storeTrips)}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  إنشاء الرحلة 
+                  إنشاء الرحلة
                 </button>
               )}
             </div>
@@ -462,7 +467,7 @@ return (
           </div>
         </form>
       </div>
-          
+
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
         <thead>
@@ -471,10 +476,10 @@ return (
               الترتيب
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              نوع الرحلة 
+              اسم الرحلة
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              وقت الإقلاع
+              تاريخ الإقلاع
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               التكلفة
@@ -486,18 +491,21 @@ return (
               الحالة
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              من 
+              من
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              إلي 
+              إلي
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              نوع الرحلة
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               {" "}
-            وقت الإنشاء{" "}
+              وقت الإنشاء{" "}
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               {" "}
-             التعديل{" "}
+              التعديل{" "}
             </th>
           </tr>
         </thead>
@@ -512,8 +520,9 @@ return (
               description,
               status,
               created_at,
-              from, 
-              to    
+              from,
+              to,
+              category_id,
             } = trip;
             return (
               <tr
@@ -556,12 +565,18 @@ return (
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
-                  {from.en_short_name}
+                    {from.en_short_name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
-                  {to.en_short_name}
+                    {to.en_short_name}
+                  </span>
+                </td>
+                {/* toDo - نوع الرحلة */}
+                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  px-1  text-xs font-bold">
+                    {category_id}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -570,20 +585,21 @@ return (
                   </span>
                 </td>
 
-
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <button
                     onClick={() => {
                       ScrollUp();
-                      setupdateTripsID(id);
+                      setUpdateTripsID(id);
                       setUpdateMode(true);
-                      setValue("tirpName", name);
-                      setValue("tripCost", cost);
+                      setValue("tripName", name);
+                      setValue("tripCost", cost.toString());
+                      setValue("take_off", takeOff);
                       setValue("tripDescription", description);
                       setValue("tripStatus", status === "مفعل" ? true : false);
-                      setValue("tripFrom", from.en_short_name);
-                      setValue("tripTo", to.en_short_name);
-                      setValue("category_id", to.category_id);
+                      setValue("tripFrom", from.id);
+                      setValue("tripTo", to.id);
+                      // console.log("from", from.en_short_name);
+                      setValue("category_id", category_id);
                       setBranchStatus(status === "مفعل" ? true : false);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
@@ -592,7 +608,8 @@ return (
                   </button>
                   <button
                     onClick={() => deleteTrips(id)}
-                    className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500">
+                    className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
+                  >
                     <DeleteForeverIcon />
                   </button>
                 </td>
@@ -602,59 +619,8 @@ return (
         </tbody>
       </table>
 
-            {/* loader */}
-            {loader && (
-                          <svg
-                            id="loading-spinner"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="100"
-                            height="100"
-                            viewBox="0 0 48 48"
-                          >
-                            <g fill="none">
-                              <path
-                                id="track"
-                                fill="#C6CCD2"
-                                d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
-                              />
-                              <path
-                                id="section"
-                                fill="#3F4850"
-                                d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
-                              />
-                            </g>
-                          </svg>
-            )}
-    
-    
-    {/* Pagination */}
-      <div className="max-w-full md:max-w-screen-md lg:max-w-screen-lg xl:max-w-screen-xl mx-auto bg-white p-6 rounded-lg shadow-sm">
-          <div className="flex justify-center">
-              <nav className="flex space-x-2" aria-label="Pagination">
-                  <a href="#" className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
-                      Previous
-                  </a>
-                  {Array.from({ length: NbPage }, (_, i) => i + 1).map((page) => (
-                    <a
-                      key={page} // Make sure to include a unique key for each element in the array
-                      href="#"
-                      className="relative inline-flex items-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-fuchsia-100 hover:bg-fuchsia-200 cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10"
-                    >
-                      {page}
-                    </a>
-                  ))}
-
-                
-                  <a   href="#" className="relative inline-flex items-center px-4 py-2 text-sm bg-gradient-to-r from-violet-300 to-indigo-300 border border-fuchsia-100 hover:border-violet-100 text-white font-semibold cursor-pointer leading-5 rounded-md transition duration-150 ease-in-out focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10">
-                      Next
-                  </a>
-              </nav>
-          </div>
-      </div>
-    
-                
-
-
+      {/* loader */}
+      {loader && <div className="spinner"></div>}
     </main>
   );
 }
