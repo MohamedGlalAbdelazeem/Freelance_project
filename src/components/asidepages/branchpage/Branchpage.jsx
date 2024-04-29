@@ -1,4 +1,3 @@
-
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
@@ -7,16 +6,14 @@ import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 import "./branchpage.css";
 import axios from "axios";
-import { useForm ,  } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 
-
 function Branchpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
-
 
   const [branches, setBranches] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -26,7 +23,6 @@ function Branchpage() {
   const [updateMode, setUpdateMode] = useState(false);
   const [updateBranchID, setUpdateBranchID] = useState("");
   const [searchValue, setSearchValue] = useState("");
-
 
   const schema = z.object({
     branchName: z.string().min(1, { message: "ادخل اسم الفرع" }),
@@ -42,10 +38,8 @@ function Branchpage() {
     setValue,
     reset,
     getValues,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
-
-
 
   useEffect(() => {
     fetchBranches();
@@ -53,14 +47,13 @@ function Branchpage() {
 
   // Pagination
 
-  const items =8
-  const [current , setcurrent] = useState(1)
-  const NbPage = Math.ceil(branches.length / items)
-  const offset = (current - 1) * items
-  const startIndex =  (current - 1) * items
-  const endIndex = startIndex + items
-  const DataPerPage = branches.slice(startIndex , endIndex)
-  
+  const items = 8;
+  const [current, setcurrent] = useState(1);
+  const NbPage = Math.ceil(branches.length / items);
+  const offset = (current - 1) * items;
+  const startIndex = (current - 1) * items;
+  const endIndex = startIndex + items;
+  const DataPerPage = branches.slice(startIndex, endIndex);
 
   const fetchBranches = () => {
     setLoader(true);
@@ -106,7 +99,7 @@ function Branchpage() {
   }) => {
     setLoader(true);
     if (timeTo <= timeFrom) {
-      toast("عدل الوقت ينجم", { type: "error" });
+      toast.error("يجب أن تكون بداية الوقت اقل من نهاية الوقت");
       return;
     }
     await axios
@@ -133,11 +126,11 @@ function Branchpage() {
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
-          toast("هذا الفرع موجود بالفعل", { type: "error" });
+          toast.error("هذا الفرع موجود بالفعل");
         }
-        // if (response.response.data.message == "Unauthenticated") {
-        //   handleUnauthenticated();
-        // }
+        if (response.response.data.message == "To must be greter than from") {
+          toast.error("يجب أن تكون بداية الوقت اقل من نهاية الوقت");
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -203,19 +196,20 @@ function Branchpage() {
       .then(() => {
         toast("تم تحديث الفرع بنجاح", { type: "success" });
         fetchBranches();
+        reset();
+        setUpdateMode(false);
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
           toast("هذا الفرع موجود بالفعل", { type: "error" });
         }
-        console.log("Error updating branch:", response.response.data.message);
+        if (response.response.data.message == "To must be greter than from") {
+          toast.error("يجب أن تكون بداية الوقت اقل من نهاية الوقت");
+        }
       })
       .finally(() => {
         setLoader(false);
-       setUpdateMode(false);
-       reset();
       });
-      
   };
 
   const handleSearch = (e) => {
