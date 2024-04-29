@@ -24,15 +24,15 @@ function Services() {
   const [branches, setBranches] = useState([]);
   const Naviagate = useNavigate();
 
-  const handleUnauthenticated = () => {
-    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-      type: "error",
-      autoClose: 4000,
-    });
-    Naviagate("/Login");
-    localStorage.removeItem("user_token");
-    localStorage.removeItem("user_role_name");
-  };
+  // const handleUnauthenticated = () => {
+  //   toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+  //     type: "error",
+  //     autoClose: 4000,
+  //   });
+  //   Naviagate("/Login");
+  //   localStorage.removeItem("user_token");
+  //   localStorage.removeItem("user_role_name");
+  // };
 
   const schema = z
     .object({
@@ -70,7 +70,7 @@ function fetchCategories() {
     })
     .catch(function (error) {
       console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-      handleUnauthenticated();
+      // handleUnauthenticated();
     });
 }
 
@@ -89,7 +89,7 @@ function fetchCategories() {
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
-        handleUnauthenticated();
+        // handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
@@ -135,7 +135,7 @@ const deleteService = (id) => {
       })
       .then(function (response) {
         if (response.status === 401) {
-          handleUnauthenticated();
+          // handleUnauthenticated();
         } else if (response.status === 204) {
           toast.success("تم حذف الخدمة بنجاح");
           fetchServices();
@@ -147,17 +147,17 @@ const deleteService = (id) => {
       .catch(function (error) {
         console.error("Error deleting service:", error);
         setLoader(true);
-        if (
-          error.response &&
-          error.response.status === 401 &&
-          error.response.data.message === "Unauthenticated"
-        ) {
-          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-            type: "error",
-          });
-        } else {
-          console.log("Error deleting branch:", error);
-        }
+        // if (
+        //   error.response &&
+        //   error.response.status === 401 &&
+        //   error.response.data.message === "Unauthenticated"
+        // ) {
+        //   toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+        //     type: "error",
+        //   });
+        // } else {
+        //   console.log("Error deleting branch:", error);
+        // }
       })
       .finally(() => {
         setLoader(false);
@@ -251,7 +251,6 @@ const deleteService = (id) => {
             </div>
             <div className=" flex flex-wrap gap-3">
               <div className="w-[49%] flex-grow">
-                <p className="text-white p-1">(اختياري)</p>
                 <input
                   type="text"
                   {...register("description")}
@@ -278,9 +277,9 @@ const deleteService = (id) => {
                   );
                 })}
                 {errors && (
-                  <span className="text-red-500 text-sm">
+                  <p className="text-red-500 text-sm">
                     {errors.category_id?.message}
-                  </span>
+                  </p>
                 )}
               </select>
                </div>
