@@ -16,7 +16,7 @@ function Services() {
 
   const [updateMode, setUpdateMode] = useState(false);
   const [updateEmpID, setUpdateEmpID] = useState("");
-
+  const [showCategories, setShowCategories] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const userToken = localStorage.getItem("user_token");
 
@@ -36,23 +36,10 @@ function Services() {
 
   const schema = z
     .object({
-      name: z.string().min(1, "الاسم يجب ان يكون 3 احرف على الاقل"),
-      email: z
-        .string()
-        .min(1, { message: "البريد الالكترونى مطلوب" })
-        .email("البريد الالكترونى غير صحيح"),
-      password: z.string().min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"),
-      password_confirmation: z
-        .string()
-        .min(6, "كلمة المرور يجب ان تكون 6 احرف على الاقل"),
-      phone_number: z.string().min(11, "رقم الهاتف يجب ان يكون 11 رقم"),
-      branch_id: z.string().min(1, "رقم الفرع مطلوب"),
+      name: z.string().min(1, "ادخل اسم الخدمة"),
+      cost: z.string().min( "ادخل تكلفة الخدمة "),
+      category_id: z.string().min(1, "اختر تصنيف الخدمة"),
     })
-    .refine((data) => data.password === data.password_confirmation, {
-      message: "كلمة المرور غير متطابقة",
-      path: ["password_confirmation"],
-    });
-
   const {
     register,
     handleSubmit,
@@ -64,9 +51,30 @@ function Services() {
 
   useEffect(() => {
     fetchServices();
+    fetchCategories();
   }, []);
 
 const [services , setServices] = useState([])
+
+// show category 
+function fetchCategories() {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}categories/selection/id-name`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setShowCategories(response.data.data);
+    })
+    .catch(function (error) {
+      console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+      handleUnauthenticated();
+    });
+}
+
+// show services
   const fetchServices = () => {
     setLoader(true);
     axios
@@ -76,12 +84,8 @@ const [services , setServices] = useState([])
         },
       })
       .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        } else {
           setLoader(false);
           setServices(response.data.data);
-        }
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
@@ -91,26 +95,24 @@ const [services , setServices] = useState([])
         setLoader(false);
       });
   };
-console.log(services);
-  const storeEmployee = () => {
+
+  const storeService = () => {
     setLoader(true);
-    const employeeData = {
+    const servicesData = {
       name: getValues("name"),
-      email: getValues("email"),
-      password: getValues("password"),
-      password_confirmation: getValues("password_confirmation"),
-      phone_number: getValues("phone_number"),
-      branch_id: getValues("branch_id").toString(),
+      cost: getValues("cost"),
+      description: getValues("description"),
+      category_id: getValues("category_id"),
     };
     axios
-      .post(`${baseUrl}services`, employeeData, {
+      .post(`${baseUrl}services`, servicesData, {
         headers: {
           Authorization: `Bearer ${userToken}`,
-          "Content-Type": "multipart/form-data",
         },
       })
-      .then(function () {
-        toast.success("تم تسجيل الموظف بنجاح");
+      .then(function (res) {
+        toast.success("تم تسجيل الخدمة  بنجاح");
+        console.log(res);
         fetchServices();
         reset();
       })
@@ -122,7 +124,8 @@ console.log(services);
       });
   };
 
-  const deleteEmp = (id) => {
+// handel delete 
+const deleteService = (id) => {
     setLoader(true);
     axios
       .delete(`${baseUrl}services/${id}`, {
@@ -134,7 +137,7 @@ console.log(services);
         if (response.status === 401) {
           handleUnauthenticated();
         } else if (response.status === 204) {
-          toast.success("تم حذف الفرع بنجاح");
+          toast.success("تم حذف الخدمة بنجاح");
           fetchServices();
         } else {
           console.error("Unexpected response status:", response.status);
@@ -142,7 +145,7 @@ console.log(services);
         }
       })
       .catch(function (error) {
-        console.error("Error deleting branch:", error);
+        console.error("Error deleting service:", error);
         setLoader(true);
         if (
           error.response &&
@@ -159,7 +162,7 @@ console.log(services);
       .finally(() => {
         setLoader(false);
       });
-  };
+};
 
   const handleEmpUpdate = () => {
     setLoader(true);
@@ -223,7 +226,7 @@ console.log(services);
                 <input
                   type="text"
                   {...register("name")}
-                  placeholder="اسم الموظف"
+                  placeholder="اسم الخدمة"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {errors && (
@@ -235,56 +238,54 @@ console.log(services);
               <div className="w-[49%] flex-grow">
                 <input
                   type="text"
-                  {...register("email")}
+                  {...register("cost")}
                   placeholder="تكلفة الخدمة"
                   className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {errors && (
                   <span className="text-red-500 text-sm">
-                    {errors.email?.message}
+                    {errors.cost?.message}
                   </span>
                 )}
               </div>
             </div>
             <div className=" flex flex-wrap gap-3">
               <div className="w-[49%] flex-grow">
+                <p className="text-white p-1">(اختياري)</p>
                 <input
                   type="text"
-                  {...register("password")}
+                  {...register("description")}
                   placeholder="وصف الخدمة "
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
+                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"/>
+              </div>
+               
+        {
+          updateMode && 
+          <div className="w-[49%] flex-grow">
+               <select
+                id="countries"
+                {...register("category_id")}
+                className=" border  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 mt-8   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              >
+                <option value="" disabled selected>
+                  نوع الرحلة
+                </option>
+                {showCategories.map((categories, index) => {
+                  return (
+                    <option key={index} value={categories.id}>
+                      {categories.name}
+                    </option>
+                  );
+                })}
                 {errors && (
                   <span className="text-red-500 text-sm">
-                    {errors.password?.message}
+                    {errors.category_id?.message}
                   </span>
                 )}
-              </div>
+              </select>
+               </div>
+        }
              
-            </div>
-            <div className=" flex flex-wrap gap-3">
-              <div className="w-[49%] flex-grow">
-                <select
-                  {...register("branch_id")}
-                  className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                >
-                  <option
-                    value=""
-                    disabled
-                  >
-                    اختر نوع الخدمة 
-                  </option>
-                  {branches.map((branch) => {
-                    const { id, name } = branch;
-                    return <option key={id} value={id} label={name} />;
-                  })}
-                </select>
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.branch_id?.message}
-                  </span>
-                )}
-              </div>
             </div>
 
             <div>
@@ -292,17 +293,15 @@ console.log(services);
                 <button
                   onClick={handleSubmit(handleEmpUpdate)}
                   disabled={isSubmitting}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-                >
-                  تحديث الخدمة 
-                </button>
-              ) : (
+                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block">
+                     تحديث الخدمة 
+                  </button>
+                  ) : (
                 <button
-                  onClick={handleSubmit(storeEmployee)}
+                  onClick={handleSubmit(storeService)}
                   disabled={isSubmitting}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-                >
-                  تسجيل خدمة جديد
+                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block">
+                    تسجيل خدمة جديد 
                 </button>
               )}
             </div>
@@ -358,6 +357,7 @@ console.log(services);
               "الترتيب",
               "اسم الخدمة ",
               "تكلفة الخدمة",
+              "وصف عن الخدمة",
               "تاريخ الانشاء",
               " الحالة",
               "التعديل",
@@ -373,15 +373,16 @@ console.log(services);
         </thead>
         <tbody>
           {/* Mapping branches data to table rows */}
-          {services.map((emp, index) => {
+          {services.map((service, index) => {
             const {
               id,
               name,
               cost,
+              description,
               status,
               branch_id,
               created_at,
-            } = emp;
+            } = service;
             return (
               <tr
                 key={id}
@@ -400,7 +401,11 @@ console.log(services);
                     {cost}
                   </span>
                 </td>
-              
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  px-2 text-xs font-bold">
+                    {description}
+                  </span>
+                </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
                     {created_at}
@@ -424,10 +429,10 @@ console.log(services);
                       setUpdateEmpID(id);
                       setUpdateMode(true);
                       setValue("name", name);
-                      setValue("email", email);
-                      setValue("phone_number", phone_number);
+                      setValue("cost", cost);
+                      setValue("description", description);
                       setValue(
-                        "branch_id",
+                        "category_id",
                         branches
                           .find((branch) => branch.id === branch_id)
                           ?.id.toString()
@@ -438,7 +443,7 @@ console.log(services);
                     <DriveFileRenameOutlineIcon />
                   </button>
                   <button
-                    onClick={() => deleteEmp(id)}
+                    onClick={() => deleteService(id)}
                     className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
                   >
                     <DeleteForeverIcon />
