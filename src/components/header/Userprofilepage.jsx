@@ -1,86 +1,158 @@
 import axios from 'axios';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { useState , useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import { toast } from "react-toastify";
+import userPhoto from './user.avif';
+import { useNavigate } from "react-router-dom";
 
 function Userprofilepage() {
+    const [userProfile, setUserprofile] = useState([]);
+    const [loader, setLoader] = useState(true);
+    const navigate = useNavigate(); // Renamed useNavigate to navigate to avoid confusion with component
 
-    // const [userProfile, setUserprofile] = useState([]);
-    // const [loader , setLoader ] = useState(true)
-    // useEffect(() => {
-      // const storedUser = localStorage.getItem('user');
-      // const retrievedUser = JSON.parse(storedUser);
-      // const token = retrievedUser.access_token;
-    //   axios.get('http://127.0.0.1:8000/api/refresh', {
-    //     headers: {
-    //       'Authorization': `Bearer ${token}`
-    //     }
-    //   })
-    //   .then(function (response) {
-    //     if (response.status === 401) {
-    //         handleUnauthenticated();
-    //       } else {
-    //         setLoader(false)
-    //        setUserprofile(response.data.Admin);
-    //       }
-        
-    //   })
-    //   .catch(function (error) {
-    //     alert(error);
-    //     setLoader(true);
-    //     handleUnauthenticated();
-    //   })
-    // }, []);
+    useEffect(() => {
+        const userRoleName = localStorage.getItem('user_role_name');
+        const userToken = localStorage.getItem('user_token');
 
-//     // hande unuthenticated
-// const handleUnauthenticated = () => {
-//     alert('يجب عليك التسجيل مرة أخرى لانتهاء وقت الصلاحية');
-//     Naviagate("/Login");
-//     localStorage.removeItem('user');
-//   };
-    // const userName = userProfile.name
-    // const userEmail = userProfile.email
-    // const userRole = userProfile.role_name
-    // const userPhone = userProfile.phone_number
-    // const userRoleID = userProfile.role_id
-    // const userTime = userProfile.created_at
- 
+        if (!userToken) {
+            handleUnauthenticated();
+            return;
+        }
+
+        axios.get('http://127.0.0.1:8000/api/refresh', {
+            headers: {
+                'Authorization': `Bearer ${userToken}`
+            }
+        })
+        .then(function (response) { 
+            setLoader(false);
+            setUserprofile(response.data.Admin);
+        })
+        .catch(function (error) {
+            if (error.response && error.response.status === 401) {
+                handleUnauthenticated();
+            } else {
+                // Handle other errors
+                console.error("Error refreshing token:", error);
+            }
+            setLoader(false);
+        });
+    }, []);
+
+    const handleUnauthenticated = () => {
+        toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+            type: "error",
+            autoClose: 4000,
+        });
+        navigate("/Login"); // Changed Naviagate to navigate
+        localStorage.removeItem("user_token");
+        localStorage.removeItem("user_role_name");
+    };
+
     return (
-        <div className="flex bg-slate-700 rounded-3xl">
-            <div className="w-full">
-                <div className="p-16">
-                    <div className=" bg-white shadow p-5 rounded-2xl">
-                        <div className="grid grid-cols-1 md:grid-cols-3">
-                            <div className="grid grid-cols-3 text-center order-last md:order-first mt-20 md:mt-0">
-                            </div>
-                            <div className="relative">
-                                <div className="w-32 h-32 bg-indigo-100 mx-auto rounded-full shadow-2xl absolute inset-x-0 top-0 -mt-16 flex items-center justify-center text-indigo-500">
-                                    <AccountCircleIcon sx={{ fontSize: "8rem" }} />
+        <div className="items-center justify-center">
+            <div className="mx-auto w-full max-w-[550px] bg-white">
+                <form>
+                    <div className="mb-2 pt-2">
+                        <div>
+                        <div className="flex justify-center items-center">
+                                <img  src={userPhoto} className="border-double border-4 border-sky-500 w-36 rounded-full h-36 mb-8" alt="user_profile_photo" /> </div>
+                             <input type="file" name="file" id="file" className="sr-only" />
+                            <label className="cursor-pointer relative flex min-h-[50px] items-center justify-center rounded-xl border border-dashed border-[#e0e0e0] p-5 text-center">
+                                <div>
+                                    <span className="mb-2 block text-sm font-semibold text-[#07074D]">
+                                        تغيير الصورة الشخصية
+                                    </span>
+                                    <span className="mb-2 block text-base font-medium text-[#6B7280]">
+                                        Or
+                                    </span>
+                                    <span className="inline-flex rounded border border-[#e0e0e0] py-2 px-2 text-base font-medium text-[#07074D]">
+                                        Browse
+                                    </span>
                                 </div>
-                            </div>
-                        {/* </div>
-                        {loader && <div className="spinner"></div>}
-                        <div className="mt-20 text-center border-b pb-12">
-                            <h1 className="text-4xl text-gray-700 font-bold">{userName}</h1>
-                            <p className="font-bold  text-red-600 mt-3 text-2xl underline">{userRole}</p>
-                            <p className="font-bold  text-red-600 mt-3 text-xl">Role_ID : {userRoleID}</p>
-                            <p className="font-bold  text-red-500 mt-3 text-xl"> الوقت / التاريخ : {userTime}</p>
-                            <p className="mt-2 text-gray-500">{userEmail}</p>
-                            <p className="mt-2 text-gray-500">{userPhone}</p> */}
+                            </label>
                         </div>
-                        <div className="divider divider-info">تعديل المعلومات الشخصية</div>
-                        <div className="mt-12 flex flex-col justify-center">
-                            <p className="text-gray-600 text-center font-light lg:px-16">
-                              tesssssssssssssssssssssssssst
-                            </p>
+    
+                        {/* Rest of the form */}
+                    </div>
+                </form>
+            </div>
+            <h3 className="flex items-center w-full">
+            <span className="flex-grow bg-gray-200 rounded h-1"></span>
+            <button className="mx-2 text-md font-medium  border-2 rounded-full hover:bg-gray-200">
+                تعديل البيانات الشخصية
+            </button>
+            <span className="flex-grow bg-gray-200 rounded h-1"></span>
+        </h3>
+            <div className="items-center justify-center p-12">
+                <div className="rounded-3xl mx-auto w-full max-w-[700px] bg-gray-700 text-white p-10">
+                    <form>
+                        <div className="mb-5">
+                            <label  className="mb-3 block text-base font-medium ">
+                                 الاسم 
+                            </label>
+                            <input type="text" 
+                                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                        </div>
+                        <div className="mb-5">
+                            <label  className="mb-3 block text-base font-medium">
+                                رقم الهاتف
+                            </label>
+                            <input type="number"
+                                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                        </div>
+                      
+                        <div>
                             <button
-                                className="text-indigo-500 py-2 px-4  font-medium mt-4"
-                            >
-                                button
+                                className="hover:shadow-form rounded-md bg-success hover:bg-success/90 py-3 px-8 text-base font-semibold text-white outline-none">
+                                تعديل 
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
-            </div>
+              </div>
+
+              <h3 className="flex items-center w-full">
+            <span className="flex-grow bg-gray-200 rounded h-1"></span>
+            <button className="mx-2 text-md font-medium  border-2 rounded-full hover:bg-gray-200">
+            تغيير كلمة السر
+            </button>
+            <span className="flex-grow bg-gray-200 rounded h-1"></span>
+        </h3>
+            <div className="items-center justify-center p-12">
+                <div className="rounded-3xl mx-auto w-full max-w-[700px] bg-gray-700 text-white p-10">
+                    <form>
+                        <div className="mb-5">
+                            <label  className="mb-3 block text-base font-medium ">
+                                 كلمة السر الحالية 
+                            </label>
+                            <input type="password" name="name" id="name" 
+                                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                        </div>
+                        <div className="mb-5">
+                            <label  className="mb-3 block text-base font-medium">
+                                كلمة السر الجديدة 
+                            </label>
+                            <input type="password"
+                                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                        </div>
+
+                        <div className="mb-5">
+                            <label  className="mb-3 block text-base font-medium">
+                                                تأكيد كلمة السر الجديدة
+                            </label>
+                            <input type="password"
+                                className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md" />
+                        </div>
+                      
+                        <div>
+                            <button
+                                className="hover:shadow-form rounded-md bg-success hover:bg-success/90 py-3 px-8 text-base font-semibold text-white outline-none">
+                                تعديل 
+                            </button>
+                        </div>
+                    </form>
+                </div>
+              </div>
         </div>
     );
 }
