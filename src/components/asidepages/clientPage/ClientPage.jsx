@@ -21,7 +21,6 @@ function ClientPage() {
   const [searchValue, setSearchValue] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
   const [updateClientID, setUpdateClientID] = useState("");
-  const [picture, setPicture] = useState(null);
   const Navigate = useNavigate();
 
   const handleUnauthenticated = () => {
