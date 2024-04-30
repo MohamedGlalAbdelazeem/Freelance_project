@@ -9,6 +9,8 @@ import { ScrollUp } from "../../ScrollUp";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+//pagenation
+import ReactPaginate from 'react-paginate';
 
 function ClientPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
@@ -57,7 +59,44 @@ function ClientPage() {
     fetchClients();
     fetchBranches();
     fetchNationalities();
+    fetchPagenation()
   }, []);
+
+
+// fetch pagenation data///////////////////////
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+
+useEffect(() => {
+  fetchPagenation();
+}, [currentPage]); // Fetch data whenever currentPage changes
+
+const fetchPagenation = () => {
+  setLoader(true);
+  axios
+    .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setClients(response.data.data);
+      setTotalPages(response.data.meta.pagination.last_page);
+    })
+    .catch(function (error) {
+      console.error("Error fetching branches:", error);
+    })
+};
+
+
+const handlePageClick = (selectedPage) => {
+  setCurrentPage(selectedPage.selected + 1);  
+};
+// fetch pagenation data///////////////////////
+
+
+
+
 
   const fetchNationalities = () => {
     setLoader(true);
@@ -448,13 +487,14 @@ function ClientPage() {
               nationality,
               created_at,
             } = client;
+            const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
               <tr
                 key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
-                  {index + 1}
+                  {tableIndex}
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
@@ -520,6 +560,22 @@ function ClientPage() {
           })}
         </tbody>
       </table>
+      <div>
+            {/* Render pagination */}
+            <ReactPaginate
+                pageCount={totalPages}
+                pageRangeDisplayed={3}
+                marginPagesDisplayed={2}
+                onPageChange={handlePageClick}
+                containerClassName={'flex justify-center mt-4 text-2xl'}
+                activeClassName={'bg-blue-500 text-white'}
+                previousLabel={'السابق '}
+                nextLabel={'التالي'}
+                previousClassName={'mr-3 px-3 py-2 border rounded hover:bg-gray-200'}
+                nextClassName={'ml-2 px-3 py-1 border rounded hover:bg-gray-200'}
+                pageClassName={'mr-2 px-3 py-1 border rounded hover:bg-gray-200'}
+            />
+        </div>
       {loader && <div className="spinner"></div>}
     </div>
   );

@@ -11,7 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
-// import Pagenation from "../../Pagenation";
+//pagenation
 import ReactPaginate from 'react-paginate';
 
 function Branchpage() {
@@ -47,6 +47,7 @@ function Branchpage() {
     fetchBranches();
     fetchPagenation()
   }, []);
+
 
   const fetchBranches = () => {
     setLoader(true);
@@ -99,13 +100,15 @@ const fetchPagenation = () => {
       console.error("Error fetching branches:", error);
     })
 };
-// fetch pagenation data///////////////////////
-
 
 
 const handlePageClick = (selectedPage) => {
   setCurrentPage(selectedPage.selected + 1);  
 };
+// fetch pagenation data///////////////////////
+
+
+
 
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
