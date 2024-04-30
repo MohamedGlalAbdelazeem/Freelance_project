@@ -19,7 +19,7 @@ function UserProfilePage() {
 
   useEffect(() => {
     setLoader(true);
-    const userRoleName = localStorage.getItem("user_role_name");
+   // const userRoleName = localStorage.getItem("user_role_name");
     const userToken = localStorage.getItem("user_token");
     if (!userToken) {
       handleUnauthenticated();
@@ -74,7 +74,7 @@ function UserProfilePage() {
           },
         }
       )
-      .then(function (res) {
+      .then(function () {
         toast.success("تم تحديث البيانات بنجاح");
         refreshUser();
       })
