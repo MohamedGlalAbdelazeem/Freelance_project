@@ -219,6 +219,7 @@ function Trippage() {
           to_countries_id: getValues("tripTo"),
           description: getValues("tripDescription"),
           category_id: getValues("category_id"),
+          status: branchStatus,
         },
         {
           headers: {
@@ -341,12 +342,12 @@ function Trippage() {
                     </option>
                   );
                 })}
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.tripFrom?.message}
-                  </span>
-                )}
               </select>
+              {errors && (
+                <span className="text-red-500 text-sm">
+                  {errors.tripFrom?.message}
+                </span>
+              )}
 
               <select
                 id="countries"
@@ -363,12 +364,12 @@ function Trippage() {
                     </option>
                   );
                 })}
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.tripTo?.message}
-                  </span>
-                )}
               </select>
+              {errors && (
+                <span className="text-red-500 text-sm">
+                  {errors.tripTo?.message}
+                </span>
+              )}
 
               <select
                 id="countries"
@@ -385,12 +386,12 @@ function Trippage() {
                     </option>
                   );
                 })}
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.category_id?.message}
-                  </span>
-                )}
               </select>
+              {errors && (
+                <span className="text-red-500 text-sm">
+                  {errors.category_id?.message}
+                </span>
+              )}
             </div>
 
             <div className="pt-3">
@@ -450,7 +451,7 @@ function Trippage() {
               id="default-search"
               value={searchValue}
               onChange={(e) => {
-                setSearchValue(e.target.value)
+                setSearchValue(e.target.value);
               }}
               onKeyUp={(e) => {
                 handleSearch(e);
@@ -597,8 +598,18 @@ function Trippage() {
                       setValue("take_off", takeOff);
                       setValue("tripDescription", description);
                       setValue("tripStatus", status === "مفعل" ? true : false);
-                      setValue("tripFrom", from.id);
-                      setValue("tripTo", to.id);
+                      setValue(
+                        "tripFrom",
+                        showCountCountries
+                          .find((trip) => trip.id === from.id)
+                          ?.id.toString()
+                      );
+                      setValue(
+                        "tripTo",
+                        showCountCountries
+                          .find((trip) => trip.id === to.id)
+                          ?.id.toString()
+                      );
                       // console.log("from", from.en_short_name);
                       // setValue("category_id", category_id);
                       setBranchStatus(status === "مفعل" ? true : false);
