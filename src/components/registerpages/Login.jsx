@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./register.css";
 import axios from "axios";
-import { createContext } from "react";
 import { toast } from "react-toastify";
 
-export const userRole = createContext();
+ 
 function Login() {
   const Navigate = useNavigate();
   const [email, setEmail] = useState("");
