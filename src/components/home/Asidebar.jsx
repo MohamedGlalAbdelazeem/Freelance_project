@@ -41,9 +41,8 @@ function Asidebar() {
             { text: "إدارة الفروع", path: "/Mainpage/Branchpage", icon: <AddHomeWorkOutlinedIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة الموظفين", path: "/Mainpage/Userpage", icon: <GroupAddOutlinedIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة العملاء", path: "/Mainpage/clientpage", icon: <GroupAddIcon sx={{ fontSize: 35 }} /> },
-            { text: "تصنيف الرحلات ", path: "/Mainpage/Categoriespage", icon: <CategoryIcon sx={{ fontSize: 35 }} /> },
             { text: "إدارة الراحلات", path: "/Mainpage/Trippage", icon: <LocalAirportIcon sx={{ fontSize: 35 }} /> },
-            { text: "إدارة الخدمات ", path: "/Mainpage/", icon: <SettingsSuggestIcon sx={{ fontSize: 35 }} /> },
+            { text: "إدارة الخدمات ", path: "/Mainpage/Services", icon: <SettingsSuggestIcon sx={{ fontSize: 35 }} /> },
         ];
     }
 

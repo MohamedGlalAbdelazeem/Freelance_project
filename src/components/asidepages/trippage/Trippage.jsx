@@ -68,7 +68,7 @@ function Trippage() {
         handleUnauthenticated();
       });
   }
-
+// hid in suber  admin
   function fetchCategories() {
     setLoader(true);
     axios
