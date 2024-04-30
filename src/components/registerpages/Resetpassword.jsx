@@ -1,36 +1,47 @@
 import React from 'react'
 import { Link , useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
-
 function Resetpassword() {
     const [loader , setLoader ] = useState(false);
     const [password1, setPassword1] = useState("");
     const [password2, setPassword2] = useState("");
-    const navigate = useNavigate();
+    const navigate = useNavigate(); 
 
+  
+    const queryString = window.location.search;
+    const token = new URLSearchParams(queryString).get('token');
     const submitForm = async (e) => {
         e.preventDefault();
         if (password1.trim() !==  password2.trim()) {
             toast("كلمة المرور غير متطابقة", { type: "error"});
             return; 
-          }
-        
-        try {
+          }try {
            setLoader(true); 
-           const res = await axios.post(`http://127.0.0.1:8000/api/reset-password`, {
-           password1: password1, 
-           password2: password2
-          });
-    
+           const res = await axios.post(
+            `http://127.0.0.1:8000/api/reset-password`,
+            {
+              password: password1,
+              password_confirmation: password2,
+              token:token
+            },{
+              headers: {
+                Authorization: `Bearer ${token}`
+              } }
+ );
           if (res.status === 200) {
-            navigate("/Mainpage");
-            toast("تم تسجيل الدخول بنجاح", { type: "success"});
+            navigate("/Login");
+            toast("تم تغيير كلمة المرور بنجاح", { type: "success"});
             console.log(res);
           }
         } catch (error) {
+          if (error.response.data.message === "The password must be at least 6 characters.") {
+            toast("يجب ألا تقل كلمة المرور عن 6 أرقام", { type: "error"});
+          }
+
           toast(error, { type: "error"});
+          console.log(error);
         }
         finally {
             setLoader(false); // Hide loader whether request was successful or failed
@@ -45,7 +56,7 @@ function Resetpassword() {
             <img className="w-auto h-7 sm:h-8" src="https://merakiui.com/images/logo.svg" alt=""/>
         </div>
         <p className="mt-4 text-sm font-semibold tracking-wide text-center text-gray-800 capitalize dark:text-white">
-            سوف يتم إرسال رسالة إلي البريد الإلكتروني الخاص بك
+              ادخل كلمة المرور الجديدة 
         </p>
 
         <div className="w-full max-w-md mx-auto mt-6">

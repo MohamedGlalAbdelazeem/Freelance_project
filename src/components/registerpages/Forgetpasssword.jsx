@@ -14,7 +14,6 @@ function Forgetpasssword() {
         toast("يجب إدخال البريد الإلكتروني", { type: "error"});
         return; 
       }
-    
     try {
        setLoader(true); 
        const res = await axios.post(`http://127.0.0.1:8000/api/forget-password`, {
@@ -23,17 +22,14 @@ function Forgetpasssword() {
 
       if (res.status === 200) {
         navigate("/Resetpassword");
-        toast("تم إرسال رسالة إلي البريد الإلكتروني الخاص بك", { type: "success"});
-        console.log(res);
+        toast("تم إرسال رسالة إليك برجاء التوجة إلي البريد الإلكتروني الخاص بك", { type: "success"});
       }
     } catch (error) {
       toast("يجب كتابة البريد الإلكتروني الخاص بك  ", { type: "error"});
     }
     finally {
         setLoader(false); // Hide loader whether request was successful or failed
-      }
-
-  };
+    }};
 
 
 
