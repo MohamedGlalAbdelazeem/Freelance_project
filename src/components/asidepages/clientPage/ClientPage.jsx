@@ -10,7 +10,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 //pagenation
-import ReactPaginate from 'react-paginate';
+import ReactPaginate from "react-paginate";
 
 function ClientPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
@@ -59,43 +59,38 @@ function ClientPage() {
     fetchClients();
     fetchBranches();
     fetchNationalities();
+    fetchPagenation();
   }, []);
 
+  // fetch pagenation data///////////////////////
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-// fetch pagenation data///////////////////////
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
+  useEffect(() => {
+    fetchPagenation();
+  }, [currentPage]); // Fetch data whenever currentPage changes
 
-useEffect(() => {
-  fetchPagenation();
-}, [currentPage]); // Fetch data whenever currentPage changes
+  const fetchPagenation = () => {
+    setLoader(true);
+    axios
+      .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setClients(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      });
+  };
 
-const fetchPagenation = () => {
-  setLoader(true);
-  axios
-    .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setClients(response.data.data);
-      setTotalPages(response.data.meta.pagination.last_page);
-    })
-    .catch(function (error) {
-      console.error("Error fetching branches:", error);
-    })
-};
-
-
-const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);  
-};
-// fetch pagenation data///////////////////////
-
-
-
-
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
+  // fetch pagenation data///////////////////////
 
   const fetchNationalities = () => {
     setLoader(true);
@@ -560,21 +555,27 @@ const handlePageClick = (selectedPage) => {
         </tbody>
       </table>
       <div>
-            {/* Render pagination */}
-            <ReactPaginate
-                pageCount={totalPages}
-                pageRangeDisplayed={3}
-                marginPagesDisplayed={2}
-                onPageChange={handlePageClick}
-                containerClassName={'flex justify-center mt-4 text-2xl'}
-                activeClassName={'bg-blue-500 text-white'}
-                previousLabel={'السابق '}
-                nextLabel={'التالي'}
-                previousClassName={'mr-3 px-3 py-2 border rounded hover:bg-gray-200'}
-                nextClassName={'ml-2 px-3 py-1 border rounded hover:bg-gray-200'}
-                pageClassName={'mr-2 px-3 py-1 border rounded hover:bg-gray-200'}
-            />
-        </div>
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          pageClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+        />
+      </div>
       {loader && <div className="spinner"></div>}
     </div>
   );
