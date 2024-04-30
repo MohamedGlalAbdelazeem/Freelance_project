@@ -9,6 +9,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ScrollUp } from "../../ScrollUp";
+//pagenation
+import ReactPaginate from 'react-paginate';
 
 function Userpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
@@ -62,9 +64,45 @@ function Userpage() {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
+ 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
     fetchEmployees();
+    fetchPagenation();
   }, []);
+
+  const fetchPagenation = () => {
+    setLoader(true);
+    axios
+      .get(`http://127.0.0.1:8000/api/employees?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setEmployees(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      })
+  };
+  
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);  
+  };
+
+
+
+
+
+
+
+
+
+
+
 
   const fetchEmployees = () => {
     setLoader(true);
@@ -426,13 +464,15 @@ function Userpage() {
               role_name,
               created_at,
             } = emp;
+            const tableIndex = (currentPage - 1) * 15 + index + 1;
+
             return (
               <tr
                 key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
-                  {index + 1}
+                  {tableIndex}
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
@@ -497,6 +537,22 @@ function Userpage() {
         </tbody>
       </table>
       {loader && <div className="spinner"></div>}
+      <div>
+            {/* Render pagination */}
+            <ReactPaginate
+                pageCount={totalPages}
+                pageRangeDisplayed={3}
+                marginPagesDisplayed={2}
+                onPageChange={handlePageClick}
+                containerClassName={'flex justify-center mt-4 text-2xl'}
+                activeClassName={'bg-blue-500 text-white'}
+                previousLabel={'السابق '}
+                nextLabel={'التالي'}
+                previousClassName={'mr-3 px-3 py-2 border rounded hover:bg-gray-200'}
+                nextClassName={'ml-2 px-3 py-1 border rounded hover:bg-gray-200'}
+                pageClassName={'mr-2 px-3 py-1 border rounded hover:bg-gray-200'}
+            />
+        </div>
     </div>
   );
 }

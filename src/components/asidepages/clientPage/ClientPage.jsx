@@ -59,7 +59,6 @@ function ClientPage() {
     fetchClients();
     fetchBranches();
     fetchNationalities();
-    fetchPagenation()
   }, []);
 
 
