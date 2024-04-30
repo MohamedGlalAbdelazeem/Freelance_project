@@ -10,6 +10,7 @@ import Categoriespage from "./components/asidepages/categoriespage/Categoriespag
 import Trippage from "./components/asidepages/trippage/Trippage"
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Resetpassword from "./components/registerpages/Resetpassword"
 import Services from "./components/asidepages/servicespage/Services"
 
 // admin  josh.pfannerstill@example.net
@@ -20,6 +21,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/Login" element={<Login />} />
+        <Route path="/Resetpassword" element={<Resetpassword />} />
         <Route path="/Forgetpasssword" element={<Forgetpasssword />} />
         <Route path="/Mainpage" element={<Mainpage />}>
           <Route path="Userpage" element={<Userpage />} />
