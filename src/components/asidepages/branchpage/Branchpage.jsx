@@ -564,12 +564,12 @@ const handlePageClick = (selectedPage) => {
                 marginPagesDisplayed={2}
                 onPageChange={handlePageClick}
                 containerClassName={'flex justify-center mt-4 text-2xl'}
-                activeClassName={'bg-blue-500 text-white'}
-                previousLabel={'السابق '}
+                activeClassName={'bg-blue-500 text-white hover:bg-blue-700'}
+                previousLabel={'السابق'}
                 nextLabel={'التالي'}
-                previousClassName={'mr-3 px-3 py-2 border rounded hover:bg-gray-200'}
-                nextClassName={'ml-2 px-3 py-1 border rounded hover:bg-gray-200'}
-                pageClassName={'mr-2 px-3 py-1 border rounded hover:bg-gray-200'}
+                previousClassName={'mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200'}
+                nextClassName={'mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200'}
+                pageClassName={'mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200'}
             />
         </div>
       {loader && <div className="spinner"></div>}
