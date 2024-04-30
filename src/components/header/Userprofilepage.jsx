@@ -133,8 +133,7 @@ const handleUnauthenticated = () => {
                 </button>
                 <span className="flex-grow bg-gray-200 rounded h-1"></span>
                 </h3>
-
-         {/* change name  & phone  */}
+         {/* change name  &   */}
             <div className="items-center justify-center p-12">
                 <div className="rounded-3xl mx-auto w-full max-w-[750px] bg-gray-700 text-white p-10">
                     <form>
