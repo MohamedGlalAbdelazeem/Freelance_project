@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react';
 import { toast } from "react-toastify";
 import userPhoto from './user.avif';
 import { useNavigate } from "react-router-dom";
-import { useForm, SubmitHandler } from "react-hook-form"
+import { useForm } from "react-hook-form"
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 
 
