@@ -8,6 +8,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function Userprofilepage() {
+    
   const [userProfile, setUserprofile] = useState([]);
   const [loader, setLoader] = useState(true);
   const navigate = useNavigate(); // Renamed useNavigate to navigate to avoid confusion with component
@@ -44,6 +45,7 @@ function Userprofilepage() {
       .then(function (response) {
         setLoader(false);
         setUserprofile(response.data.Admin);
+        console.log(response.data.Admin);
       })
       .catch(function (error) {
         if (error.response && error.response.status === 401) {
@@ -52,9 +54,13 @@ function Userprofilepage() {
           // Handle other errors
           console.error("Error refreshing token:", error);
         }
+
+      }).finally(() => {
         setLoader(false);
-      });
-  }, []);
+     console.log(userProfile);
+      });   
+  }, [])
+  
   const handleUpdate = () => {
     setLoader(true);
     axios
@@ -72,7 +78,6 @@ function Userprofilepage() {
       )
       .then(function () {
         toast.success("تم تحديث البيانات بنجاح");
-        fetchEmployees();
         setUpdateMode(false);
       })
       .catch(function (error) {
@@ -142,6 +147,7 @@ function Userprofilepage() {
               <input
                 type="text"
                 {...register("name")}
+                 value={userProfile.name}
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
             </div>
@@ -152,12 +158,13 @@ function Userprofilepage() {
               <input
                 type="number"
                 {...register("phone_number")}
+                value={userProfile.phone_number}
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
             </div>
             <div>
               <button
-                onClick={handleSubmit(handleUpdate)}
+                onClick={handleUpdate}
                 className="hover:shadow-form rounded-md bg-success hover:bg-success/90 py-3 px-8 text-base font-semibold text-white outline-none"
               >
                 تعديل
