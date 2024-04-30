@@ -13,11 +13,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 function ClientPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [loader, setLoader] = useState(true);
+  const [branches, setBranches] = useState([]);
+  const [nationalities, setNationalities] = useState([]);
+
   const userToken = localStorage.getItem("user_token");
   const [clients, setClients] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
   const [updateClientID, setUpdateClientID] = useState("");
+  const [picture, setPicture] = useState(null);
   const Navigate = useNavigate();
 
   const handleUnauthenticated = () => {
@@ -36,10 +40,11 @@ function ClientPage() {
     phone_number: z.string().min(1, { message: "يجب ادخال رقم الهاتف" }),
     address: z.string().min(1, { message: "يجب ادخال العنوان" }),
     branch_id: z.string().min(1, { message: "يجب ادخال رقم الفرع" }),
-    country_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
-    image : z.any(),
+    countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
+    image: z.any(),
     notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
   });
+
   const {
     register,
     handleSubmit,
@@ -51,8 +56,48 @@ function ClientPage() {
 
   useEffect(() => {
     fetchClients();
+    fetchBranches();
+    fetchNationalities();
   }, []);
 
+  const fetchNationalities = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}countries`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setNationalities(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("Error fetching nationalities:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  const fetchBranches = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}branches/select-name-id`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setLoader(false);
+        setBranches(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+        handleUnauthenticated();
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
   const fetchClients = () => {
     setLoader(true);
     axios
@@ -66,23 +111,12 @@ function ClientPage() {
       })
       .catch(function (error) {
         console.error("Error:", error);
-        handleUnauthenticated();
       })
       .finally(() => {
-        // console.log(clients);
         setLoader(false);
       });
   };
-  const [picture, setPicture] = useState(null);
-  const handleImage = (e) => {
-    setPicture(e.target.files[0]);
-    console.log(picture.name);
-
-  }
   const storeClient = () => {
-    // e.preventDefault();
-    // const formData = new FormData();
-
     setLoader(true);
     const clientData = {
       name: getValues("name"),
@@ -91,15 +125,14 @@ function ClientPage() {
       address: getValues("address"),
       branch_id: getValues("branch_id"),
       countries_id: getValues("countries_id"),
-      image: picture.name,
+      image: getValues("image[0]"),
       notes: getValues("notes"),
     };
-    console.log(clientData);
     axios
       .post(`${baseUrl}clients`, clientData, {
         headers: {
           Authorization: `Bearer ${userToken}`,
-          "Content-Type": "multipart/form-data",
+          "content-type": "multipart/form-data",
         },
       })
       .then(function () {
@@ -248,26 +281,38 @@ function ClientPage() {
               </div>
             </div>
             <div className=" flex flex-wrap gap-3">
-              <div className="flex-grow ">
-                <input
-                  type="text"
+              <div className="w-[49%] flex-grow ">
+                <select
                   {...register("branch_id")}
-                  placeholder="رقم الفرع"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
+                  className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                >
+                  <option value="" disabled selected>
+                    اختر الفرع
+                  </option>
+                  {branches.map((branch) => {
+                    const { id, name } = branch;
+                    return <option key={id} value={id} label={name} />;
+                  })}
+                </select>
                 {errors && (
                   <span className="text-red-500 text-sm">
                     {errors.branch_id?.message}
                   </span>
                 )}
               </div>
-              <div className="flex-grow ">
-                <input
-                  type="text"
+              <div className="w-[49%] flex-grow ">
+                <select
                   {...register("countries_id")}
-                  placeholder="رمز المدينة"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
+                  className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                >
+                  <option value="" disabled selected>
+                    الجنسية
+                  </option>
+                  {nationalities.map((nat) => {
+                    const { id, en_short_name } = nat;
+                    return <option key={id} value={id} label={en_short_name} />;
+                  })}
+                </select>
                 {errors && (
                   <span className="text-red-500 text-sm">
                     {errors.countries_id?.message}
@@ -276,11 +321,12 @@ function ClientPage() {
               </div>
             </div>
             <div className=" flex flex-wrap gap-3">
-              <div className="flex-grow ">
+              <div className="w-[49%] flex-grow ">
                 <textarea
                   {...register("notes")}
+                  rows={1}
                   placeholder="ملاحظات"
-                  className="w-full min-h-36 rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  className="w-full overflow-auto rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
                 {errors && (
                   <span className="text-red-500 text-sm">
@@ -288,21 +334,19 @@ function ClientPage() {
                   </span>
                 )}
               </div>
-              <div className="flex-grow ">
+              <div className="w-[49%] flex-grow ">
                 <div className="flex items-center justify-center w-full">
                   {/* <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label> */}
                   <input
                     {...register("image")}
-                    onChange={handleImage}
                     accept="image/*"
-                    className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400"
+                    className="file-input file-input-bordered w-full"
                     id="file_input"
                     type="file"
                   />
                 </div>
               </div>
             </div>
-
             <div>
               {updateMode ? (
                 <button
@@ -315,6 +359,7 @@ function ClientPage() {
               ) : (
                 <button
                   onClick={handleSubmit(storeClient)}
+                  // onClick={(e) => storeClient(e)}
                   disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
@@ -391,6 +436,7 @@ function ClientPage() {
           </tr>
         </thead>
         <tbody>
+          {console.log(clients)}
           {/* Mapping branches data to table rows */}
           {clients.map((client, index) => {
             const {
@@ -455,9 +501,9 @@ function ClientPage() {
                       setValue("name", name);
                       setValue("address", address);
                       setValue("email", email);
-                      setValue("phone_number", phone_number);
-                      setValue("branch_id", branch.branch_name);
-                      setValue("countries_id", nationality.id);
+                      setValue("phone_number", phone_number.toString());
+                      setValue("branch_id", branch.branch_name.toString());
+                      setValue("countries_id", nationality.id.toString());
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >

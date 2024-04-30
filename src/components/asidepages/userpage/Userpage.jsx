@@ -148,7 +148,7 @@ function Userpage() {
         if (response.status === 401) {
           handleUnauthenticated();
         } else if (response.status === 204) {
-          toast.success("تم حذف الفرع بنجاح");
+          toast.success("تم حذف الموظف بنجاح");
           fetchEmployees();
         } else {
           console.error("Unexpected response status:", response.status);
