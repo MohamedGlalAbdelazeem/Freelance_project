@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import userPhoto from "./user.avif";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
+import PersonPinIcon from '@mui/icons-material/PersonPin';
 function UserProfilePage() {
   const [userProfile, setUserprofile] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -11,7 +11,6 @@ function UserProfilePage() {
   const userToken = localStorage.getItem("user_token");
   const [name, setName] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
@@ -90,11 +89,11 @@ function UserProfilePage() {
   const changePassword = async (e) => {
     setLoader(true);
     e.preventDefault();
-    if (newPassword.trim() === "" && confirmNewPassword.trim() === "") {
+    if (newPassword.trim() === "" && confirmNewPassword.trim() === "" && oldPassword.trim() === "") {
       setIsError(true);
       return;
     }
-    if (newPassword.trim() !== confirmNewPassword.trim()) {
+    if (newPassword.trim() !== confirmNewPassword.trim() ) {
       toast("كلمة المرور غير متطابقة", { type: "error" });
       return;
     }
@@ -122,7 +121,10 @@ function UserProfilePage() {
         }
       })
       .catch((error) => {
-        toast(error.response.data.message, { type: "error" });
+        if (error.response.data.message === "The password is incorrect.") {
+          toast("كلمة المررو القديمة غير صحيحة", { type: "error" });
+        }
+        toast("لم يتم تغيير كلمة السر", { type: "error" });
       })
       .finally(() => {
         setLoader(false);
@@ -143,14 +145,10 @@ function UserProfilePage() {
     <div className="items-center justify-center">
       <div className="mx-auto w-full max-w-[750px] bg-white">
         <form>
-          <div className="mb-2 pt-2">
+          <div className="mb-0 pt-0">
             <div>
               <div className="flex justify-center items-center flex-col mb-10">
-                <img
-                  src={userPhoto}
-                  className="border-double border-4 border-sky-500 w-36 rounded-full h-36 "
-                  alt="user_profile_photo"
-                />
+               <PersonPinIcon sx={{ fontSize: 200 }}/>
                 <p className="text-yellow-600">Demo</p>
                 <p>
                   <strong>الاسم: </strong>
@@ -161,7 +159,7 @@ function UserProfilePage() {
                   {userProfile.phone_number}
                 </p>
               </div>
-              <input type="file" name="file" id="file" className="sr-only" />
+              {/* <input type="file" name="file" id="file" className="sr-only" />
               <label
                 htmlFor="file"
                 className="cursor-pointer relative flex min-h-[50px] items-center justify-center rounded-xl border border-dashed border-[#e0e0e0] p-5 text-center"
@@ -177,7 +175,7 @@ function UserProfilePage() {
                     Browse
                   </span>
                 </div>
-              </label>
+              </label> */}
             </div>
 
             {/* Rest of the form */}
@@ -251,9 +249,14 @@ function UserProfilePage() {
                 name="name"
                 id="name"
                 value={oldPassword}
-                onChange={(e) => setOldPassword(e.target.value)}
+                onChange={(e) =>{setOldPassword(e.target.value)}}
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
+                 {isError && (
+                <p className="text-red-500 text-sm">
+                  ادخل كلمة المرور الحالية
+                </p>
+              )}
             </div>
             <div className="mb-5">
               <label className="mb-3 block text-base font-medium">

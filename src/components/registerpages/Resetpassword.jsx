@@ -30,7 +30,7 @@ function Resetpassword() {
             console.log(res);
           }
         } catch (error) {
-          toast(error, { type: "error"});
+          toast("يجب كتابة كلمة السر مرتين   ", { type: "error"});
         }
         finally {
             setLoader(false); // Hide loader whether request was successful or failed

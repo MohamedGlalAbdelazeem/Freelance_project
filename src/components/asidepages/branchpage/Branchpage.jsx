@@ -11,6 +11,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
+import Pagenation from "../../Pagenation";
 
 function Branchpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
@@ -518,6 +519,7 @@ function Branchpage() {
       </table>
 
       {loader && <div className="spinner"></div>}
+      <Pagenation/>
     </main>
   );
 }
