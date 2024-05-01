@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import userPhoto from "./user.avif";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PersonPinIcon from '@mui/icons-material/PersonPin';
@@ -148,7 +147,7 @@ function UserProfilePage() {
           <div className="mb-0 pt-0">
             <div>
               <div className="flex justify-center items-center flex-col mb-10">
-               <PersonPinIcon sx={{ fontSize: 200 }}/>
+                <PersonPinIcon sx={{ fontSize: 200 }} />
                 <p className="text-yellow-600">Demo</p>
                 <p>
                   <strong>الاسم: </strong>
@@ -249,13 +248,13 @@ function UserProfilePage() {
                 name="name"
                 id="name"
                 value={oldPassword}
-                onChange={(e) =>{setOldPassword(e.target.value)}}
+                onChange={(e) => {
+                  setOldPassword(e.target.value);
+                }}
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
-                 {isError && (
-                <p className="text-red-500 text-sm">
-                  ادخل كلمة المرور الحالية
-                </p>
+              {isError && (
+                <p className="text-red-500 text-sm">ادخل كلمة المرور الحالية</p>
               )}
             </div>
             <div className="mb-5">
@@ -303,6 +302,7 @@ function UserProfilePage() {
           </form>
         </div>
       </div>
+      {loader && <div className="spinner"></div>}
     </div>
   );
 }

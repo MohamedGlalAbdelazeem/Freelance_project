@@ -181,8 +181,7 @@ function Trippage() {
         if (response.status === 200) {
           toast.success("تم حذف الرحلة بنجاح");
           fetchData();
-        } else if (response.status === 204) {
-        } else {
+        } else{
           console.error("Unexpected response status:", response.status);
           toast.warning("حدث خطأ غير متوقع");
         }

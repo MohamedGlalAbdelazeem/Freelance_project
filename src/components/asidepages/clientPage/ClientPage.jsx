@@ -254,161 +254,163 @@ function ClientPage() {
 
   return (
     <div>
-     {
-      userRoleName === "admin" ? (
+      {userRoleName === "admin" ? (
         <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
-        {/* register & update users */}
-        <div className="mx-auto w-full ">
-          <form className=" space-y-3">
-            <div className=" flex flex-wrap gap-3">
-              <div className="flex-grow ">
-                <input
-                  type="text"
-                  {...register("name")}
-                  placeholder="اسم العميل "
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.name?.message}
-                  </span>
-                )}
-              </div>
-              <div className="flex-grow">
-                <input
-                  type="email"
-                  {...register("email")}
-                  placeholder="البريد الإلكترونى"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.email?.message}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className=" flex flex-wrap gap-3">
-              <div className="flex-grow ">
-                <input
-                  type="tel"
-                  {...register("phone_number")}
-                  placeholder="رقم الهاتف"
-                  dir="rtl"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.phone_number?.message}
-                  </span>
-                )}
-              </div>
-              <div className="flex-grow ">
-                <input
-                  type="text"
-                  {...register("address")}
-                  placeholder="العنوان"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.address?.message}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className=" flex flex-wrap gap-3">
-              <div className="w-[49%] flex-grow ">
-                <select
-                  {...register("branch_id")}
-                  className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                >
-                  <option value="" disabled selected>
-                    اختر الفرع
-                  </option>
-                  {branches.map((branch) => {
-                    const { id, name } = branch;
-                    return <option key={id} value={id} label={name} />;
-                  })}
-                </select>
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.branch_id?.message}
-                  </span>
-                )}
-              </div>
-              <div className="w-[49%] flex-grow ">
-                <select
-                  {...register("countries_id")}
-                  className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                >
-                  <option value="" disabled selected>
-                    الجنسية
-                  </option>
-                  {nationalities.map((nat) => {
-                    const { id, en_short_name } = nat;
-                    return <option key={id} value={id} label={en_short_name} />;
-                  })}
-                </select>
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.countries_id?.message}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className=" flex flex-wrap gap-3">
-              <div className="w-[49%] flex-grow ">
-                <textarea
-                  {...register("notes")}
-                  rows={1}
-                  placeholder="ملاحظات"
-                  className="w-full overflow-auto rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.notes?.message}
-                  </span>
-                )}
-              </div>
-              <div className="w-[49%] flex-grow ">
-                <div className="flex items-center justify-center w-full">
-                  {/* <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label> */}
+          {/* register & update users */}
+          <div className="mx-auto w-full ">
+            <form className=" space-y-3">
+              <div className=" flex flex-wrap gap-3">
+                <div className="flex-grow ">
                   <input
-                    {...register("image")}
-                    accept="image/*"
-                    className="file-input file-input-bordered w-full"
-                    id="file_input"
-                    type="file"
+                    type="text"
+                    {...register("name")}
+                    placeholder="اسم العميل "
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.name?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-grow">
+                  <input
+                    type="email"
+                    {...register("email")}
+                    placeholder="البريد الإلكترونى"
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.email?.message}
+                    </span>
+                  )}
                 </div>
               </div>
-            </div>
-            <div>
-              {updateMode ? (
-                <button
-                  onClick={handleSubmit(handleClientUpdate)}
-                  disabled={isSubmitting}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-                >
-                  تحديث العميل
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit(storeClient)}
-                  // onClick={(e) => storeClient(e)}
-                  disabled={isSubmitting}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-                >
-                  تسجيل عميل جديد
-                </button>
-              )}
-            </div>
-          </form>
+              <div className=" flex flex-wrap gap-3">
+                <div className="flex-grow ">
+                  <input
+                    type="tel"
+                    {...register("phone_number")}
+                    placeholder="رقم الهاتف"
+                    dir="rtl"
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.phone_number?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-grow ">
+                  <input
+                    type="text"
+                    {...register("address")}
+                    placeholder="العنوان"
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.address?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className=" flex flex-wrap gap-3">
+                <div className="w-[49%] flex-grow ">
+                  <select
+                    {...register("branch_id")}
+                    className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  >
+                    <option value="" disabled selected>
+                      اختر الفرع
+                    </option>
+                    {branches.map((branch) => {
+                      const { id, name } = branch;
+                      return <option key={id} value={id} label={name} />;
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.branch_id?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="w-[49%] flex-grow ">
+                  <select
+                    {...register("countries_id")}
+                    className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  >
+                    <option value="" disabled selected>
+                      الجنسية
+                    </option>
+                    {nationalities.map((nat) => {
+                      const { id, en_short_name } = nat;
+                      return (
+                        <option key={id} value={id} label={en_short_name} />
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.countries_id?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className=" flex flex-wrap gap-3">
+                <div className="w-[49%] flex-grow ">
+                  <textarea
+                    {...register("notes")}
+                    rows={1}
+                    placeholder="ملاحظات"
+                    className="w-full overflow-auto rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.notes?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="w-[49%] flex-grow ">
+                  <div className="flex items-center justify-center w-full">
+                    {/* <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label> */}
+                    <input
+                      {...register("image")}
+                      accept="image/*"
+                      className="file-input file-input-bordered w-full"
+                      id="file_input"
+                      type="file"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div>
+                {updateMode ? (
+                  <button
+                    onClick={handleSubmit(handleClientUpdate)}
+                    disabled={isSubmitting}
+                    className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                  >
+                    تحديث العميل
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSubmit(storeClient)}
+                    // onClick={(e) => storeClient(e)}
+                    disabled={isSubmitting}
+                    className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                  >
+                    تسجيل عميل جديد
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
-      ) : "" 
-     }
+      ) : (
+        ""
+      )}
 
       {/* Search input form */}
       <div className="my-3">
@@ -453,50 +455,48 @@ function ClientPage() {
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
         <thead>
-         {
-          userRoleName === "admin" ? (
+          {userRoleName === "admin" ? (
             <tr>
-            {[
-              "الترتيب",
-              "الاسم",
-              "الجنسية",
-              "العنوان",
-              "البريد الالكترونى",
-              "رقم الموبايل",
-              "الفرع",
-              "تاريخ الانشاء",
-              "تعديل",
-            ].map((header, index) => (
-              <th
-                key={index}
-                className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
-              >
-                {header}
-              </th>
-            ))}
-          </tr>
+              {[
+                "الترتيب",
+                "الاسم",
+                "الجنسية",
+                "العنوان",
+                "البريد الالكترونى",
+                "رقم الموبايل",
+                "الفرع",
+                "تاريخ الانشاء",
+                "تعديل",
+              ].map((header, index) => (
+                <th
+                  key={index}
+                  className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
+                >
+                  {header}
+                </th>
+              ))}
+            </tr>
           ) : (
             <tr>
-            {[
-              "الترتيب",
-              "الاسم",
-              "الجنسية",
-              "العنوان",
-              "البريد الالكترونى",
-              "رقم الموبايل",
-              "الفرع",
-              "تاريخ الانشاء",
-            ].map((header, index) => (
-              <th
-                key={index}
-                className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
-              >
-                {header}
-              </th>
-            ))}
-          </tr>
-          )
-        }
+              {[
+                "الترتيب",
+                "الاسم",
+                "الجنسية",
+                "العنوان",
+                "البريد الالكترونى",
+                "رقم الموبايل",
+                "الفرع",
+                "تاريخ الانشاء",
+              ].map((header, index) => (
+                <th
+                  key={index}
+                  className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
+                >
+                  {header}
+                </th>
+              ))}
+            </tr>
+          )}
         </thead>
         <tbody>
           {clients.map((client, index) => {
@@ -554,34 +554,34 @@ function ClientPage() {
                     {created_at}
                   </span>
                 </td>
-                {
-                  userRoleName === "Admin" ? (
-                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <button
-                    onClick={() => {
-                      ScrollUp();
-                      setUpdateClientID(id);
-                      setUpdateMode(true);
-                      setValue("name", name);
-                      setValue("address", address);
-                      setValue("email", email);
-                      setValue("phone_number", phone_number.toString());
-                      setValue("branch_id", branch.branch_name.toString());
-                      setValue("countries_id", nationality.id.toString());
-                    }}
-                    className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
-                  >
-                    <DriveFileRenameOutlineIcon />
-                  </button>
-                  <button
-                    onClick={() => deleteClient(id)}
-                    className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
-                  >
-                    <DeleteForeverIcon />
-                  </button>
-                </td>
-                  ) : ""
-                }
+                {userRoleName === "Admin" ? (
+                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                    <button
+                      onClick={() => {
+                        ScrollUp();
+                        setUpdateClientID(id);
+                        setUpdateMode(true);
+                        setValue("name", name);
+                        setValue("address", address);
+                        setValue("email", email);
+                        setValue("phone_number", phone_number.toString());
+                        setValue("branch_id", branch.branch_name.toString());
+                        setValue("countries_id", nationality.id.toString());
+                      }}
+                      className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
+                    >
+                      <DriveFileRenameOutlineIcon />
+                    </button>
+                    <button
+                      onClick={() => deleteClient(id)}
+                      className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
+                    >
+                      <DeleteForeverIcon />
+                    </button>
+                  </td>
+                ) : (
+                  ""
+                )}
               </tr>
             );
           })}
@@ -631,6 +631,7 @@ function ClientPage() {
             </g>
           </svg>
                    )} */}
+      {loader && <div className="spinner"></div>}
     </div>
   );
 }
