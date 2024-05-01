@@ -62,11 +62,11 @@ function Trippage() {
         setShowCountries(response.data.data);
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
+        console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
         handleUnauthenticated();
       });
   }
-  // hid in suber  admin
+  // hid in suber admin
   function fetchCategories() {
     setLoader(true);
     axios
@@ -97,9 +97,6 @@ function Trippage() {
         },
       })
       .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        }
         setLoader(false);
         setTrips(response.data.data);
       })
@@ -181,11 +178,10 @@ function Trippage() {
         },
       })
       .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        } else if (response.status === 204) {
+        if (response.status === 200) {
           toast.success("تم حذف الرحلة بنجاح");
           fetchData();
+        } else if (response.status === 204) {
         } else {
           console.error("Unexpected response status:", response.status);
           toast.warning("حدث خطأ غير متوقع");
@@ -194,17 +190,7 @@ function Trippage() {
       .catch(function (error) {
         console.error("Error deleting branch:", error);
         setLoader(true);
-        if (
-          error.response &&
-          error.response.status === 401 &&
-          error.response.data.message === "Unauthenticated"
-        ) {
-          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-            type: "error",
-          });
-        } else {
           console.log("Error deleting branch:", error);
-        }
       });
     setLoader(false);
   }

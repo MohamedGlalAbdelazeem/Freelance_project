@@ -13,7 +13,7 @@ import { ScrollUp } from "../../ScrollUp";
 function Services() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [loader, setLoader] = useState(true);
-
+ const userRoleName = localStorage.getItem("user_role_name");
   const [updateMode, setUpdateMode] = useState(false);
   const [updateEmpID, setUpdateEmpID] = useState("");
   const [showCategories, setShowCategories] = useState([]);
@@ -212,103 +212,107 @@ function Services() {
 
   return (
     <div>
-      <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
-        {/* register & update users */}
-        <div className="mx-auto w-full ">
-          <form className="space-y-3">
-            <div className=" flex flex-wrap gap-3">
-              <div className="w-[49%] flex-grow">
-                <input
-                  type="text"
-                  {...register("name")}
-                  placeholder="اسم الخدمة"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.name?.message}
-                  </span>
-                )}
-              </div>
-              <div className="w-[49%] flex-grow">
-                <input
-                  type="number"
-                  {...register("cost")}
-                  placeholder="تكلفة الخدمة"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.cost?.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <div className="w-[49%] flex-grow">
-                <select
-                  id="countries"
-                  {...register("category_id")}
-                  className=" border  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                  <option value="" disabled selected>
-                    نوع الرحلة
-                  </option>
-                  {showCategories.map((categories, index) => {
-                    return (
-                      <option key={index} value={categories.id}>
-                        {categories.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.category_id?.message}
-                  </span>
-                )}
-              </div>
-              <div className="w-[49%] flex flex-wrap gap-3">
+       {
+        userRoleName === "admin" ? (
+          <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
+          {/* register & update users */}
+          <div className="mx-auto w-full ">
+            <form className="space-y-3">
+              <div className=" flex flex-wrap gap-3">
                 <div className="w-[49%] flex-grow">
-                  <textarea
-                    rows={1}
+                  <input
                     type="text"
-                    {...register("description")}
-                    placeholder="وصف الخدمة "
+                    {...register("name")}
+                    placeholder="اسم الخدمة"
                     className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   />
                   {errors && (
                     <span className="text-red-500 text-sm">
-                      {errors.description?.message}
+                      {errors.name?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="w-[49%] flex-grow">
+                  <input
+                    type="number"
+                    {...register("cost")}
+                    placeholder="تكلفة الخدمة"
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.cost?.message}
                     </span>
                   )}
                 </div>
               </div>
-            </div>
-
-            <div>
-              {updateMode ? (
-                <button
-                  onClick={handleSubmit(handleSrvUpdate)}
-                  disabled={isSubmitting}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-                >
-                  تحديث الخدمة
-                </button>
-              ) : (
-                <button
-                  onClick={handleSubmit(storeService)}
-                  disabled={isSubmitting}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-                >
-                  تسجيل خدمة جديد
-                </button>
-              )}
-            </div>
-          </form>
+  
+              <div className="flex gap-4">
+                <div className="w-[49%] flex-grow">
+                  <select
+                    id="countries"
+                    {...register("category_id")}
+                    className=" border  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="" disabled selected>
+                      نوع الرحلة
+                    </option>
+                    {showCategories.map((categories, index) => {
+                      return (
+                        <option key={index} value={categories.id}>
+                          {categories.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.category_id?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="w-[49%] flex flex-wrap gap-3">
+                  <div className="w-[49%] flex-grow">
+                    <textarea
+                      rows={1}
+                      type="text"
+                      {...register("description")}
+                      placeholder="وصف الخدمة "
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                    />
+                    {errors && (
+                      <span className="text-red-500 text-sm">
+                        {errors.description?.message}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+  
+              <div>
+                {updateMode ? (
+                  <button
+                    onClick={handleSubmit(handleSrvUpdate)}
+                    disabled={isSubmitting}
+                    className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                  >
+                    تحديث الخدمة
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleSubmit(storeService)}
+                    disabled={isSubmitting}
+                    className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                  >
+                    تسجيل خدمة جديد
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
         </div>
-      </div>
+        ) : ""
+       }
 
       {/* Search input form */}
       <div className="my-3">
@@ -353,7 +357,9 @@ function Services() {
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
         <thead>
-          <tr>
+         {
+          userRoleName === "admin" ? (
+            <tr>
             {[
               "الترتيب",
               "اسم الخدمة ",
@@ -371,6 +377,26 @@ function Services() {
               </th>
             ))}
           </tr>
+          ):(
+            <tr>
+            {[
+              "الترتيب",
+              "اسم الخدمة ",
+              "تكلفة الخدمة",
+              "وصف عن الخدمة",
+              "تاريخ الانشاء",
+              " الحالة",
+            ].map((header, index) => (
+              <th
+                key={index}
+                className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
+              >
+                {header}
+              </th>
+            ))}
+          </tr>
+          )
+         }
         </thead>
         <tbody>
           {/* Mapping branches data to table rows */}
@@ -423,7 +449,9 @@ function Services() {
                     </div>
                   )}
                 </td>
-                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+              {
+                userRoleName === "admin" ? (
+                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <button
                     onClick={() => {
                       ScrollUp();
@@ -450,6 +478,8 @@ function Services() {
                     <DeleteForeverIcon />
                   </button>
                 </td>
+                ) : ""
+              }
               </tr>
             );
           })}

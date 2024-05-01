@@ -14,11 +14,13 @@ import ReactPaginate from "react-paginate";
 
 function ClientPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
-  const [loader, setLoader] = useState(true);
+  const [loader, setLoader] = useState(false);
   const [branches, setBranches] = useState([]);
   const [nationalities, setNationalities] = useState([]);
 
   const userToken = localStorage.getItem("user_token");
+  const userRoleName = localStorage.getItem("user_role_name");
+ 
   const [clients, setClients] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
@@ -230,6 +232,7 @@ function ClientPage() {
         setLoader(false);
       });
   };
+  
   const handleSearch = (e) => {
     e.preventDefault();
     setLoader(true);
@@ -251,7 +254,9 @@ function ClientPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
+     {
+      userRoleName === "admin" ? (
+        <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         {/* register & update users */}
         <div className="mx-auto w-full ">
           <form className=" space-y-3">
@@ -402,6 +407,8 @@ function ClientPage() {
           </form>
         </div>
       </div>
+      ) : "" 
+     }
 
       {/* Search input form */}
       <div className="my-3">
@@ -446,7 +453,9 @@ function ClientPage() {
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
         <thead>
-          <tr>
+         {
+          userRoleName === "admin" ? (
+            <tr>
             {[
               "الترتيب",
               "الاسم",
@@ -456,7 +465,7 @@ function ClientPage() {
               "رقم الموبايل",
               "الفرع",
               "تاريخ الانشاء",
-              "التعديل",
+               "تعديل",
             ].map((header, index) => (
               <th
                 key={index}
@@ -466,6 +475,28 @@ function ClientPage() {
               </th>
             ))}
           </tr>
+          ) : (
+            <tr>
+            {[
+              "الترتيب",
+              "الاسم",
+              "الجنسية",
+              "العنوان",
+              "البريد الالكترونى",
+              "رقم الموبايل",
+              "الفرع",
+              "تاريخ الانشاء",
+            ].map((header, index) => (
+              <th
+                key={index}
+                className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
+              >
+                {header}
+              </th>
+            ))}
+          </tr>
+          )
+         }
         </thead>
         <tbody>
           {clients.map((client, index) => {
@@ -523,7 +554,9 @@ function ClientPage() {
                     {created_at}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                {
+                  userRoleName === "Admin" ? (
+                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <button
                     onClick={() => {
                       ScrollUp();
@@ -547,6 +580,8 @@ function ClientPage() {
                     <DeleteForeverIcon />
                   </button>
                 </td>
+                  ) : ""
+                }
               </tr>
             );
           })}
@@ -574,7 +609,28 @@ function ClientPage() {
           }
         />
       </div>
-      {loader && <div className="spinner"></div>}
+      {/* {loader && (
+          <svg
+            id="loading-spinner"
+            xmlns="http://www.w3.org/2000/svg"
+            width="100"
+            height="100"
+            viewBox="0 0 48 48"
+          >
+            <g fill="none">
+              <path
+                id="track"
+                fill="#C6CCD2"
+                d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
+              />
+              <path
+                id="section"
+                fill="#3F4850"
+                d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
+              />
+            </g>
+          </svg>
+                   )} */}
     </div>
   );
 }
