@@ -1,21 +1,20 @@
-import React from 'react'
-import Header from './Header'
-import Asidebar from './Asidebar'
-import {Outlet} from 'react-router-dom';
+import Header from "./Header";
+import Asidebar from "./Asidebar";
+import { Outlet } from "react-router-dom";
 function Mainpage() {
   return (
-    <main className='flex'>
+    <main className="flex">
       <div>
-        <Asidebar/>
+        <Asidebar />
       </div>
-      <div className='w-full'>
-        <Header/>
-        <div className='p-5'>
-            <Outlet/>
+      <div className="w-full">
+        <Header />
+        <div className="p-5">
+          <Outlet />
         </div>
       </div>
     </main>
-  )
+  );
 }
 
-export default Mainpage
+export default Mainpage;

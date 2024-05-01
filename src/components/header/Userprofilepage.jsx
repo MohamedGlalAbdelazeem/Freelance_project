@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
-import userPhoto from "./user.avif";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PersonPinIcon from '@mui/icons-material/PersonPin';
