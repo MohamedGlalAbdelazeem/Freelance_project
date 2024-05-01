@@ -21,7 +21,6 @@ function Forgetpasssword() {
       });
 
       if (res.status === 200) {
-        navigate("/Resetpassword");
         toast("تم إرسال رسالة إليك برجاء التوجة إلي البريد الإلكتروني الخاص بك", { type: "success"});
       }
     } catch (error) {
