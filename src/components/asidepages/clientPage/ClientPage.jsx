@@ -465,7 +465,7 @@ function ClientPage() {
               "رقم الموبايل",
               "الفرع",
               "تاريخ الانشاء",
-               "تعديل",
+              "تعديل",
             ].map((header, index) => (
               <th
                 key={index}
@@ -496,7 +496,7 @@ function ClientPage() {
             ))}
           </tr>
           )
-         }
+        }
         </thead>
         <tbody>
           {clients.map((client, index) => {
