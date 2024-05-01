@@ -573,11 +573,15 @@ function Branchpage() {
 
       <dialog id="my_modal_2" className="modal">
         <div className="modal-box relative">
-          <form method="dialog" className=" absolute top-0 left-0">
-            <button className="btn">X</button>
-          </form>
-          <h3 className="font-bold text-lg">Hello!</h3>
-          <p className="py-4">Press ESC key or click outside to close</p>
+          <div className="modal-action absolute -top-4 left-2">
+            <form method="dialog" className="">
+              <button className="btn rounded-full w-12 h-10">X</button>
+            </form>
+          </div>
+          <div className="text-center">
+            <h3 className="font-bold text-lg">Hello!</h3>
+            <p className="py-4">Press ESC key or click outside to close</p>
+          </div>
         </div>
 
         <form method="dialog" className="modal-backdrop">
