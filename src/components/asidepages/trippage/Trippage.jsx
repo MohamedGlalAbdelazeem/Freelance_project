@@ -44,6 +44,10 @@ function Trippage() {
   useEffect(() => {
     fetchData();
     fetchCountries();
+    if (localStorage.getItem("user_role_name") === "super_admin") {
+      toast.error("هذا المستخدم ليس له صلاحية التعديل");
+      return;
+    }
     fetchCategories();
   }, []);
 
@@ -62,8 +66,15 @@ function Trippage() {
         setShowCountries(response.data.data);
       })
       .catch(function (error) {
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
+          toast.error("هذا المستخدم ليس له صلاحية التعديل");
+        }
         console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
-        handleUnauthenticated();
+      })
+      .finally(() => {
+        setLoader(false);
       });
   }
   // hid in suber admin
@@ -79,8 +90,12 @@ function Trippage() {
         setShowCategories(response.data.data);
       })
       .catch(function (error) {
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
+          toast.error("هذا المستخدم ليس له صلاحية التعديل");
+        }
         console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-        handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
@@ -181,7 +196,7 @@ function Trippage() {
         if (response.status === 200) {
           toast.success("تم حذف الرحلة بنجاح");
           fetchData();
-        } else{
+        } else {
           console.error("Unexpected response status:", response.status);
           toast.warning("حدث خطأ غير متوقع");
         }
@@ -189,7 +204,6 @@ function Trippage() {
       .catch(function (error) {
         console.error("Error deleting branch:", error);
         setLoader(true);
-          console.log("Error deleting branch:", error);
       });
     setLoader(false);
   }
