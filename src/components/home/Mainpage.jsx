@@ -4,9 +4,9 @@ import Asidebar from './Asidebar'
 import {Outlet} from 'react-router-dom';
 function Mainpage() {
   return (
-     <main className='flex'>
+    <main className='flex'>
       <div>
-         <Asidebar/>
+        <Asidebar/>
       </div>
       <div className='w-full'>
         <Header/>
@@ -14,7 +14,7 @@ function Mainpage() {
             <Outlet/>
         </div>
       </div>
-     </main>
+    </main>
   )
 }
 
