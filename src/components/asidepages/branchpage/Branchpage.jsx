@@ -1,5 +1,6 @@
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 //pagenation
-import ReactPaginate from 'react-paginate';
+import ReactPaginate from "react-paginate";
 
 function Branchpage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
@@ -25,6 +26,7 @@ function Branchpage() {
   const [updateMode, setUpdateMode] = useState(false);
   const [updateBranchID, setUpdateBranchID] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [showClient, setShowClient] = useState(false);
 
   const schema = z.object({
     branchName: z.string().min(1, { message: "ادخل اسم الفرع" }),
@@ -45,9 +47,8 @@ function Branchpage() {
 
   useEffect(() => {
     fetchBranches();
-    fetchPagenation()
+    fetchPagenation();
   }, []);
-
 
   const fetchBranches = () => {
     setLoader(true);
@@ -74,41 +75,35 @@ function Branchpage() {
       });
   };
 
+  // fetch pagenation data///////////////////////
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
+  useEffect(() => {
+    fetchPagenation();
+  }, [currentPage]); // Fetch data whenever currentPage changes
 
-// fetch pagenation data///////////////////////
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
+  const fetchPagenation = () => {
+    setLoader(true);
+    axios
+      .get(`http://127.0.0.1:8000/api/branches?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setBranches(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      });
+  };
 
-useEffect(() => {
-  fetchPagenation();
-}, [currentPage]); // Fetch data whenever currentPage changes
-
-const fetchPagenation = () => {
-  setLoader(true);
-  axios
-    .get(`http://127.0.0.1:8000/api/branches?page=${currentPage}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setBranches(response.data.data);
-      setTotalPages(response.data.meta.pagination.last_page);
-    })
-    .catch(function (error) {
-      console.error("Error fetching branches:", error);
-    })
-};
-
-
-const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);  
-};
-// fetch pagenation data///////////////////////
-
-
-
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
+  // fetch pagenation data///////////////////////
 
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
@@ -120,15 +115,9 @@ const handlePageClick = (selectedPage) => {
     localStorage.removeItem("user_role_name");
   };
 
-  const storeBranch = async ({
-    branchName,
-    branchLocation,
-    timeFrom,
-    timeTo,
-    hotline,
-  }) => {
+  const storeBranch = async () => {
     setLoader(true);
-    if (timeTo <= timeFrom) {
+    if (getValues("timeTo") <= getValues("timeFrom")) {
       toast.error("يجب أن تكون بداية الوقت اقل من نهاية الوقت");
       return;
     }
@@ -136,12 +125,13 @@ const handlePageClick = (selectedPage) => {
       .post(
         `${baseUrl}branches`,
         {
-          name: branchName,
-          location: branchLocation,
-          from: timeFrom,
-          to: timeTo,
-          hot_line: hotline,
+          name: getValues("branchName"),
+          location: getValues("branchLocation"),
+          from: getValues("timeFrom"),
+          to: getValues("timeTo"),
+          hot_line: getValues("hotline"),
           status: branchStatus,
+          show_client: showClient,
         },
         {
           headers: {
@@ -215,6 +205,7 @@ const handlePageClick = (selectedPage) => {
           to: getValues("timeTo"),
           hot_line: getValues("hotline"),
           status: branchStatus,
+          show_client: showClient,
         },
         {
           headers: {
@@ -346,14 +337,26 @@ const handlePageClick = (selectedPage) => {
                     )}
                   </div>
                 </div>
-                <div className="w-full px-3 sm:w-1/2">
-                  <label className="text-white">تفعيل الفرع أم لا ؟</label>
-                  <div className="mb-5">
-                    <Switch
-                      checked={branchStatus}
-                      onChange={(e) => setBranchStatus(e.target.checked)}
-                      color="success"
-                    />
+                <div className="w-full sm:w-1/2 flex gap-5 justify-evenly px-5 ">
+                  <div>
+                    <label className="text-white">تفعيل الفرع أم لا ؟</label>
+                    <div className="mb-5">
+                      <Switch
+                        checked={branchStatus}
+                        onChange={(e) => setBranchStatus(e.target.checked)}
+                        color="success"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-white">إظهار العميل أم لا ؟</label>
+                    <div className="mb-5">
+                      <Switch
+                        checked={showClient}
+                        onChange={(e) => setShowClient(e.target.checked)}
+                        color="success"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -527,51 +530,82 @@ const handlePageClick = (selectedPage) => {
                     {created_at}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <button
-                    onClick={() => {
-                      ScrollUp();
-                      setUpdateBranchID(id);
-                      setUpdateMode(true);
-                      setValue("branchName", name);
-                      setValue("branchLocation", location);
-                      setValue("timeFrom", from);
-                      setValue("timeTo", to);
-                      setValue("hotline", hotLine);
-                      setBranchStatus(status === "مفعل" ? true : false);
-                    }}
-                    className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
-                  >
-                    <DriveFileRenameOutlineIcon />
-                  </button>
-                  <button
-                    onClick={() => deleteBranch(id)}
-                    className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
-                  >
-                    <DeleteForeverIcon />
-                  </button>
+                <td className="w-full lg:w-auto p-3 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <div className="flex gap-2 justify-center items-center">
+                    <button
+                      onClick={() => {
+                        ScrollUp();
+                        setUpdateBranchID(id);
+                        setUpdateMode(true);
+                        setValue("branchName", name);
+                        setValue("branchLocation", location);
+                        setValue("timeFrom", from);
+                        setValue("timeTo", to);
+                        setValue("hotline", hotLine);
+                        setBranchStatus(status === "مفعل" ? true : false);
+                        setShowClient(show_client === "مفعل" ? true : false);
+                      }}
+                      className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
+                    >
+                      <DriveFileRenameOutlineIcon />
+                    </button>
+                    <button
+                      onClick={() => deleteBranch(id)}
+                      className="bg-red-800 text-white p-2 rounded hover:bg-red-500"
+                    >
+                      <DeleteForeverIcon />
+                    </button>
+                    <button
+                      onClick={() =>
+                        document.getElementById("my_modal_2").showModal()
+                      }
+                      className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
+                    >
+                      <VisibilityIcon />
+                    </button>
+                  </div>
                 </td>
               </tr>
             );
           })}
         </tbody>
       </table>
-      <div>
-            {/* Render pagination */}
-            <ReactPaginate
-                pageCount={totalPages}
-                pageRangeDisplayed={3}
-                marginPagesDisplayed={2}
-                onPageChange={handlePageClick}
-                containerClassName={'flex justify-center mt-4 text-2xl'}
-                activeClassName={'bg-blue-500 text-white hover:bg-blue-700'}
-                previousLabel={'السابق'}
-                nextLabel={'التالي'}
-                previousClassName={'mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200'}
-                nextClassName={'mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200'}
-                pageClassName={'mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200'}
-            />
+
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box relative">
+          <form method="dialog" className=" absolute top-0 left-0">
+            <button className="btn">X</button>
+          </form>
+          <h3 className="font-bold text-lg">Hello!</h3>
+          <p className="py-4">Press ESC key or click outside to close</p>
         </div>
+
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+      <div>
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          pageClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+        />
+      </div>
       {loader && <div className="spinner"></div>}
     </main>
   );
