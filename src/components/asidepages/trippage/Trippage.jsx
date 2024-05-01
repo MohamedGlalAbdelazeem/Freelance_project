@@ -18,6 +18,7 @@ function Trippage() {
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem("user_token");
+  const userRoleName = localStorage.getItem("user_role_name");
   const [branchStatus, setBranchStatus] = useState(false);
   const [updateMode, setUpdateMode] = useState(false);
   const [updateTripsID, setUpdateTripsID] = useState("");
@@ -300,8 +301,10 @@ function Trippage() {
 
   return (
     <main className="branchTable">
-      {/* add branch form */}
-      <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
+      
+    {
+      userRoleName === "admin" ? (
+        <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
           <form className=" space-y-3">
             <div className="flex gap-4	">
@@ -472,6 +475,8 @@ function Trippage() {
           </form>
         </div>
       </div>
+      ) : ("")
+    }
       <div className="divider"></div>
 
       {/* Search input form */}
@@ -508,7 +513,9 @@ function Trippage() {
 
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
-        <thead>
+       {
+        userRoleName === "admin" ? (
+          <thead>
           <tr>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               الترتيب
@@ -547,6 +554,45 @@ function Trippage() {
             </th>
           </tr>
         </thead>
+        ):
+        (
+          <thead>
+          <tr>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              الترتيب
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              اسم الرحلة
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              تاريخ الإقلاع
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              التكلفة
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              وصف
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              الحالة
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              من
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              إلي
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              نوع الرحلة
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              {" "}
+              وقت الإنشاء{" "}
+            </th>
+          </tr>
+        </thead>
+        )
+       }
         <tbody>
           {trips.map((trip, index) => {
             const {
@@ -621,49 +667,53 @@ function Trippage() {
                     {created_at}
                   </span>
                 </td>
-
-                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <button
-                    onClick={() => {
-                      ScrollUp();
-                      setUpdateTripsID(id);
-                      setUpdateMode(true);
-                      setValue("tripName", name);
-                      setValue("tripCost", cost.toString());
-                      setValue("take_off", takeOff);
-                      setValue("tripDescription", description);
-                      setValue("tripStatus", status === "مفعل" ? true : false);
-                      setValue(
-                        "tripFrom",
-                        showCountCountries
-                          .find((trip) => trip.id === from.id)
-                          ?.id.toString()
-                      );
-                      setValue(
-                        "tripTo",
-                        showCountCountries
-                          .find((trip) => trip.id === to.id)
-                          ?.id.toString()
-                      );
-                      setValue(
-                        "category_id",
-                        showCategories
-                          .find((cat) => cat.id === category.id)
-                          ?.id.toString()
-                      );
-                      setBranchStatus(status === "مفعل" ? true : false);
-                    }}
-                    className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
-                  >
-                    <DriveFileRenameOutlineIcon />
-                  </button>
-                  <button
-                    onClick={() => deleteTrips(id)}
-                    className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
-                  >
-                    <DeleteForeverIcon />
-                  </button>
-                </td>
+                {
+                  userRoleName === "admin" ? (
+                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                    <button
+                      onClick={() => {
+                        ScrollUp();
+                        setUpdateTripsID(id);
+                        setUpdateMode(true);
+                        setValue("tripName", name);
+                        setValue("tripCost", cost.toString());
+                        setValue("take_off", takeOff);
+                        setValue("tripDescription", description);
+                        setValue("tripStatus", status === "مفعل" ? true : false);
+                        setValue(
+                          "tripFrom",
+                          showCountCountries
+                            .find((trip) => trip.id === from.id)
+                            ?.id.toString()
+                        );
+                        setValue(
+                          "tripTo",
+                          showCountCountries
+                            .find((trip) => trip.id === to.id)
+                            ?.id.toString()
+                        );
+                        setValue(
+                          "category_id",
+                          showCategories
+                            .find((cat) => cat.id === category.id)
+                            ?.id.toString()
+                        );
+                        setBranchStatus(status === "مفعل" ? true : false);
+                      }}
+                      className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
+                    >
+                      <DriveFileRenameOutlineIcon />
+                    </button>
+                    <button
+                      onClick={() => deleteTrips(id)}
+                      className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
+                    >
+                      <DeleteForeverIcon />
+                    </button>
+                  </td>
+                  ) : ("")
+                  
+                }
               </tr>
             );
           })}

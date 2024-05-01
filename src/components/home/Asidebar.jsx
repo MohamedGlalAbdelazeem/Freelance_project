@@ -9,11 +9,13 @@ import { toast } from "react-toastify";
 import CategoryIcon from "@mui/icons-material/Category";
 import LocalAirportIcon from "@mui/icons-material/LocalAirport";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
+import { useEffect } from "react";
 function Asidebar() {
   const Navigate = useNavigate();
+  const userToken = localStorage.getItem("user_token");
 
   function handelLogout() {
-    if (localStorage.getItem("user_token")) {
+    if (userToken) {
       localStorage.removeItem("user_token");
       localStorage.removeItem("user_role_name");
       Navigate("/Login");
@@ -79,6 +81,34 @@ function Asidebar() {
       },
     ];
   }
+
+ useEffect(() => {
+  refreshUser()
+ }, [])
+ const refreshUser = () => {
+  axios
+    .get("http://127.0.0.1:8000/api/refresh", {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setLoader(false);
+      setUserprofile(response.data.Admin);
+      setName(response.data.Admin.name);
+      setPhoneNumber(response.data.Admin.phone_number);
+    })
+    .catch(function (error) {
+      if (error.response && error.response.status === 401) {
+        handleUnauthenticated();
+      } else {
+        console.error("Error refreshing token:", error);
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
 
   return (
     <>

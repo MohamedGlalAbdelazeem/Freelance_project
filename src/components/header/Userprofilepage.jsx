@@ -48,7 +48,6 @@ function UserProfilePage() {
       })
       .finally(() => {
         setLoader(false);
-        console.log(userProfile);
       });
   };
 
@@ -148,15 +147,54 @@ function UserProfilePage() {
             <div>
               <div className="flex justify-center items-center flex-col mb-10">
                 <PersonPinIcon sx={{ fontSize: 200 }} />
-                <p className="text-yellow-600">Demo</p>
-                <p>
-                  <strong>الاسم: </strong>
-                  {userProfile.name}
-                </p>
-                <p>
-                  <strong>رقم الهاتف: </strong>
-                  {userProfile.phone_number}
-                </p>
+                <h1 className="mb-2 text-2xl font-bold text-emerald-600">المعلومات الشخصية</h1>
+                <div class="bg-white overflow-hidden shadow rounded-lg border">
+                   
+                    <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
+                        <dl class="sm:divide-y sm:divide-gray-200">
+                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    الاسم :
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                {userProfile.name}
+                                </dd>
+                            </div>
+                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    البريد الإلكتروني : 
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                {userProfile.email}
+                                </dd>
+                            </div>
+                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    رقم الهاتف : 
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                {userProfile.phone_number}
+                                </dd>
+                            </div>
+                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    دور المستخدم : 
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    {userProfile.role_name}
+                                </dd>
+                            </div>
+                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                                <dt class="text-sm font-medium text-gray-500">
+                                    وقت إنشاء الحساب : 
+                                </dt>
+                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                                    {userProfile.created_at}
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+                 </div>
               </div>
               {/* <input type="file" name="file" id="file" className="sr-only" />
               <label
