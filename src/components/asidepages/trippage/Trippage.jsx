@@ -21,6 +21,8 @@ function Trippage() {
   const [updateMode, setUpdateMode] = useState(false);
   const [updateTripsID, setUpdateTripsID] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [showCountCountries, setShowCountries] = useState([]);
+  const [showCategories, setShowCategories] = useState([]);
 
   const schema = z.object({
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
@@ -44,15 +46,8 @@ function Trippage() {
   useEffect(() => {
     fetchData();
     fetchCountries();
-    if (localStorage.getItem("user_role_name") === "super_admin") {
-      toast.error("هذا المستخدم ليس له صلاحية التعديل");
-      return;
-    }
     fetchCategories();
   }, []);
-
-  const [showCountCountries, setShowCountries] = useState([]);
-  const [showCategories, setShowCategories] = useState([]);
 
   function fetchCountries() {
     setLoader(true);
@@ -90,11 +85,11 @@ function Trippage() {
         setShowCategories(response.data.data);
       })
       .catch(function (error) {
-        if (
-          error.response.data.message === "User does not have the right roles."
-        ) {
-          toast.error("هذا المستخدم ليس له صلاحية التعديل");
-        }
+        // if (
+        //   error.response.data.message === "User does not have the right roles."
+        // ) {
+        //   toast.error("هذا المستخدم ليس له صلاحية التعديل");
+        // }
         console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
       })
       .finally(() => {

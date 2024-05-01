@@ -114,7 +114,6 @@ function Services() {
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
-        handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
