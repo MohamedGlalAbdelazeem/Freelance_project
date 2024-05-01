@@ -27,6 +27,7 @@ function Branchpage() {
   const [updateBranchID, setUpdateBranchID] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [showClient, setShowClient] = useState(false);
+  const [branchClients, setBranchClients] = useState([]);
 
   const schema = z.object({
     branchName: z.string().min(1, { message: "ادخل اسم الفرع" }),
@@ -75,7 +76,26 @@ function Branchpage() {
       });
   };
 
-  // fetch pagenation data///////////////////////
+  const fetchBranchClients = (id) => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}clients/${id}/branch`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setLoader(false);
+        setBranchClients(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -556,9 +576,10 @@ function Branchpage() {
                       <DeleteForeverIcon />
                     </button>
                     <button
-                      onClick={() =>
-                        document.getElementById("my_modal_2").showModal()
-                      }
+                      onClick={() => {
+                        document.getElementById("my_modal_2").showModal();
+                        fetchBranchClients(id);
+                      }}
                       className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
                     >
                       <VisibilityIcon />
@@ -572,24 +593,108 @@ function Branchpage() {
       </table>
 
       <dialog id="my_modal_2" className="modal">
-        <div className="modal-box relative">
+        <div className="modal-box max-w-[90%] relative">
           <div className="modal-action absolute -top-4 left-2">
-            <form method="dialog" className="">
+            <form method="dialog">
               <button className="btn rounded-full w-12 h-10">X</button>
             </form>
           </div>
-          <div className="text-center">
-            <h3 className="font-bold text-lg">Hello!</h3>
-            <p className="py-4">Press ESC key or click outside to close</p>
+          <div className="text-center flex flex-col justify-center">
+            {branchClients.length > 0 ? (
+              <>
+                <h1
+                  key={branchClients[0].id}
+                  className="text-2xl font-bold mb-6"
+                >
+                  العملاء الموجودين فى فرع {branchClients[0].branch.branch_name}
+                </h1>
+                <table>
+                  <thead>
+                    <tr>
+                      {[
+                        "الترتيب",
+                        "الاسم",
+                        "الجنسية",
+                        "العنوان",
+                        "البريد الالكترونى",
+                        "رقم الموبايل",
+                        "تاريخ الانشاء",
+                      ].map((header, index) => (
+                        <th
+                          key={index}
+                          className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
+                        >
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {branchClients.map((client, index) => {
+                      const {
+                        id,
+                        name,
+                        address,
+                        email,
+                        phone_number,
+                        nationality,
+                        created_at,
+                      } = client;
+                      return (
+                        <tr
+                          key={id}
+                          className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
+                        >
+                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
+                            {index+1}
+                          </td>
+                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                            <span className="rounded  px-2 text-xs font-bold">
+                              {name}
+                            </span>
+                          </td>
+                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                            <span className="rounded  py-1 px-3 text-xs font-bold">
+                              {nationality.nationality}
+                            </span>
+                          </td>
+                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                            <span className="rounded  py-1 px-3 text-xs font-bold">
+                              {address}
+                            </span>
+                          </td>
+                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                            <span className="rounded  py-1 px-3 text-xs font-bold">
+                              {email}
+                            </span>
+                          </td>
+                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                            <span className="rounded  py-1 px-3 text-xs font-bold">
+                              {phone_number}
+                            </span>
+                          </td>
+                          <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                            <span className="rounded  px-1  text-xs font-bold">
+                              {created_at}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </>
+            ) : (
+              <p className="mb-10 text-xl">لا يوجد عملاء فى هذا الفرع</p>
+            )}
           </div>
         </div>
-
         <form method="dialog" className="modal-backdrop">
           <button>close</button>
         </form>
       </dialog>
+
       <div>
-        {/* Render pagination */}
         <ReactPaginate
           pageCount={totalPages}
           pageRangeDisplayed={3}
