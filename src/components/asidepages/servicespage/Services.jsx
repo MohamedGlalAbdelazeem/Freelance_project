@@ -105,9 +105,8 @@ function Services() {
           Authorization: `Bearer ${userToken}`,
         },
       })
-      .then(function (res) {
+      .then(function () {
         toast.success("تم تسجيل الخدمة  بنجاح");
-        console.log(res);
         fetchServices();
         reset();
       })

@@ -83,7 +83,7 @@ function Trippage() {
         handleUnauthenticated();
       })
       .finally(() => {
-        // console.log(showCategories.find((cat) => cat.id === 3)?.name);
+        setLoader(false);
       });
   }
 
