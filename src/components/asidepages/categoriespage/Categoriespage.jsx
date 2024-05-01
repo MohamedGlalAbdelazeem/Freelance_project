@@ -9,6 +9,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
+//pagenation
+import ReactPaginate from "react-paginate";
 import { ScrollUp } from "../../ScrollUp";
 
 function Categoriespage() {
@@ -199,6 +201,45 @@ function Categoriespage() {
     setLoader(false);
   };
 
+
+
+// fetch pagenation data///////////////////////
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+
+useEffect(() => {
+  fetchPagenation();
+}, [currentPage]); // Fetch data whenever currentPage changes
+
+const fetchPagenation = () => {
+  setLoader(true);
+  axios
+    .get(`http://127.0.0.1:8000/api/services?page=${currentPage}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setCategories(response.data.data);
+      setTotalPages(response.data.meta.pagination.last_page);
+    })
+    .catch(function (error) {
+      console.error("Error fetching branches:", error);
+    });
+};
+
+const handlePageClick = (selectedPage) => {
+  setCurrentPage(selectedPage.selected + 1);
+};
+// fetch pagenation data///////////////////////
+
+
+
+
+
+
+
+  
   return (
     <main className="branchTable">
       {/* add category form */}
@@ -317,13 +358,14 @@ function Categoriespage() {
           {/* Mapping categories data to table rows */}
           {categories.map((cat, index) => {
             const { name, id, status, created_at } = cat;
+            const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
               <tr
                 key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  {index + 1}
+                  {tableIndex}
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
@@ -373,6 +415,28 @@ function Categoriespage() {
         </tbody>
       </table>
       {/* loader */}
+      <div>
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          pageClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+        />
+      </div>
       {loader && <div className="spinner"></div>}
     </main>
   );
