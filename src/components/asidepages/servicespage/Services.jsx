@@ -9,6 +9,8 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ScrollUp } from "../../ScrollUp";
+//pagenation
+import ReactPaginate from "react-paginate";
 
 function Services() {
   const baseUrl = "http://127.0.0.1:8000/api/";
@@ -52,7 +54,35 @@ function Services() {
     fetchServices();
     fetchCategories();
   }, []);
+ // fetch pagenation data///////////////////////
+ const [currentPage, setCurrentPage] = useState(1);
+ const [totalPages, setTotalPages] = useState(1);
 
+ useEffect(() => {
+   fetchPagenation();
+ }, [currentPage]); // Fetch data whenever currentPage changes
+
+ const fetchPagenation = () => {
+   setLoader(true);
+   axios
+     .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
+       headers: {
+         Authorization: `Bearer ${userToken}`,
+       },
+     })
+     .then(function (response) {
+       setClients(response.data.data);
+       setTotalPages(response.data.meta.pagination.last_page);
+     })
+     .catch(function (error) {
+       console.error("Error fetching branches:", error);
+     });
+ };
+
+ const handlePageClick = (selectedPage) => {
+   setCurrentPage(selectedPage.selected + 1);
+ };
+ // fetch pagenation data///////////////////////
   function fetchCategories() {
     setLoader(true);
     axios
@@ -485,6 +515,28 @@ function Services() {
           })}
         </tbody>
       </table>
+      <div>
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          pageClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+        />
+      </div>
       {loader && <div className="spinner"></div>}
     </div>
   );
