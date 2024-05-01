@@ -22,8 +22,6 @@ function Trippage() {
   const [updateTripsID, setUpdateTripsID] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
-  // show and hide more
-
   const schema = z.object({
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
     tripCost: z.string().min(1, { message: "رقم الرحلة خاطئ" }),
@@ -518,7 +516,6 @@ function Trippage() {
           </tr>
         </thead>
         <tbody>
-          {/* Mapping trips data to table rows */}
           {trips.map((trip, index) => {
             const {
               name,
@@ -528,6 +525,7 @@ function Trippage() {
               description,
               status,
               created_at,
+              category,
               from,
               to,
             } = trip;
@@ -580,10 +578,9 @@ function Trippage() {
                     {to.en_short_name}
                   </span>
                 </td>
-                {/* toDo - نوع الرحلة */}
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
-                    {/* {showCategories.find((cat) => cat.id === category_id)?.name} */}
+                    {category.name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -615,8 +612,12 @@ function Trippage() {
                           .find((trip) => trip.id === to.id)
                           ?.id.toString()
                       );
-                      // console.log("from", from.en_short_name);
-                      // setValue("category_id", category_id);
+                      setValue(
+                        "category_id",
+                        showCategories
+                          .find((cat) => cat.id === category.id)
+                          ?.id.toString()
+                      );
                       setBranchStatus(status === "مفعل" ? true : false);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
