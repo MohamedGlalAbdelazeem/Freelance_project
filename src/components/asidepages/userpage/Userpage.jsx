@@ -129,7 +129,12 @@ function Userpage() {
         reset();
       })
       .catch(function (error) {
-        console.error("Error fetching", error);
+        if (
+          error.response.data.message === "The email has already been taken."
+        ) {
+          toast.error("الموظف موجود بالفعل");
+        }
+        console.error("Error fetching", error.response.data.message);
       })
       .finally(() => {
         setLoader(false);

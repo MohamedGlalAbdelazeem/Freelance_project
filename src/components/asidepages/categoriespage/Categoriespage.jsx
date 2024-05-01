@@ -94,10 +94,17 @@ function Categoriespage() {
         reset();
         fetchCategories();
       })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
+      .catch((error) => {
+        if (error.response.data.message == "Already_exist") {
           toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
         }
+        if (
+          error.response.data.message ===
+          "The name has already been taken."
+        ) {
+          toast.error("تصنيف الرحلة موجود بالفعل");
+        }
+        console.log(error);
       })
       .finally(() => {
         setLoader(false);
