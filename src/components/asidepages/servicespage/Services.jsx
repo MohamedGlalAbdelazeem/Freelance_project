@@ -65,13 +65,13 @@ function Services() {
  const fetchPagenation = () => {
    setLoader(true);
    axios
-     .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
+     .get(`http://127.0.0.1:8000/api/services?page=${currentPage}`, {
        headers: {
          Authorization: `Bearer ${userToken}`,
        },
      })
      .then(function (response) {
-       setClients(response.data.data);
+      setServices(response.data.data);
        setTotalPages(response.data.meta.pagination.last_page);
      })
      .catch(function (error) {
@@ -440,13 +440,14 @@ function Services() {
               branch_id,
               created_at,
             } = service;
+            const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
               <tr
                 key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
-                  {index + 1}
+                  {tableIndex}
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
