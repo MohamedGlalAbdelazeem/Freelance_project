@@ -351,11 +351,7 @@ function Userpage() {
                   {...register("branch_id")}
                   className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 >
-                  <option
-                    value=""
-                    disabled
-                    selected
-                  >
+                  <option value="" disabled selected>
                     اختر الفرع
                   </option>
                   {branches.map((branch) => {
@@ -543,27 +539,28 @@ function Userpage() {
       </table>
       {loader && <div className="spinner"></div>}
       <div>
-            {/* Render pagination */}
-            <ReactPaginate
-                pageCount={totalPages}
-                pageRangeDisplayed={3}
-                marginPagesDisplayed={2}
-                onPageChange={handlePageClick}
-                containerClassName={"flex justify-center mt-4 text-2xl"}
-                activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-                previousLabel={"السابق"}
-                nextLabel={"التالي"}
-                previousClassName={
-                  "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-                }
-                nextClassName={
-                  "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-                }
-                pageClassName={
-                  "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-                }
-            />
-        </div>
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+          pageClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+          }
+        />
+      </div>
+      {loader && <div className="spinner"></div>}
     </div>
   );
 }
