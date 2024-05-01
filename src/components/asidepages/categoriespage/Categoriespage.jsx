@@ -163,10 +163,9 @@ function Categoriespage() {
           },
         }
       )
-      .then((response) => {
+      .then(() => {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
         fetchCategories();
-        console.log(response.data.data);
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {

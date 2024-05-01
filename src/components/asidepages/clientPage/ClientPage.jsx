@@ -175,8 +175,8 @@ function ClientPage() {
         reset();
       })
       .catch(function (error) {
-        console.log(error);
         toast.error(error.response.data.message);
+        console.log(error);
       })
       .finally(() => {
         setLoader(false);
@@ -499,8 +499,6 @@ function ClientPage() {
          }
         </thead>
         <tbody>
-          {console.log(clients)}
-          {/* Mapping branches data to table rows */}
           {clients.map((client, index) => {
             const {
               id,
