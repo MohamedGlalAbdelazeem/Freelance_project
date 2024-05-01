@@ -112,6 +112,11 @@ function Services() {
         reset();
       })
       .catch(function (error) {
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
+          toast.error("الخدمة موجودة بالفعل");
+        }
         console.error("Error fetching", error);
       })
       .finally(() => {

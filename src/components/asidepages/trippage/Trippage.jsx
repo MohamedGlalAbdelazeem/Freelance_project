@@ -68,7 +68,7 @@ function Trippage() {
         handleUnauthenticated();
       });
   }
-// hid in suber  admin
+  // hid in suber  admin
   function fetchCategories() {
     setLoader(true);
     axios
@@ -150,17 +150,22 @@ function Trippage() {
         fetchData();
         reset();
       })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
+      .catch((error) => {
+        if (error.response.data.message == "Already_exist") {
           toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
         }
         if (
-          response.response.data.message ==
+          error.response.data.message ==
           "The take off must be a date after now."
         ) {
           toast.error("يجب أن يكون وقت الإقلاع بعد الآن");
         }
-        console.log("Error creating branch:", response);
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
+          toast.error("الرحلة موجود بالفعل");
+        }
+        console.log(error);
         // toast.warning(response.response.data.message);
       })
       .finally(() => {
