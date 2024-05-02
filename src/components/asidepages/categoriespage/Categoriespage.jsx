@@ -214,7 +214,7 @@ useEffect(() => {
 const fetchPagenation = () => {
   setLoader(true);
   axios
-    .get(`http://127.0.0.1:8000/api/services?page=${currentPage}`, {
+    .get(`http://127.0.0.1:8000/api/categories?page=${currentPage}`, {
       headers: {
         Authorization: `Bearer ${userToken}`,
       },
@@ -231,11 +231,6 @@ const fetchPagenation = () => {
 const handlePageClick = (selectedPage) => {
   setCurrentPage(selectedPage.selected + 1);
 };
-// fetch pagenation data///////////////////////
-
-
-
-
 
 
 

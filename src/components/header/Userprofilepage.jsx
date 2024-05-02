@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import PersonPinIcon from '@mui/icons-material/PersonPin';
+import PersonPinIcon from "@mui/icons-material/PersonPin";
 function UserProfilePage() {
   const [userProfile, setUserprofile] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -14,20 +14,23 @@ function UserProfilePage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [isError, setIsError] = useState(false);
+  const [branch, setBranch] = useState("");
+  let [branchID, setBranchID] = useState("");
 
   useEffect(() => {
     setLoader(true);
-   // const userRoleName = localStorage.getItem("user_role_name");
+    // const userRoleName = localStorage.getItem("user_role_name");
     const userToken = localStorage.getItem("user_token");
     if (!userToken) {
       handleUnauthenticated();
       return;
     }
     refreshUser();
+    getBranch();
   }, []);
 
-  const refreshUser = () => {
-    axios
+  const refreshUser = async () => {
+    await axios
       .get("http://127.0.0.1:8000/api/refresh", {
         headers: {
           Authorization: `Bearer ${userToken}`,
@@ -38,6 +41,7 @@ function UserProfilePage() {
         setUserprofile(response.data.Admin);
         setName(response.data.Admin.name);
         setPhoneNumber(response.data.Admin.phone_number);
+        setBranchID(response.data.Admin.branch_id);
       })
       .catch(function (error) {
         if (error.response && error.response.status === 401) {
@@ -48,6 +52,19 @@ function UserProfilePage() {
       })
       .finally(() => {
         setLoader(false);
+      });
+  };
+  const getBranch = async () => {
+    await axios
+      .get(`http://127.0.0.1:8000/api/branches/select-name-id`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then((res) => {
+        let branchName = res.data.data.filter((item) => item.id === branchID)[0]
+          .name;
+        setBranch(branchName);
       });
   };
 
@@ -87,11 +104,15 @@ function UserProfilePage() {
   const changePassword = async (e) => {
     setLoader(true);
     e.preventDefault();
-    if (newPassword.trim() === "" && confirmNewPassword.trim() === "" && oldPassword.trim() === "") {
+    if (
+      newPassword.trim() === "" &&
+      confirmNewPassword.trim() === "" &&
+      oldPassword.trim() === ""
+    ) {
       setIsError(true);
       return;
     }
-    if (newPassword.trim() !== confirmNewPassword.trim() ) {
+    if (newPassword.trim() !== confirmNewPassword.trim()) {
       toast("كلمة المرور غير متطابقة", { type: "error" });
       return;
     }
@@ -147,54 +168,63 @@ function UserProfilePage() {
             <div>
               <div className="flex justify-center items-center flex-col mb-10">
                 <PersonPinIcon sx={{ fontSize: 200 }} />
-                <h1 className="mb-2 text-2xl font-bold text-emerald-600">المعلومات الشخصية</h1>
-                <div class="bg-white overflow-hidden shadow rounded-lg border">
-                   
-                    <div class="border-t border-gray-200 px-4 py-5 sm:p-0">
-                        <dl class="sm:divide-y sm:divide-gray-200">
-                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    الاسم :
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                {userProfile.name}
-                                </dd>
-                            </div>
-                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    البريد الإلكتروني : 
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                {userProfile.email}
-                                </dd>
-                            </div>
-                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    رقم الهاتف : 
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                {userProfile.phone_number}
-                                </dd>
-                            </div>
-                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    دور المستخدم : 
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    {userProfile.role_name}
-                                </dd>
-                            </div>
-                            <div class="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                                <dt class="text-sm font-medium text-gray-500">
-                                    وقت إنشاء الحساب : 
-                                </dt>
-                                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                    {userProfile.created_at}
-                                </dd>
-                            </div>
-                        </dl>
-                    </div>
-                 </div>
+                <h1 className="mb-2 text-2xl font-bold text-emerald-600">
+                  المعلومات الشخصية
+                </h1>
+                <div className="bg-white overflow-hidden shadow rounded-lg border">
+                  <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
+                    <dl className="sm:divide-y sm:divide-gray-200">
+                      <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">
+                          الاسم :
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          {userProfile.name}
+                        </dd>
+                      </div>
+                      <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">
+                          البريد الإلكتروني :
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          {userProfile.email}
+                        </dd>
+                      </div>
+                      <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">
+                          رقم الهاتف :
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          {userProfile.phone_number}
+                        </dd>
+                      </div>
+                      <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">
+                          دور المستخدم :
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          {userProfile.role_name}
+                        </dd>
+                      </div>
+                      <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">
+                           الفرع :
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          {branch}
+                        </dd>
+                      </div>
+                      <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">
+                          وقت إنشاء الحساب :
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          {userProfile.created_at}
+                        </dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
               </div>
               {/* <input type="file" name="file" id="file" className="sr-only" />
               <label

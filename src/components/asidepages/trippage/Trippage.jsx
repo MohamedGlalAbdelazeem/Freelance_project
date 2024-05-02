@@ -10,6 +10,8 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+
 //pagenation
 import ReactPaginate from "react-paginate";
 function Trippage() {
@@ -74,37 +76,42 @@ function Trippage() {
         setLoader(false);
       });
   }
+  const [singleTrip, setSingleTrip] = useState({});
 
- // fetch pagenation data///////////////////////
- const [currentPage, setCurrentPage] = useState(1);
- const [totalPages, setTotalPages] = useState(1);
+  const fetchSingleTrip = (id) => {
+    let single = trips.filter((trip) => trip.id === id);
+    setSingleTrip(...single);
+    console.log(singleTrip);
+  };
+  // fetch pagenation data///////////////////////
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
- useEffect(() => {
-   fetchPagenation();
- }, [currentPage]); // Fetch data whenever currentPage changes
+  useEffect(() => {
+    fetchPagenation();
+  }, [currentPage]); // Fetch data whenever currentPage changes
 
- const fetchPagenation = () => {
-   setLoader(true);
-   axios
-     .get(`http://127.0.0.1:8000/api/trips?page=${currentPage}`, {
-       headers: {
-         Authorization: `Bearer ${userToken}`,
-       },
-     })
-     .then(function (response) {
-      setTrips(response.data.data);
-       setTotalPages(response.data.meta.pagination.last_page);
-     })
-     .catch(function (error) {
-       console.error("Error fetching branches:", error);
-     });
- };
+  const fetchPagenation = () => {
+    setLoader(true);
+    axios
+      .get(`http://127.0.0.1:8000/api/trips?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setTrips(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      });
+  };
 
- 
- const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);
-};
-// fetch pagenation data///////////////////////
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
+  // fetch pagenation data///////////////////////
 
   // hid in suber admin
   function fetchCategories() {
@@ -296,183 +303,271 @@ function Trippage() {
 
   return (
     <main className="branchTable">
-      
-    {
-      userRoleName === "admin" ? (
-        <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
-        <div className="mx-auto w-full ">
-          <form className=" space-y-3">
-            <div className="flex gap-4	">
-              <div className="flex-grow w-full">
-                <input
-                  type="text"
-                  {...register("tripName")}
-                  placeholder="اسم الرحلة"
-                  className="w-full flex-grow rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.tripName?.message}
-                  </span>
-                )}
-              </div>
-              <div className="flex-grow w-full">
-                <input
-                  type="number"
-                  {...register("tripCost")}
-                  placeholder="تكلفة الرحلة "
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.tripCost?.message}
-                  </span>
-                )}
-              </div>
-            </div>
-            <div className="flex gap-4 ">
-              <div className="w-full">
-                <input
-                  type="date"
-                  {...register("take_off")}
-                  placeholder="تاريخ إقلاع الرحلة "
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.take_off?.message}
-                  </span>
-                )}
-              </div>
-              <div className="w-full">
-                <textarea
-                  rows="1"
-                  {...register("tripDescription")}
-                  placeholder="وصف بسيط عن الرحلة"
-                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.tripDescription?.message}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="flex gap-2">
-              <select
-                id="countries"
-                {...register("tripFrom")}
-                className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="" disabled selected>
-                  من
-                </option>
-                {showCountCountries.map((trip, index) => {
-                  return (
-                    <option key={index} value={trip.id}>
-                      {trip.en_short_name}
-                    </option>
-                  );
-                })}
-              </select>
-              {errors && (
-                <span className="text-red-500 text-sm">
-                  {errors.tripFrom?.message}
-                </span>
-              )}
-
-              <select
-                id="countries"
-                {...register("tripTo")}
-                className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="" disabled selected>
-                  إلى
-                </option>
-                {showCountCountries.map((trip, index) => {
-                  return (
-                    <option key={index} value={trip.id}>
-                      {trip.en_short_name}
-                    </option>
-                  );
-                })}
-              </select>
-              {errors && (
-                <span className="text-red-500 text-sm">
-                  {errors.tripTo?.message}
-                </span>
-              )}
-
-              <select
-                id="countries"
-                {...register("category_id")}
-                className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="" disabled selected>
-                  نوع الرحلة
-                </option>
-                {showCategories.map((categories, index) => {
-                  return (
-                    <option key={index} value={categories.id}>
-                      {categories.name}
-                    </option>
-                  );
-                })}
-              </select>
-              {errors && (
-                <span className="text-red-500 text-sm">
-                  {errors.category_id?.message}
-                </span>
-              )}
-            </div>
-
-            <div className="pt-3">
-              <div className="-mx-3 flex flex-wrap">
-                {updateMode && (
-                  <div className="w-full px-3 sm:w-1/2">
-                    <label className="text-white">
-                      تفعيل الرحلة أو إلفاء تفعيل الرحلة ؟
-                    </label>
-                    <div className="mb-5">
-                      <Switch
-                        checked={branchStatus}
-                        onChange={(e) => setBranchStatus(e.target.checked)}
-                        color="success"
-                      />
-                    </div>
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box relative">
+          <div className="modal-action absolute -top-4 left-2">
+            <form method="dialog">
+              <button className="btn rounded-full w-12 h-10">X</button>
+            </form>
+          </div>
+          <div className="text-center flex flex-col justify-center">
+            <div className="bg-white overflow-hidden shadow rounded-lg border">
+              <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
+                <dl className="sm:divide-y sm:divide-gray-200">
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      اسم الرحلة :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.name}
+                    </dd>
                   </div>
-                )}
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      التكلفة :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.cost}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      تاريخ الاقلاع :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.takeOff}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">من :</dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.from?.en_short_name}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">إلى :</dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.to?.en_short_name}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      نوع الرحلة :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.category?.name}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      الحالة :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.status}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      الوصف :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.description}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      وقت الإنشاء :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.created_at}
+                    </dd>
+                  </div>
+                </dl>
               </div>
             </div>
-
-            <div>
-              {updateMode ? (
-                <button
-                  type="submit"
-                  onClick={handleSubmit(updateTrips)}
-                  disabled={isSubmitting}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-                >
-                  تحديث الرحلة
-                </button>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  onClick={handleSubmit(storeTrips)}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
-                >
-                  إنشاء الرحلة
-                </button>
-              )}
-            </div>
-          </form>
+          </div>
         </div>
-      </div>
-      ) : ("")
-    }
-      <div className="divider"></div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+
+      {userRoleName === "admin" ? (
+        <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
+          <div className="mx-auto w-full ">
+            <form className=" space-y-3">
+              <div className="flex gap-4	">
+                <div className="flex-grow w-full">
+                  <input
+                    type="text"
+                    {...register("tripName")}
+                    placeholder="اسم الرحلة"
+                    className="w-full flex-grow rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.tripName?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-grow w-full">
+                  <input
+                    type="number"
+                    {...register("tripCost")}
+                    placeholder="تكلفة الرحلة "
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.tripCost?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-4 ">
+                <div className="w-full">
+                  <input
+                    type="date"
+                    {...register("take_off")}
+                    placeholder="تاريخ إقلاع الرحلة "
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.take_off?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="w-full">
+                  <textarea
+                    rows="1"
+                    {...register("tripDescription")}
+                    placeholder="وصف بسيط عن الرحلة"
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.tripDescription?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <select
+                  id="countries"
+                  {...register("tripFrom")}
+                  className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  <option value="" disabled selected>
+                    من
+                  </option>
+                  {showCountCountries.map((trip, index) => {
+                    return (
+                      <option key={index} value={trip.id}>
+                        {trip.en_short_name}
+                      </option>
+                    );
+                  })}
+                </select>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.tripFrom?.message}
+                  </span>
+                )}
+
+                <select
+                  id="countries"
+                  {...register("tripTo")}
+                  className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  <option value="" disabled selected>
+                    إلى
+                  </option>
+                  {showCountCountries.map((trip, index) => {
+                    return (
+                      <option key={index} value={trip.id}>
+                        {trip.en_short_name}
+                      </option>
+                    );
+                  })}
+                </select>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.tripTo?.message}
+                  </span>
+                )}
+
+                <select
+                  id="countries"
+                  {...register("category_id")}
+                  className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                >
+                  <option value="" disabled selected>
+                    نوع الرحلة
+                  </option>
+                  {showCategories.map((categories, index) => {
+                    return (
+                      <option key={index} value={categories.id}>
+                        {categories.name}
+                      </option>
+                    );
+                  })}
+                </select>
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.category_id?.message}
+                  </span>
+                )}
+              </div>
+
+              <div className="pt-3">
+                <div className="-mx-3 flex flex-wrap">
+                  {updateMode && (
+                    <div className="w-full px-3 sm:w-1/2">
+                      <label className="text-white">
+                        تفعيل الرحلة أو إلفاء تفعيل الرحلة ؟
+                      </label>
+                      <div className="mb-5">
+                        <Switch
+                          checked={branchStatus}
+                          onChange={(e) => setBranchStatus(e.target.checked)}
+                          color="success"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div>
+                {updateMode ? (
+                  <button
+                    type="submit"
+                    onClick={handleSubmit(updateTrips)}
+                    disabled={isSubmitting}
+                    className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                  >
+                    تحديث الرحلة
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    onClick={handleSubmit(storeTrips)}
+                    className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                  >
+                    إنشاء الرحلة
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+          <div className="divider"></div>
+        </div>
+      ) : (
+        ""
+      )}
 
       {/* Search input form */}
       <div className="my-3">
@@ -508,100 +603,65 @@ function Trippage() {
 
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
-       {
-        userRoleName === "admin" ? (
+        {userRoleName === "admin" ? (
           <thead>
-          <tr>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الترتيب
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              اسم الرحلة
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              تاريخ الإقلاع
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              التكلفة
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              وصف
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الحالة
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              من
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              إلي
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              نوع الرحلة
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              {" "}
-              وقت الإنشاء{" "}
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              {" "}
-              التعديل{" "}
-            </th>
-          </tr>
-        </thead>
-        ):
-        (
+            <tr>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                الترتيب
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                اسم الرحلة
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                تاريخ الإقلاع
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                التكلفة
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                الحالة
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                من
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                إلي
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                التعديل
+              </th>
+            </tr>
+          </thead>
+        ) : (
           <thead>
-          <tr>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الترتيب
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              اسم الرحلة
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              تاريخ الإقلاع
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              التكلفة
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              وصف
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الحالة
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              من
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              إلي
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              نوع الرحلة
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              {" "}
-              وقت الإنشاء{" "}
-            </th>
-          </tr>
-        </thead>
-        )
-       }
+            <tr>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                الترتيب
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                اسم الرحلة
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                تاريخ الإقلاع
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                التكلفة
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                الحالة
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                من
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                إلي
+              </th>
+            </tr>
+          </thead>
+        )}
         <tbody>
           {trips.map((trip, index) => {
-            const {
-              name,
-              id,
-              takeOff,
-              cost,
-              description,
-              status,
-              created_at,
-              category,
-              from,
-              to,
-            } = trip;
+            const { name, id, takeOff, cost, status, from, to } = trip;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
               <tr
@@ -626,11 +686,6 @@ function Trippage() {
                     {cost}
                   </span>
                 </td>
-                <td className="p-0 text-gray-800  text-sm  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded   px-1 text-xs font-bold">
-                    {description}
-                  </span>
-                </td>
                 <td className="w-full lg:w-auto  text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                   {status === "مفعل" ? (
                     <div className="bg-green-500 text-white text-sm rounded-md">
@@ -652,19 +707,8 @@ function Trippage() {
                     {to.en_short_name}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  px-1  text-xs font-bold">
-                    {category.name}
-                  </span>
-                </td>
-                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  px-1  text-xs font-bold">
-                    {created_at}
-                  </span>
-                </td>
-                {
-                  userRoleName === "admin" ? (
-                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                {userRoleName === "admin" ? (
+                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <button
                       onClick={() => {
                         ScrollUp();
@@ -674,7 +718,10 @@ function Trippage() {
                         setValue("tripCost", cost.toString());
                         setValue("take_off", takeOff);
                         setValue("tripDescription", description);
-                        setValue("tripStatus", status === "مفعل" ? true : false);
+                        setValue(
+                          "tripStatus",
+                          status === "مفعل" ? true : false
+                        );
                         setValue(
                           "tripFrom",
                           showCountCountries
@@ -705,10 +752,19 @@ function Trippage() {
                     >
                       <DeleteForeverIcon />
                     </button>
+                    <button
+                      onClick={() => {
+                        document.getElementById("my_modal_2").showModal();
+                        fetchSingleTrip(id);
+                      }}
+                      className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
+                    >
+                      <VisibilityIcon />
+                    </button>
                   </td>
-                  ) : ("")
-                  
-                }
+                ) : (
+                  ""
+                )}
               </tr>
             );
           })}

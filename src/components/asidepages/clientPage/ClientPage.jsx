@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 import { z } from "zod";
@@ -19,12 +20,12 @@ function ClientPage() {
 
   const userToken = localStorage.getItem("user_token");
   const userRoleName = localStorage.getItem("user_role_name");
-  console.log(userRoleName);
- 
+
   const [clients, setClients] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
   const [updateClientID, setUpdateClientID] = useState("");
+  const [singleClient, setSingleClient] = useState({});
   const Navigate = useNavigate();
 
   const handleUnauthenticated = () => {
@@ -209,7 +210,6 @@ function ClientPage() {
         setLoader(false);
       });
   };
-  
   const handleSearch = (e) => {
     e.preventDefault();
     setLoader(true);
@@ -228,9 +228,96 @@ function ClientPage() {
     setClients(filteredClients);
     setLoader(false);
   };
-
+  const fetchClientById = (id) => {
+    let single = clients.filter((client) => client.id === id);
+    setSingleClient(...single);
+  };
   return (
     <div>
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box relative">
+          <div className="modal-action absolute -top-4 left-2">
+            <form method="dialog">
+              <button className="btn rounded-full w-12 h-10">X</button>
+            </form>
+          </div>
+          <div className="text-center flex flex-col justify-center">
+            <div>
+              <img
+                src={`http://127.0.0.1:8000${singleClient?.imagePath}/${singleClient?.image}`}
+                alt="avatar"
+                className="w-[100px] h-[100px] rounded-full border-4 border-zinc-500 mx-auto mb-4"
+              />
+            </div>
+            <div className="bg-white overflow-hidden shadow rounded-lg border">
+              <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
+                <dl className="sm:divide-y sm:divide-gray-200">
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      الاسم :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleClient?.name}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      البريد الإلكتروني :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleClient?.email}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      رقم الهاتف :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleClient?.phone_number}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      العنوان:
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleClient?.address}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      الفرع :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleClient?.branch?.branch_name}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      الجنسية :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleClient?.nationality?.nationality}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      وقت إنشاء الحساب :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleClient?.created_at}
+                    </dd>
+                  </div>
+                </dl>
+              </div>
+            </div>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
+
       {userRoleName === "admin" ? (
         <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
           {/* register & update users */}
@@ -419,11 +506,8 @@ function ClientPage() {
               {[
                 "الترتيب",
                 "الاسم",
-                "الجنسية",
-                "العنوان",
-                "البريد الالكترونى",
                 "رقم الموبايل",
-                "تاريخ الانشاء",
+                "الفرع",
                 "تعديل",
               ].map((header, index) => (
                 <th
@@ -439,11 +523,8 @@ function ClientPage() {
               {[
                 "الترتيب",
                 "الاسم",
-                "الجنسية",
-                "العنوان",
-                "البريد الالكترونى",
                 "رقم الموبايل",
-                "تاريخ الانشاء",
+                "الفرع",
               ].map((header, index) => (
                 <th
                   key={index}
@@ -465,8 +546,14 @@ function ClientPage() {
               phone_number,
               nationality,
               created_at,
+              notes,
+              imagePath,
+              image,
             } = client;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
+
+            {/* const imageUrl = "http://127.0.0.1:8000" + imagePath + "/" + image; */}
+
             return (
               <tr
                 key={id}
@@ -475,12 +562,21 @@ function ClientPage() {
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
                   {tableIndex}
                 </td>
+                {/* <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded flex justify-center items-center  px-2 text-xs font-bold">
+                    <img
+                      src={imageUrl}
+                      alt="avatar"
+                      className="w-[40px] h-[40px] rounded-full border-4 border-white"
+                    />
+                  </span>
+                </td> */}
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
                     {name}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                {/* <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {nationality.nationality}
                   </span>
@@ -494,20 +590,25 @@ function ClientPage() {
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {email}
                   </span>
-                </td>
+                </td> */}
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {phone_number}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  py-1 px-3 text-xs font-bold">
+                    {branch.branch_name}
+                  </span>
+                </td>
+                {/* <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
                     {created_at}
                   </span>
-                </td>
-                  {
-                    userRoleName === "admin" ? (
-                      <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                </td> */}
+                {userRoleName === "admin" ? (
+                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                    <div className="flex gap-2 justify-center items-center">
                       <button
                         onClick={() => {
                           ScrollUp();
@@ -517,7 +618,9 @@ function ClientPage() {
                           setValue("address", address);
                           setValue("email", email);
                           setValue("phone_number", phone_number.toString());
+                          setValue("branch_id", branch.branch_name.toString());
                           setValue("countries_id", nationality.id.toString());
+                          setValue("notes", notes);
                         }}
                         className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                       >
@@ -529,12 +632,20 @@ function ClientPage() {
                       >
                         <DeleteForeverIcon />
                       </button>
-                    </td>
-              
-                    ) : null
-                  }
-              
-
+                      <button
+                        onClick={() => {
+                          document.getElementById("my_modal_2").showModal();
+                          fetchClientById(id);
+                        }}
+                        className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
+                      >
+                        <VisibilityIcon />
+                      </button>
+                    </div>
+                  </td>
+                ) : (
+                  ""
+                )}
               </tr>
             );
           })}
@@ -562,28 +673,7 @@ function ClientPage() {
           }
         />
       </div>
-      {/* {loader && (
-          <svg
-            id="loading-spinner"
-            xmlns="http://www.w3.org/2000/svg"
-            width="100"
-            height="100"
-            viewBox="0 0 48 48"
-          >
-            <g fill="none">
-              <path
-                id="track"
-                fill="#C6CCD2"
-                d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
-              />
-              <path
-                id="section"
-                fill="#3F4850"
-                d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
-              />
-            </g>
-          </svg>
-                   )} */}
+
       {loader && <div className="spinner"></div>}
     </div>
   );
