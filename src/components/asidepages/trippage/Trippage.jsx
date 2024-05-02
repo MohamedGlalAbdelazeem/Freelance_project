@@ -613,6 +613,12 @@ function Trippage() {
                 اسم الرحلة
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                من
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                إلي
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 تاريخ الإقلاع
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
@@ -620,12 +626,6 @@ function Trippage() {
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 الحالة
-              </th>
-              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                من
-              </th>
-              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                إلي
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 التعديل
@@ -642,6 +642,12 @@ function Trippage() {
                 اسم الرحلة
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                من
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                إلي
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 تاريخ الإقلاع
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
@@ -649,12 +655,6 @@ function Trippage() {
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 الحالة
-              </th>
-              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                من
-              </th>
-              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                إلي
               </th>
             </tr>
           </thead>
@@ -674,6 +674,16 @@ function Trippage() {
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1 text-xs font-bold">
                     {name}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  px-1  text-xs font-bold">
+                    {from.en_short_name}
+                  </span>
+                </td>
+                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  <span className="rounded  px-1  text-xs font-bold">
+                    {to.en_short_name}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -697,16 +707,7 @@ function Trippage() {
                     </div>
                   )}
                 </td>
-                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  px-1  text-xs font-bold">
-                    {from.en_short_name}
-                  </span>
-                </td>
-                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  px-1  text-xs font-bold">
-                    {to.en_short_name}
-                  </span>
-                </td>
+
                 {userRoleName === "admin" ? (
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <button
