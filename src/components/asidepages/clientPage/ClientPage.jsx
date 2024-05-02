@@ -627,7 +627,7 @@ function ClientPage() {
                         <DriveFileRenameOutlineIcon />
                       </button>
                       <button
-                        onClick={() => deleteClient(id)}
+                        onClick={() => deleteClient(id)}    
                         className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
                       >
                         <DeleteForeverIcon />
