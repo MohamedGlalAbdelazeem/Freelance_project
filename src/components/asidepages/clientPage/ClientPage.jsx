@@ -381,56 +381,57 @@ function ClientPage() {
                 </div>
               </div>
               <div className=" flex   gap-3">
-              <div className=" flex flex-wrap gap-3">
-                <div className="w-[49%] flex-grow ">
-                  <textarea
-                    {...register("notes")}
-                    rows={2}
-                    placeholder="ملاحظات"
-                    className="w-full overflow-auto rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                  />
-                  {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.notes?.message}
-                    </span>
-                  )}
-                </div>
-                <div className="w-[49%] flex-grow ">
-                  <div className="flex items-center justify-center w-full">
-                    {/* <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label> */}
-                    <input
-                      {...register("image")}
-                      accept="image/*"
-                      className="file-input file-input-bordered w-full"
-                      id="file_input"
-                      type="file"
+                <div className=" flex flex-wrap gap-3">
+                  <div className="w-[49%] flex-grow ">
+                    <select
+                      {...register("countries_id")}
+                      className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                    >
+                      <option value="" disabled selected>
+                        الجنسية
+                      </option>
+                      {nationalities.map((nat) => {
+                        const { id, en_short_name } = nat;
+                        return (
+                          <option key={id} value={id} label={en_short_name} />
+                        );
+                      })}
+                    </select>
+                    {errors && (
+                      <span className="text-red-500 text-sm">
+                        {errors.countries_id?.message}
+                      </span>
+                    )}
+                  </div>
+                  <div className="w-[49%] flex-grow ">
+                    <div className="flex items-center justify-center w-full">
+                      {/* <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label> */}
+                      <input
+                        {...register("image")}
+                        accept="image/*"
+                        className="file-input file-input-bordered w-full"
+                        id="file_input"
+                        type="file"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="w-[49%] flex-grow ">
+                    <textarea
+                      {...register("notes")}
+                      rows={2}
+                      placeholder="ملاحظات"
+                      className="w-full overflow-auto rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
+                    {errors && (
+                      <span className="text-red-500 text-sm">
+                        {errors.notes?.message}
+                      </span>
+                    )}
                   </div>
                 </div>
               </div>
-                <div className="w-[49%] flex-grow ">
-                  <select
-                    {...register("countries_id")}
-                    className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                  >
-                    <option value="" disabled selected>
-                      الجنسية
-                    </option>
-                    {nationalities.map((nat) => {
-                      const { id, en_short_name } = nat;
-                      return (
-                        <option key={id} value={id} label={en_short_name} />
-                      );
-                    })}
-                  </select>
-                  {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.countries_id?.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-            
+
               <div>
                 {updateMode ? (
                   <button
@@ -443,7 +444,6 @@ function ClientPage() {
                 ) : (
                   <button
                     onClick={handleSubmit(storeClient)}
-                    // onClick={(e) => storeClient(e)}
                     disabled={isSubmitting}
                     className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                   >
@@ -503,36 +503,29 @@ function ClientPage() {
         <thead>
           {userRoleName === "admin" ? (
             <tr>
-              {[
-                "الترتيب",
-                "الاسم",
-                "رقم الموبايل",
-                "الفرع",
-                "تعديل",
-              ].map((header, index) => (
-                <th
-                  key={index}
-                  className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
-                >
-                  {header}
-                </th>
-              ))}
+              {["الترتيب", "الاسم", "رقم الموبايل", "الفرع", "تعديل"].map(
+                (header, index) => (
+                  <th
+                    key={index}
+                    className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
+                  >
+                    {header}
+                  </th>
+                )
+              )}
             </tr>
           ) : (
             <tr>
-              {[
-                "الترتيب",
-                "الاسم",
-                "رقم الموبايل",
-                "الفرع",
-              ].map((header, index) => (
-                <th
-                  key={index}
-                  className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
-                >
-                  {header}
-                </th>
-              ))}
+              {["الترتيب", "الاسم", "رقم الموبايل", "الفرع"].map(
+                (header, index) => (
+                  <th
+                    key={index}
+                    className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
+                  >
+                    {header}
+                  </th>
+                )
+              )}
             </tr>
           )}
         </thead>
@@ -545,6 +538,7 @@ function ClientPage() {
               email,
               phone_number,
               nationality,
+              branch,
               created_at,
               notes,
               imagePath,
@@ -552,7 +546,9 @@ function ClientPage() {
             } = client;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
 
-            {/* const imageUrl = "http://127.0.0.1:8000" + imagePath + "/" + image; */}
+            {
+              /* const imageUrl = "http://127.0.0.1:8000" + imagePath + "/" + image; */
+            }
 
             return (
               <tr
