@@ -324,7 +324,7 @@ function ClientPage() {
           <div className="mx-auto w-full ">
             <form className=" space-y-3">
               <div className=" flex flex-wrap gap-3">
-                <div className="flex-grow ">
+                <div className="w-[49%] flex-grow ">
                   <input
                     type="text"
                     {...register("name")}
@@ -337,7 +337,7 @@ function ClientPage() {
                     </span>
                   )}
                 </div>
-                <div className="flex-grow">
+                <div className="w-[49%] flex-grow">
                   <input
                     type="email"
                     {...register("email")}
@@ -352,7 +352,7 @@ function ClientPage() {
                 </div>
               </div>
               <div className=" flex flex-wrap gap-3">
-                <div className="flex-grow ">
+                <div className="w-[49%] flex-grow ">
                   <input
                     type="tel"
                     {...register("phone_number")}
@@ -366,7 +366,7 @@ function ClientPage() {
                     </span>
                   )}
                 </div>
-                <div className="flex-grow ">
+                <div className="w-[49%] flex-grow ">
                   <input
                     type="text"
                     {...register("address")}
