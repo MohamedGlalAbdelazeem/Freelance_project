@@ -9,11 +9,11 @@ import { toast } from "react-toastify";
 import CategoryIcon from "@mui/icons-material/Category";
 import LocalAirportIcon from "@mui/icons-material/LocalAirport";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 function Asidebar() {
   const Navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
-
+  const [userProfile, setUserprofile] = useState([]);
   function handelLogout() {
     if (userToken) {
       localStorage.removeItem("user_token");
@@ -93,10 +93,7 @@ function Asidebar() {
       },
     })
     .then(function (response) {
-      setLoader(false);
       setUserprofile(response.data.Admin);
-      setName(response.data.Admin.name);
-      setPhoneNumber(response.data.Admin.phone_number);
     })
     .catch(function (error) {
       if (error.response && error.response.status === 401) {
@@ -106,7 +103,7 @@ function Asidebar() {
       }
     })
     .finally(() => {
-      setLoader(false);
+ 
     });
 };
 
@@ -124,6 +121,10 @@ function Asidebar() {
             <div className="w-14 rounded-full">
               <AccountCircleOutlinedIcon sx={{ fontSize: 55 }} />
             </div>
+          </div>
+          <div className="mt-3 text-center">
+            <p className="text-green-500 text-lg font-bold">{userProfile.name}</p>
+            <p className="text-white text-sm">{userProfile.role_name}</p>
           </div>
         </div>
         <div className="flex flex-col justify-between flex-1 mt-6">

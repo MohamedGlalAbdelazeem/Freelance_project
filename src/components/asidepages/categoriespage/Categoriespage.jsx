@@ -125,7 +125,7 @@ function Categoriespage() {
         if (response.status === 401) {
           handleUnauthenticated();
         } else if (response.status === 204) {
-          toast.success("تم حذف الفرع بنجاح");
+          toast.success("تم حذف الرحلة بنجاح");
           fetchCategories();
         } else {
           console.error("Unexpected response status:", response.status);

@@ -15,11 +15,11 @@ import ReactPaginate from "react-paginate";
 function ClientPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [loader, setLoader] = useState(false);
-  const [branches, setBranches] = useState([]);
   const [nationalities, setNationalities] = useState([]);
 
   const userToken = localStorage.getItem("user_token");
   const userRoleName = localStorage.getItem("user_role_name");
+  console.log(userRoleName);
  
   const [clients, setClients] = useState([]);
   const [searchValue, setSearchValue] = useState("");
@@ -42,7 +42,6 @@ function ClientPage() {
     email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
     phone_number: z.string().min(1, { message: "يجب ادخال رقم الهاتف" }),
     address: z.string().min(1, { message: "يجب ادخال العنوان" }),
-    branch_id: z.string().min(1, { message: "يجب ادخال رقم الفرع" }),
     countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
     image: z.any(),
     notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
@@ -59,7 +58,6 @@ function ClientPage() {
 
   useEffect(() => {
     fetchClients();
-    fetchBranches();
     fetchNationalities();
     fetchPagenation();
   }, []);
@@ -112,26 +110,7 @@ function ClientPage() {
         setLoader(false);
       });
   };
-  const fetchBranches = () => {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}branches/select-name-id`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setLoader(false);
-        setBranches(response.data.data);
-      })
-      .catch(function (error) {
-        console.error("Error fetching branches:", error);
-        handleUnauthenticated();
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
+
   const fetchClients = () => {
     setLoader(true);
     axios
@@ -157,7 +136,6 @@ function ClientPage() {
       email: getValues("email"),
       phone_number: getValues("phone_number"),
       address: getValues("address"),
-      branch_id: getValues("branch_id"),
       countries_id: getValues("countries_id"),
       image: getValues("image[0]"),
       notes: getValues("notes"),
@@ -208,7 +186,6 @@ function ClientPage() {
           email: getValues("email"),
           phone_number: getValues("phone_number"),
           address: getValues("address"),
-          branch_id: getValues("branch_id"),
           countries_id: getValues("countries_id"),
           image: getValues("image"),
           notes: getValues("notes"),
@@ -316,53 +293,12 @@ function ClientPage() {
                   )}
                 </div>
               </div>
-              <div className=" flex flex-wrap gap-3">
-                <div className="w-[49%] flex-grow ">
-                  <select
-                    {...register("branch_id")}
-                    className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                  >
-                    <option value="" disabled selected>
-                      اختر الفرع
-                    </option>
-                    {branches.map((branch) => {
-                      const { id, name } = branch;
-                      return <option key={id} value={id} label={name} />;
-                    })}
-                  </select>
-                  {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.branch_id?.message}
-                    </span>
-                  )}
-                </div>
-                <div className="w-[49%] flex-grow ">
-                  <select
-                    {...register("countries_id")}
-                    className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                  >
-                    <option value="" disabled selected>
-                      الجنسية
-                    </option>
-                    {nationalities.map((nat) => {
-                      const { id, en_short_name } = nat;
-                      return (
-                        <option key={id} value={id} label={en_short_name} />
-                      );
-                    })}
-                  </select>
-                  {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.countries_id?.message}
-                    </span>
-                  )}
-                </div>
-              </div>
+              <div className=" flex   gap-3">
               <div className=" flex flex-wrap gap-3">
                 <div className="w-[49%] flex-grow ">
                   <textarea
                     {...register("notes")}
-                    rows={1}
+                    rows={2}
                     placeholder="ملاحظات"
                     className="w-full overflow-auto rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   />
@@ -385,6 +321,29 @@ function ClientPage() {
                   </div>
                 </div>
               </div>
+                <div className="w-[49%] flex-grow ">
+                  <select
+                    {...register("countries_id")}
+                    className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  >
+                    <option value="" disabled selected>
+                      الجنسية
+                    </option>
+                    {nationalities.map((nat) => {
+                      const { id, en_short_name } = nat;
+                      return (
+                        <option key={id} value={id} label={en_short_name} />
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.countries_id?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+            
               <div>
                 {updateMode ? (
                   <button
@@ -464,7 +423,6 @@ function ClientPage() {
                 "العنوان",
                 "البريد الالكترونى",
                 "رقم الموبايل",
-                "الفرع",
                 "تاريخ الانشاء",
                 "تعديل",
               ].map((header, index) => (
@@ -485,7 +443,6 @@ function ClientPage() {
                 "العنوان",
                 "البريد الالكترونى",
                 "رقم الموبايل",
-                "الفرع",
                 "تاريخ الانشاء",
               ].map((header, index) => (
                 <th
@@ -506,7 +463,6 @@ function ClientPage() {
               address,
               email,
               phone_number,
-              branch,
               nationality,
               created_at,
             } = client;
@@ -544,44 +500,41 @@ function ClientPage() {
                     {phone_number}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {branch.branch_name}
-                  </span>
-                </td>
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
                     {created_at}
                   </span>
                 </td>
-                {userRoleName === "Admin" ? (
-                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                    <button
-                      onClick={() => {
-                        ScrollUp();
-                        setUpdateClientID(id);
-                        setUpdateMode(true);
-                        setValue("name", name);
-                        setValue("address", address);
-                        setValue("email", email);
-                        setValue("phone_number", phone_number.toString());
-                        setValue("branch_id", branch.branch_name.toString());
-                        setValue("countries_id", nationality.id.toString());
-                      }}
-                      className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
-                    >
-                      <DriveFileRenameOutlineIcon />
-                    </button>
-                    <button
-                      onClick={() => deleteClient(id)}
-                      className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
-                    >
-                      <DeleteForeverIcon />
-                    </button>
-                  </td>
-                ) : (
-                  ""
-                )}
+                  {
+                    userRoleName === "admin" ? (
+                      <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                      <button
+                        onClick={() => {
+                          ScrollUp();
+                          setUpdateClientID(id);
+                          setUpdateMode(true);
+                          setValue("name", name);
+                          setValue("address", address);
+                          setValue("email", email);
+                          setValue("phone_number", phone_number.toString());
+                          setValue("countries_id", nationality.id.toString());
+                        }}
+                        className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
+                      >
+                        <DriveFileRenameOutlineIcon />
+                      </button>
+                      <button
+                        onClick={() => deleteClient(id)}
+                        className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
+                      >
+                        <DeleteForeverIcon />
+                      </button>
+                    </td>
+              
+                    ) : null
+                  }
+              
+
               </tr>
             );
           })}

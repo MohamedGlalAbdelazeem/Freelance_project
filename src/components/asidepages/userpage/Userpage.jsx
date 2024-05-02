@@ -493,6 +493,7 @@ function Userpage() {
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {branches.find((branch) => branch.id === branch_id)?.name}
+                    null
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
