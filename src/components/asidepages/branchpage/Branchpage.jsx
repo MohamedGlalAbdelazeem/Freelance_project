@@ -5,7 +5,6 @@ import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutli
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
-import "./branchpage.css";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -117,6 +116,9 @@ function Branchpage() {
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
+      })
+      .finally(() => {
+        setLoader(false);
       });
   };
 
@@ -493,59 +495,59 @@ function Branchpage() {
                 key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   {tableIndex}
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
                     {name}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {location}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {hotLine}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto  text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                   {status === "مفعل" ? (
-                    <div className="bg-green-500 text-white text-sm rounded-md">
+                    <div className="bg-green-500 min-w-20 py-1 text-white text-sm rounded-lg">
                       مفعل
                     </div>
                   ) : (
-                    <div className="bg-red-500 text-white rounded-md text-sm">
+                    <div className="bg-red-500 min-w-20 py-1 text-white rounded-lg text-sm">
                       غير مفعل
                     </div>
                   )}
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   {show_client === "مفعل" ? (
-                    <div className="bg-green-500 text-white text-sm rounded-md">
+                    <div className="bg-green-500 min-w-20 py-1 text-white text-sm rounded-lg">
                       مفعل
                     </div>
                   ) : (
-                    <div className="bg-red-500 text-white rounded-md text-sm">
+                    <div className="bg-red-500 min-w-20 py-1 text-white rounded-lg text-sm">
                       غير مفعل
                     </div>
                   )}
                 </td>
 
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {from}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {to}
                   </span>
                 </td>
 
-                <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
                     {created_at}
                   </span>
@@ -646,7 +648,7 @@ function Branchpage() {
                           className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
                         >
                           <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
-                            {index+1}
+                            {index + 1}
                           </td>
                           <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  px-2 text-xs font-bold">
@@ -715,7 +717,31 @@ function Branchpage() {
           }
         />
       </div>
-      {loader && <div className="spinner"></div>}
+      {loader && (
+        <>
+          <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
+          <svg
+            id="loading-spinner"
+            xmlns="http://www.w3.org/2000/svg"
+            width="100"
+            height="100"
+            viewBox="0 0 48 48"
+          >
+            <g fill="none">
+              <path
+                id="track"
+                fill="#C6CCD2"
+                d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
+              />
+              <path
+                id="section"
+                fill="#3F4850"
+                d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
+              />
+            </g>
+          </svg>
+        </>
+      )}
     </main>
   );
 }

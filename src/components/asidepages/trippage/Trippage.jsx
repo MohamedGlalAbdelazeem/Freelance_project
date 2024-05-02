@@ -27,6 +27,8 @@ function Trippage() {
   const [searchValue, setSearchValue] = useState("");
   const [showCountCountries, setShowCountries] = useState([]);
   const [showCategories, setShowCategories] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const schema = z.object({
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
@@ -52,6 +54,10 @@ function Trippage() {
     fetchCountries();
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    fetchPagenation();
+  }, [currentPage]); // Fetch data whenever currentPage changes
 
   function fetchCountries() {
     setLoader(true);
@@ -81,15 +87,7 @@ function Trippage() {
   const fetchSingleTrip = (id) => {
     let single = trips.filter((trip) => trip.id === id);
     setSingleTrip(...single);
-    console.log(singleTrip);
   };
-  // fetch pagenation data///////////////////////
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-
-  useEffect(() => {
-    fetchPagenation();
-  }, [currentPage]); // Fetch data whenever currentPage changes
 
   const fetchPagenation = () => {
     setLoader(true);
@@ -105,6 +103,9 @@ function Trippage() {
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
+      })
+      .finally(() => {
+        setLoader(false);
       });
   };
 
@@ -126,12 +127,12 @@ function Trippage() {
         setShowCategories(response.data.data);
       })
       .catch(function (error) {
-        // if (
-        //   error.response.data.message === "User does not have the right roles."
-        // ) {
-        //   toast.error("هذا المستخدم ليس له صلاحية التعديل");
-        // }
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
+          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
+          console.error("هذا المستخدم ليس له صلاحية التعديل");
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -229,19 +230,19 @@ function Trippage() {
         },
       })
       .then(function (response) {
+        console.log(response);
         if (response.status === 200) {
           toast.success("تم حذف الرحلة بنجاح");
           fetchData();
-        } else {
-          console.error("Unexpected response status:", response.status);
-          toast.warning("حدث خطأ غير متوقع");
         }
       })
       .catch(function (error) {
         console.error("Error deleting branch:", error);
         setLoader(true);
+      })
+      .finally(() => {
+        setLoader(false);
       });
-    setLoader(false);
   }
 
   const updateTrips = async () => {
@@ -661,17 +662,27 @@ function Trippage() {
         )}
         <tbody>
           {trips.map((trip, index) => {
-            const { name, id, takeOff, cost, status, from, to } = trip;
+            const {
+              name,
+              id,
+              takeOff,
+              cost,
+              status,
+              from,
+              to,
+              description,
+              category,
+            } = trip;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
               <tr
                 key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   {tableIndex}
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1 text-xs font-bold">
                     {name}
                   </span>
@@ -686,23 +697,23 @@ function Trippage() {
                     {to.en_short_name}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1 text-xs font-bold">
                     {takeOff}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1 text-xs font-bold">
                     {cost}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto  text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2  text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                   {status === "مفعل" ? (
-                    <div className="bg-green-500 text-white text-sm rounded-md">
+                    <div className="bg-green-500 min-w-20 py-1 text-white text-sm rounded-lg">
                       مفعل
                     </div>
                   ) : (
-                    <div className="bg-red-500 text-white rounded-md text-sm">
+                    <div className="bg-red-500 min-w-20 py-1 text-white rounded-lg text-sm">
                       غير مفعل
                     </div>
                   )}
@@ -710,58 +721,60 @@ function Trippage() {
 
                 {userRoleName === "admin" ? (
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                    <button
-                      onClick={() => {
-                        ScrollUp();
-                        setUpdateTripsID(id);
-                        setUpdateMode(true);
-                        setValue("tripName", name);
-                        setValue("tripCost", cost.toString());
-                        setValue("take_off", takeOff);
-                        setValue("tripDescription", description);
-                        setValue(
-                          "tripStatus",
-                          status === "مفعل" ? true : false
-                        );
-                        setValue(
-                          "tripFrom",
-                          showCountCountries
-                            .find((trip) => trip.id === from.id)
-                            ?.id.toString()
-                        );
-                        setValue(
-                          "tripTo",
-                          showCountCountries
-                            .find((trip) => trip.id === to.id)
-                            ?.id.toString()
-                        );
-                        setValue(
-                          "category_id",
-                          showCategories
-                            .find((cat) => cat.id === category.id)
-                            ?.id.toString()
-                        );
-                        setBranchStatus(status === "مفعل" ? true : false);
-                      }}
-                      className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
-                    >
-                      <DriveFileRenameOutlineIcon />
-                    </button>
-                    <button
-                      onClick={() => deleteTrips(id)}
-                      className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
-                    >
-                      <DeleteForeverIcon />
-                    </button>
-                    <button
-                      onClick={() => {
-                        document.getElementById("my_modal_2").showModal();
-                        fetchSingleTrip(id);
-                      }}
-                      className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
-                    >
-                      <VisibilityIcon />
-                    </button>
+                    <div className="flex gap-2 justify-center items-center">
+                      <button
+                        onClick={() => {
+                          ScrollUp();
+                          setUpdateTripsID(id);
+                          setUpdateMode(true);
+                          setValue("tripName", name);
+                          setValue("tripCost", cost.toString());
+                          setValue("take_off", takeOff);
+                          setValue("tripDescription", description);
+                          setValue(
+                            "tripStatus",
+                            status === "مفعل" ? true : false
+                          );
+                          setValue(
+                            "tripFrom",
+                            showCountCountries
+                              .find((trip) => trip.id === from.id)
+                              ?.id.toString()
+                          );
+                          setValue(
+                            "tripTo",
+                            showCountCountries
+                              .find((trip) => trip.id === to.id)
+                              ?.id.toString()
+                          );
+                          setValue(
+                            "category_id",
+                            showCategories
+                              .find((cat) => cat.id === category.id)
+                              ?.id.toString()
+                          );
+                          setBranchStatus(status === "مفعل" ? true : false);
+                        }}
+                        className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
+                      >
+                        <DriveFileRenameOutlineIcon />
+                      </button>
+                      <button
+                        onClick={() => deleteTrips(id)}
+                        className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
+                      >
+                        <DeleteForeverIcon />
+                      </button>
+                      <button
+                        onClick={() => {
+                          document.getElementById("my_modal_2").showModal();
+                          fetchSingleTrip(id);
+                        }}
+                        className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
+                      >
+                        <VisibilityIcon />
+                      </button>
+                    </div>
                   </td>
                 ) : (
                   ""
@@ -794,7 +807,31 @@ function Trippage() {
         />
       </div>
       {/* loader */}
-      {loader && <div className="spinner"></div>}
+      {loader && (
+        <>
+          <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
+          <svg
+            id="loading-spinner"
+            xmlns="http://www.w3.org/2000/svg"
+            width="100"
+            height="100"
+            viewBox="0 0 48 48"
+          >
+            <g fill="none">
+              <path
+                id="track"
+                fill="#C6CCD2"
+                d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
+              />
+              <path
+                id="section"
+                fill="#3F4850"
+                d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
+              />
+            </g>
+          </svg>
+        </>
+      )}
     </main>
   );
 }

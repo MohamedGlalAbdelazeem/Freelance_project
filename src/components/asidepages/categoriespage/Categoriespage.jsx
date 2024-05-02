@@ -359,21 +359,21 @@ const handlePageClick = (selectedPage) => {
                 key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   {tableIndex}
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
                     {name}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto  text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                   {status === "مفعل" ? (
-                    <div className="bg-green-500 text-white text-sm rounded-md">
+                    <div className="bg-green-500 min-w-20 py-1 text-white text-sm rounded-lg">
                       مفعل
                     </div>
                   ) : (
-                    <div className="bg-red-500 text-white rounded-md text-sm">
+                    <div className="bg-red-500 min-w-20 py-1 text-white rounded-lg text-sm">
                       غير مفعل
                     </div>
                   )}

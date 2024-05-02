@@ -85,6 +85,9 @@ function ClientPage() {
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
+      })
+      .finally(() => {
+        setLoader(false);
       });
   };
 
@@ -137,6 +140,7 @@ function ClientPage() {
       email: getValues("email"),
       phone_number: getValues("phone_number"),
       address: getValues("address"),
+      branch_id: clients[0]?.branch?.branch_id,
       countries_id: getValues("countries_id"),
       image: getValues("image[0]"),
       notes: getValues("notes"),
@@ -179,24 +183,38 @@ function ClientPage() {
   };
   const handleClientUpdate = () => {
     setLoader(true);
+    let updateClientData;
+    if (!getValues("image[0]")) {
+      updateClientData = {
+        name: getValues("name"),
+        email: getValues("email"),
+        phone_number: getValues("phone_number"),
+        address: getValues("address"),
+        countries_id: getValues("countries_id"),
+        branch_id: clients[0]?.branch?.branch_id,
+        notes: getValues("notes"),
+      };
+    } else {
+      updateClientData = {
+        name: getValues("name"),
+        email: getValues("email"),
+        phone_number: getValues("phone_number"),
+        address: getValues("address"),
+        countries_id: getValues("countries_id"),
+        branch_id: clients[0]?.branch?.branch_id,
+        // image: getValues("image[0]"),
+        notes: getValues("notes"),
+      };
+    }
+    // console.log(updateClientData);
+    // setLoader(false);
+    // return;
     axios
-      .post(
-        `${baseUrl}clients/${updateClientID}`,
-        {
-          name: getValues("name"),
-          email: getValues("email"),
-          phone_number: getValues("phone_number"),
-          address: getValues("address"),
-          countries_id: getValues("countries_id"),
-          image: getValues("image"),
-          notes: getValues("notes"),
+      .post(`${baseUrl}clients/${updateClientID}`, updateClientData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
+      })
       .then(function () {
         toast.success("تم تحديث العميل بنجاح");
         fetchClients();
@@ -380,56 +398,53 @@ function ClientPage() {
                   )}
                 </div>
               </div>
-              <div className=" flex   gap-3">
-                <div className=" flex flex-wrap gap-3">
-                  <div className="w-[49%] flex-grow ">
-                    <select
-                      {...register("countries_id")}
-                      className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                    >
-                      <option value="" disabled selected>
-                        الجنسية
-                      </option>
-                      {nationalities.map((nat) => {
-                        const { id, en_short_name } = nat;
-                        return (
-                          <option key={id} value={id} label={en_short_name} />
-                        );
-                      })}
-                    </select>
-                    {errors && (
-                      <span className="text-red-500 text-sm">
-                        {errors.countries_id?.message}
-                      </span>
-                    )}
-                  </div>
-                  <div className="w-[49%] flex-grow ">
-                    <div className="flex items-center justify-center w-full">
-                      {/* <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label> */}
-                      <input
-                        {...register("image")}
-                        accept="image/*"
-                        className="file-input file-input-bordered w-full"
-                        id="file_input"
-                        type="file"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="w-[49%] flex-grow ">
-                    <textarea
-                      {...register("notes")}
-                      rows={2}
-                      placeholder="ملاحظات"
-                      className="w-full overflow-auto rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+              <div className=" flex flex-wrap gap-3">
+                <div className="w-[49%] flex-grow ">
+                  <select
+                    {...register("countries_id")}
+                    className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  >
+                    <option value="" disabled selected>
+                      الجنسية
+                    </option>
+                    {nationalities.map((nat) => {
+                      const { id, en_short_name } = nat;
+                      return (
+                        <option key={id} value={id} label={en_short_name} />
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.countries_id?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="w-[49%] flex-grow ">
+                  <div className="flex items-center justify-center w-full">
+                    {/* <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label> */}
+                    <input
+                      {...register("image")}
+                      accept="image/*"
+                      className="file-input file-input-bordered w-full"
+                      id="file_input"
+                      type="file"
                     />
-                    {errors && (
-                      <span className="text-red-500 text-sm">
-                        {errors.notes?.message}
-                      </span>
-                    )}
                   </div>
                 </div>
+              </div>
+              <div className="flex-grow ">
+                <textarea
+                  {...register("notes")}
+                  rows={2}
+                  placeholder="ملاحظات"
+                  className="w-full overflow-auto rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                />
+                {errors && (
+                  <span className="text-red-500 text-sm">
+                    {errors.notes?.message}
+                  </span>
+                )}
               </div>
 
               <div>
@@ -555,10 +570,10 @@ function ClientPage() {
                 key={id}
                 className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
               >
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
                   {tableIndex}
                 </td>
-                {/* <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                {/* <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded flex justify-center items-center  px-2 text-xs font-bold">
                     <img
                       src={imageUrl}
@@ -567,32 +582,32 @@ function ClientPage() {
                     />
                   </span>
                 </td> */}
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
                     {name}
                   </span>
                 </td>
-                {/* <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                {/* <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {nationality.nationality}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {address}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {email}
                   </span>
                 </td> */}
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {phone_number}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {branch.branch_name}
                   </span>
@@ -617,6 +632,8 @@ function ClientPage() {
                           setValue("branch_id", branch.branch_name.toString());
                           setValue("countries_id", nationality.id.toString());
                           setValue("notes", notes);
+                          
+                         
                         }}
                         className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                       >
@@ -669,8 +686,31 @@ function ClientPage() {
           }
         />
       </div>
-
-      {loader && <div className="spinner"></div>}
+      {loader && (
+        <>
+          <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
+          <svg
+            id="loading-spinner"
+            xmlns="http://www.w3.org/2000/svg"
+            width="100"
+            height="100"
+            viewBox="0 0 48 48"
+          >
+            <g fill="none">
+              <path
+                id="track"
+                fill="#C6CCD2"
+                d="M24,48 C10.745166,48 0,37.254834 0,24 C0,10.745166 10.745166,0 24,0 C37.254834,0 48,10.745166 48,24 C48,37.254834 37.254834,48 24,48 Z M24,44 C35.045695,44 44,35.045695 44,24 C44,12.954305 35.045695,4 24,4 C12.954305,4 4,12.954305 4,24 C4,35.045695 12.954305,44 24,44 Z"
+              />
+              <path
+                id="section"
+                fill="#3F4850"
+                d="M24,0 C37.254834,0 48,10.745166 48,24 L44,24 C44,12.954305 35.045695,4 24,4 L24,0 Z"
+              />
+            </g>
+          </svg>
+        </>
+      )}
     </div>
   );
 }
