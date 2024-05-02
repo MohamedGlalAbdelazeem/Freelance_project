@@ -26,7 +26,7 @@ function ClientPage() {
   const [searchValue, setSearchValue] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
   const [updateClientID, setUpdateClientID] = useState("");
-  const [singleClient, setSingleClient] = useState([]);
+  const [singleClient, setSingleClient] = useState({});
   const Navigate = useNavigate();
 
   const handleUnauthenticated = () => {
@@ -254,7 +254,7 @@ function ClientPage() {
   };
   const fetchClientById = (id) => {
     let single = clients.filter((client) => client.id === id);
-    setSingleClient(single);
+    setSingleClient(...single);
   };
   return (
     <div>
@@ -268,7 +268,7 @@ function ClientPage() {
           <div className="text-center flex flex-col justify-center">
             <div>
               <img
-                src={`http://127.0.0.1:8000${singleClient[0]?.imagePath}/${singleClient[0]?.image}`}
+                src={`http://127.0.0.1:8000${singleClient?.imagePath}/${singleClient?.image}`}
                 alt="avatar"
                 className="w-[100px] h-[100px] rounded-full border-4 border-zinc-500 mx-auto mb-4"
               />
@@ -281,7 +281,7 @@ function ClientPage() {
                       الاسم :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient[0]?.name}
+                      {singleClient?.name}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -289,7 +289,7 @@ function ClientPage() {
                       البريد الإلكتروني :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient[0]?.email}
+                      {singleClient?.email}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -297,7 +297,7 @@ function ClientPage() {
                       رقم الهاتف :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient[0]?.phone_number}
+                      {singleClient?.phone_number}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -305,7 +305,7 @@ function ClientPage() {
                       العنوان:
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient[0]?.address}
+                      {singleClient?.address}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -313,7 +313,7 @@ function ClientPage() {
                       الفرع :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient[0]?.branch?.branch_name}
+                      {singleClient?.branch?.branch_name}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -321,7 +321,7 @@ function ClientPage() {
                       الجنسية :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient[0]?.nationality?.nationality}
+                      {singleClient?.nationality?.nationality}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -329,7 +329,7 @@ function ClientPage() {
                       وقت إنشاء الحساب :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient[0]?.created_at}
+                      {singleClient?.created_at}
                     </dd>
                   </div>
                 </dl>
