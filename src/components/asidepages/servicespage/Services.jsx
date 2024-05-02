@@ -113,7 +113,6 @@ function Services() {
         },
       })
       .then(function (response) {
-        setLoader(false);
         setServices(response.data.data);
       })
       .catch(function (error) {
