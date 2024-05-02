@@ -469,10 +469,10 @@ function Trippage() {
             </div>
           </form>
         </div>
+      <div className="divider"></div>
       </div>
       ) : ("")
     }
-      <div className="divider"></div>
 
       {/* Search input form */}
       <div className="my-3">
