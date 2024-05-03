@@ -647,36 +647,36 @@ function Branchpage() {
                           key={id}
                           className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
                         >
-                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
+                          <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
                             {index + 1}
                           </td>
-                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                          <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  px-2 text-xs font-bold">
                               {name}
                             </span>
                           </td>
-                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                          <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  py-1 px-3 text-xs font-bold">
                               {nationality.nationality}
                             </span>
                           </td>
-                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                          <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  py-1 px-3 text-xs font-bold">
                               {address}
                             </span>
                           </td>
-                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                          <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  py-1 px-3 text-xs font-bold">
                               {email}
                             </span>
                           </td>
-                          <td className="w-full lg:w-auto p-0 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                          <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  py-1 px-3 text-xs font-bold">
                               {phone_number}
                             </span>
                           </td>
-                          <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                            <span className="rounded  px-1  text-xs font-bold">
+                          <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                            <span className="rounded text-xs font-bold">
                               {created_at}
                             </span>
                           </td>

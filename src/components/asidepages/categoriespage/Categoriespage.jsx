@@ -282,7 +282,7 @@ const handlePageClick = (selectedPage) => {
                   disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تحديث الرحلة
+                  تحديث التصنيف
                 </button>
               ) : (
                 <button
@@ -290,7 +290,7 @@ const handlePageClick = (selectedPage) => {
                   onClick={handleSubmit(storeCategory)}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  إنشاء الرحلة
+                  إنشاء تصنيف رحلة
                 </button>
               )}
             </div>
