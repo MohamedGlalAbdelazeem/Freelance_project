@@ -86,7 +86,7 @@ function Services() {
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage.selected + 1);
   };
-  
+
   function fetchCategories() {
     setLoader(true);
     axios
@@ -258,6 +258,14 @@ function Services() {
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {singleSrv?.cost}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      نوع الرحلة :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleSrv?.category?.name}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -484,7 +492,7 @@ function Services() {
               cost,
               description,
               status,
-              branch_id,
+              category,
               created_at,
             } = service;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
@@ -530,12 +538,7 @@ function Services() {
                           setValue("name", name);
                           setValue("cost", cost.toString());
                           setValue("description", description);
-                          setValue(
-                            "category_id",
-                            showCategories
-                              .find((cat) => cat.id === branch_id)
-                              ?.id.toString()
-                          );
+                          setValue("category_id", category.id.toString());
                         }}
                         className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                       >
