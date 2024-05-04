@@ -47,7 +47,6 @@ function Branchpage() {
 
   useEffect(() => {
     fetchBranches();
-    fetchBranchClients();
   }, []);
 
 //fetch barnches data
@@ -80,7 +79,7 @@ function Branchpage() {
   const fetchBranchClients = (id) => {
     setLoader(true);
     axios
-      .get(`${baseUrl}clients/${id}/branch`, {
+      .get(`${baseUrl}employees/${id}/branch`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -88,6 +87,7 @@ function Branchpage() {
       .then(function (response) {
         setLoader(false);
         setBranchClients(response.data.data);
+        console.log(response.data.data);
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
@@ -373,19 +373,22 @@ function Branchpage() {
                       />
                     </div>
                   </div>
-                {
-                updateMode ?  
-                <div  className="w-1/2">
-                <label className="text-white ">عرض الموظف في الفرع أم لا ؟ </label>
-                <div className="mb-5">
-                  <Switch
-                    checked={showClient}
-                    onChange={(e) => setShowClient(e.target.checked)}
-                    color="success"
-                  />
-                </div>
-              </div> :  <div className="w-1/2"></div>                      
-                }
+                  {updateMode ? (
+                    <div className="w-1/2">
+                      <label className="text-white ">
+                        عرض الموظف في الفرع أم لا ؟{" "}
+                      </label>
+                      <div className="mb-5">
+                        <Switch
+                          checked={showClient}
+                          onChange={(e) => setShowClient(e.target.checked)}
+                          color="success"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="w-1/2"></div>
+                  )}
                 </div>
               </div>
             </div>
@@ -586,6 +589,7 @@ function Branchpage() {
                     <button
                       onClick={() => {
                         document.getElementById("my_modal_2").showModal();
+                        console.log(id);
                         fetchBranchClients(id);
                       }}
                       className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
@@ -614,7 +618,8 @@ function Branchpage() {
                   key={branchClients[0].id}
                   className="text-2xl font-bold mb-6"
                 >
-                  العملاء الموجودين فى فرع {branchClients[0].branch.branch_name}
+                  الموظفين الموجودين فى الفرع
+                  {/* {branchClients[0].branch.branch_name} */}
                 </h1>
                 <table>
                   <thead>
@@ -622,8 +627,6 @@ function Branchpage() {
                       {[
                         "الترتيب",
                         "الاسم",
-                        "الجنسية",
-                        "العنوان",
                         "البريد الالكترونى",
                         "رقم الموبايل",
                         "تاريخ الانشاء",
@@ -661,16 +664,16 @@ function Branchpage() {
                               {name}
                             </span>
                           </td>
-                          <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                          {/* <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  py-1 px-3 text-xs font-bold">
                               {nationality.nationality}
                             </span>
-                          </td>
+                          </td> 
                           <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  py-1 px-3 text-xs font-bold">
                               {address}
                             </span>
-                          </td>
+                          </td> */}
                           <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  py-1 px-3 text-xs font-bold">
                               {email}
@@ -693,7 +696,7 @@ function Branchpage() {
                 </table>
               </>
             ) : (
-              <p className="mb-10 text-xl">لا يوجد عملاء فى هذا الفرع</p>
+              <p className="mb-10 text-xl">لا يوجد موظفين فى هذا الفرع</p>
             )}
           </div>
         </div>
