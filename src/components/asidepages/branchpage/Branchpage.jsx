@@ -50,6 +50,7 @@ function Branchpage() {
     fetchPagenation();
   }, []);
 
+//fetch barnches data
   const fetchBranches = () => {
     setLoader(true);
     axios
@@ -75,6 +76,7 @@ function Branchpage() {
       });
   };
 
+// fetch branch clients data
   const fetchBranchClients = (id) => {
     setLoader(true);
     axios
@@ -370,16 +372,19 @@ function Branchpage() {
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="text-white">إظهار العميل أم لا ؟</label>
-                    <div className="mb-5">
-                      <Switch
-                        checked={showClient}
-                        onChange={(e) => setShowClient(e.target.checked)}
-                        color="success"
-                      />
-                    </div>
-                  </div>
+                {
+                updateMode ?  
+                <div  className="w-1/2">
+                <label className="text-white ">تفعيل الفرع أم لا ؟</label>
+                <div className="mb-5">
+                  <Switch
+                    checked={showClient}
+                    onChange={(e) => setShowClient(e.target.checked)}
+                    color="success"
+                  />
+                </div>
+              </div> :  <div className="w-1/2"></div>                      
+                }
                 </div>
               </div>
             </div>
