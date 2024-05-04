@@ -87,7 +87,6 @@ function Branchpage() {
       .then(function (response) {
         setLoader(false);
         setBranchClients(response.data.data);
-        console.log(response.data.data);
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
@@ -589,7 +588,7 @@ function Branchpage() {
                     <button
                       onClick={() => {
                         document.getElementById("my_modal_2").showModal();
-                        console.log(id);
+                    
                         fetchBranchClients(id);
                       }}
                       className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
