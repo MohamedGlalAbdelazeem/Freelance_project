@@ -69,6 +69,7 @@ function Userpage() {
   const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
     fetchEmployees();
+    fetchBranchesInSelection();
     fetchPagenation();
   }, []);
 
@@ -119,23 +120,25 @@ function Userpage() {
       .finally(() => {
         setLoader(false);
       });
-    axios
-      .get(`${baseUrl}branches/select-name-id`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then((response) => {
-        setBranches(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching branches:", error);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
 
+  };
+  const fetchBranchesInSelection = () => {
+      axios
+        .get(`${baseUrl}branches/select-name-id`, {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        })
+        .then((response) => {
+          setBranches(response.data.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching branches:", error);
+        })
+        .finally(() => {
+          setLoader(false);
+        });
+}
   const storeEmployee = () => {
     setLoader(true);
     const employeeData = {

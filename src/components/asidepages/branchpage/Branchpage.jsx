@@ -143,6 +143,7 @@ function Branchpage() {
     setLoader(true);
     if (getValues("timeTo") <= getValues("timeFrom")) {
       toast.error("يجب أن تكون بداية الوقت اقل من نهاية الوقت");
+      setLoader(false);
       return;
     }
     await axios
