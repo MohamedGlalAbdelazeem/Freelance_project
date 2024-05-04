@@ -47,7 +47,7 @@ function Branchpage() {
 
   useEffect(() => {
     fetchBranches();
-    fetchPagenation();
+    fetchBranchClients();
   }, []);
 
 //fetch barnches data
@@ -376,7 +376,7 @@ function Branchpage() {
                 {
                 updateMode ?  
                 <div  className="w-1/2">
-                <label className="text-white ">تفعيل الفرع أم لا ؟</label>
+                <label className="text-white ">عرض الموظف في الفرع أم لا ؟ </label>
                 <div className="mb-5">
                   <Switch
                     checked={showClient}
@@ -464,7 +464,7 @@ function Branchpage() {
               الحالة
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              إظهار العميل
+              إظهار الموظف
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               من
