@@ -96,15 +96,8 @@ function Asidebar() {
       setUserprofile(response.data.Admin);
     })
     .catch(function (error) {
-      if (error.response && error.response.status === 401) {
-        handleUnauthenticated();
-      } else {
         console.error("Error refreshing token:", error);
-      }
     })
-    .finally(() => {
- 
-    });
 };
 
   return (
@@ -119,12 +112,18 @@ function Asidebar() {
         >
           <div className="avatar online bg-white rounded-3xl ">
             <div className="w-14 rounded-full">
-              <AccountCircleOutlinedIcon sx={{ fontSize: 55 }} />
+             <Link to="/Mainpage/Userprofilepage">
+               <AccountCircleOutlinedIcon sx={{ fontSize: 55 }} />
+             </Link>
             </div>
           </div>
-          <div className="mt-3 text-center">
-            <p className="text-green-500 text-lg font-bold">{userProfile.name}</p>
-            <p className="text-white text-sm">{userProfile.role_name}</p>
+          <div className="text-white mt-3 font-bold hover:text-blue-400 transition-all duration-300">
+             <Link to="/Mainpage/Userprofilepage">
+                <p>الصفحة الشخصية</p>
+             </Link>
+            </div>
+          <div className="text-center">
+            <p className="font-bold text-lg text-green-400">{userProfile.role_name}</p>
           </div>
         </div>
         <div className="flex flex-col justify-between flex-1 mt-6">

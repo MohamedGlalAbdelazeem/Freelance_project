@@ -19,7 +19,6 @@ function UserProfilePage() {
 
   useEffect(() => {
     setLoader(true);
-    // const userRoleName = localStorage.getItem("user_role_name");
     const userToken = localStorage.getItem("user_token");
     if (!userToken) {
       handleUnauthenticated();
@@ -63,8 +62,7 @@ function UserProfilePage() {
         },
       })
       .then((res) => {
-        let branchName = res.data.data.filter((item) => item.id === branchID)[0]
-          .name;
+        let branchName = res.data.data.filter((item) => item.id === branchID)[0]?.name;
         setBranch(branchName);
       });
   };
@@ -111,13 +109,16 @@ function UserProfilePage() {
       oldPassword.trim() === ""
     ) {
       setIsError(true);
+      setLoader(false);
       return;
     }
     if (newPassword.trim() !== confirmNewPassword.trim()) {
       toast("كلمة المرور غير متطابقة", { type: "error" });
+      setLoader(false);
       return;
     }
     if (newPassword.trim().length < 6 && confirmNewPassword.trim().length < 6) {
+      setLoader(false);
       setIsError(true);
       return;
     }
@@ -321,6 +322,7 @@ function UserProfilePage() {
                 value={oldPassword}
                 onChange={(e) => {
                   setOldPassword(e.target.value);
+                  setIsError(false);
                 }}
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
@@ -335,7 +337,12 @@ function UserProfilePage() {
               <input
                 type="password"
                 value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
+                onChange={(e) => 
+                 {
+                  setNewPassword(e.target.value)
+                  setIsError(false);
+                 }}
+
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
               {isError && (
@@ -352,7 +359,10 @@ function UserProfilePage() {
               <input
                 type="password"
                 value={confirmNewPassword}
-                onChange={(e) => setConfirmNewPassword(e.target.value)}
+                onChange={(e) => {
+                  setConfirmNewPassword(e.target.value)
+                  setIsError(false);
+                }}
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
               {isError && (
