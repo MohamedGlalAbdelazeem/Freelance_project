@@ -229,12 +229,9 @@ function Trippage() {
           Authorization: `Bearer ${userToken}`,
         },
       })
-      .then(function (response) {
-        console.log(response);
-        if (response.status === 200) {
-          toast.success("تم حذف الرحلة بنجاح");
-          fetchData();
-        }
+      .then(function () {
+        toast.success("تم حذف الرحلة بنجاح");
+        fetchData();
       })
       .catch(function (error) {
         console.error("Error deleting branch:", error);
