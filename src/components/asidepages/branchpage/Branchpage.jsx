@@ -79,7 +79,7 @@ function Branchpage() {
   const fetchBranchClients = (id) => {
     setLoader(true);
     axios
-      .get(`${baseUrl}employees/${id}/branch`, {
+      .get(`${baseUrl}clients/${id}/branch`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -375,7 +375,7 @@ function Branchpage() {
                   {updateMode ? (
                     <div className="w-1/2">
                       <label className="text-white ">
-                        عرض الموظف في الفرع أم لا ؟{" "}
+                        عرض العملاء في الفرع أم لا ؟{" "}
                       </label>
                       <div className="mb-5">
                         <Switch
@@ -466,7 +466,7 @@ function Branchpage() {
               الحالة
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              إظهار الموظف
+              إظهار العملاء
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               من

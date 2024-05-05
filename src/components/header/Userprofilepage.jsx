@@ -54,6 +54,7 @@ function UserProfilePage() {
         setLoader(false);
       });
   };
+  
   const getBranch = async () => {
     await axios
       .get(`http://127.0.0.1:8000/api/branches/select-name-id`, {
@@ -64,7 +65,10 @@ function UserProfilePage() {
       .then((res) => {
         let branchName = res.data.data.filter((item) => item.id === branchID)[0]?.name;
         setBranch(branchName);
-      });
+        console.log(branchName);
+      }).catch((err) => {
+        console.log(err);
+      })
   };
 
   const handleUpdate = (e) => {
