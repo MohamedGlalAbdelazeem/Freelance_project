@@ -96,9 +96,9 @@ function Branchpage() {
       });
   };
 
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   useEffect(() => {
     fetchPagenation();
   }, [currentPage]); // Fetch data whenever currentPage changes
@@ -375,7 +375,7 @@ function Branchpage() {
                   {updateMode ? (
                     <div className="w-1/2">
                       <label className="text-white ">
-                        عرض الموظف في الفرع أم لا ؟{" "}
+                        عرض الموظفين في الفرع أم لا ؟{" "}
                       </label>
                       <div className="mb-5">
                         <Switch
@@ -585,16 +585,20 @@ function Branchpage() {
                     >
                       <DeleteForeverIcon />
                     </button>
-                    <button
-                      onClick={() => {
-                        document.getElementById("my_modal_2").showModal();
-                    
-                        fetchBranchClients(id);
-                      }}
-                      className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
-                    >
-                      <VisibilityIcon />
-                    </button>
+                      {
+                        show_client === "مفعل" ? (
+                          <button
+                          onClick={() => {
+                            document.getElementById("my_modal_2").showModal();
+                        
+                            fetchBranchClients(id);
+                          }}
+                          className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
+                        >
+                          <VisibilityIcon />
+                        </button>
+                        ) : null
+                      }
                   </div>
                 </td>
               </tr>
