@@ -6,6 +6,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
+import { Switch } from "@mui/material";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -23,6 +24,7 @@ function Services() {
   const userToken = localStorage.getItem("user_token");
   const [services, setServices] = useState([]);
   const [singleSrv, setSingleSrv] = useState({});
+  const [showSrv, setShowSrv] = useState(false);
   const Naviagate = useNavigate();
 
   const handleUnauthenticated = () => {
@@ -187,6 +189,7 @@ function Services() {
           cost: getValues("cost"),
           description: getValues("description"),
           category_id: getValues("category_id"),
+          status: showSrv,
         },
         {
           headers: {
@@ -376,6 +379,22 @@ function Services() {
                   </div>
                 </div>
               </div>
+              {updateMode ? (
+                <div className="px-2">
+                  <label className="text-white ">
+                   تفعيل الخدمة أم لا؟ 
+                  </label>
+                  <div className="mb-5">
+                    <Switch
+                      checked={showSrv}
+                      onChange={(e) => setShowSrv(e.target.checked)}
+                      color="success"
+                    />
+                  </div>
+                </div>
+              ) : (
+                null
+              )}
 
               <div>
                 {updateMode ? (
