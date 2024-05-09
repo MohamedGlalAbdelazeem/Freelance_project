@@ -48,6 +48,11 @@ function Asidebar() {
         icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
       },
       {
+        text: "حجز",
+        path: "/Mainpage/booking",
+        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
+      },
+      {
         text: "إدارة العملات",
         path: "/Mainpage/currencies",
         icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
@@ -84,6 +89,11 @@ function Asidebar() {
         text: "إدارة العملاء",
         path: "/Mainpage/clientpage",
         icon: <GroupAddIcon sx={{ fontSize: 35 }} />,
+      },
+      {
+        text: "حجز",
+        path: "/Mainpage/booking",
+        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة المطارات",

@@ -332,6 +332,11 @@ function Trippage() {
         setLoader(false);
         setUpdateMode(false);
         reset();
+        setValue("tripFrom", "");
+        setValue("tripTo", "");
+        setValue("category_id", "");
+        setValue("airport_id", "");
+        setValue("currency_id", "");
       });
   };
 

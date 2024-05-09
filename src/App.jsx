@@ -15,6 +15,8 @@ import Services from "./components/asidepages/servicespage/Services";
 import AirportPage from "./components/asidepages/airportPage/AirportPage";
 import CurrencyPage from "./components/asidepages/currencyPage/CurrencyPage";
 import PaymentPage from "./components/asidepages/paymentPage/PaymentPage";
+import BookingPage from "./components/asidepages/bookingPage/BookingPage";
+import ProtectedRoute from "./ProtectedRoute";
 
 // admin  josh.pfannerstill@example.net
 // super admin khairymahmoud795@gmail.com
@@ -24,9 +26,28 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/Login" element={<Login />} />
-        <Route path="/Resetpassword" element={<Resetpassword />} />
+
+        <Route
+          path="/Resetpassword"
+          element={
+            <ProtectedRoute>
+              <Resetpassword />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/Forgetpasssword" element={<Forgetpasssword />} />
-        <Route path="/Mainpage" element={<Mainpage />}>
+        <Route
+          path="/Mainpage"
+          element={
+            <ProtectedRoute>
+              <Mainpage />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="booking" element={<BookingPage />} >
+            <Route path="trip" element={""} />
+            <Route path="service" element={""} />
+          </Route>
           <Route path="Userpage" element={<Userpage />} />
           <Route path="clientpage" element={<ClientPage />} />
           <Route path="Branchpage" element={<Branchpage />} />
