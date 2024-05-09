@@ -17,6 +17,8 @@ import CurrencyPage from "./components/asidepages/currencyPage/CurrencyPage";
 import PaymentPage from "./components/asidepages/paymentPage/PaymentPage";
 import BookingPage from "./components/asidepages/bookingPage/BookingPage";
 import ProtectedRoute from "./ProtectedRoute";
+import TripBooking from "./components/asidepages/bookingPage/tripBooking";
+import ServiceBooking from "./components/asidepages/bookingPage/serviceBooking";
 
 // admin  josh.pfannerstill@example.net
 // super admin khairymahmoud795@gmail.com
@@ -44,10 +46,9 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="booking" element={<BookingPage />} >
-            <Route path="trip" element={""} />
-            <Route path="service" element={""} />
-          </Route>
+          <Route path="booking" element={<BookingPage />} />
+          <Route path="booking/trip" element={<TripBooking />} />
+          <Route path="booking/service" element={<ServiceBooking />} />
           <Route path="Userpage" element={<Userpage />} />
           <Route path="clientpage" element={<ClientPage />} />
           <Route path="Branchpage" element={<Branchpage />} />
