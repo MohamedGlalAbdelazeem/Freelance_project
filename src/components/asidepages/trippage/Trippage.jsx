@@ -29,15 +29,21 @@ function Trippage() {
   const [showCategories, setShowCategories] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [singleTrip, setSingleTrip] = useState({});
+  const [showAirports, setShowAirports] = useState([]);
+  const [showCurrencies, setShowCurrencies] = useState([]);
+
 
   const schema = z.object({
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
-    tripCost: z.string().min(1, { message: "رقم الرحلة خاطئ" }),
+    tripCost: z.string().min(1, { message: "يجب تعيين تكلفة الرحلة" }),
     take_off: z.string().min(1, { message: "ادخل تاريخ الرحلة" }),
-    tripFrom: z.string().min(1, { message: "ادخل المنطقة من" }),
-    tripTo: z.string().min(1, { message: "ادخل المنطقة الي" }),
+    tripFrom: z.string().min(1, { message: "يجب تعيين بلد الانطلاق" }),
+    tripTo: z.string().min(1, { message: "يجب تعيين بلد الوصول" }),
     tripDescription: z.string().min(1, { message: "ادخل وصف الرحلة" }),
-    category_id: z.string().min(1, { message: "ادخل نوع الرحلة" }),
+    category_id: z.string().min(1, { message: "اختر نوع الرحلة" }),
+    airport_id: z.string().min(1, { message: "اختر المطار" }),
+    currency_id: z.string().min(1, { message: "اختر العملة" }),
   });
 
   const {
@@ -53,6 +59,8 @@ function Trippage() {
     fetchData();
     fetchCountries();
     fetchCategories();
+    fetchAirports();
+    fetchCurrencies();
   }, []);
 
   useEffect(() => {
@@ -82,7 +90,6 @@ function Trippage() {
         setLoader(false);
       });
   }
-  const [singleTrip, setSingleTrip] = useState({});
 
   const fetchSingleTrip = (id) => {
     let single = trips.filter((trip) => trip.id === id);
@@ -112,9 +119,7 @@ function Trippage() {
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage.selected + 1);
   };
-  // fetch pagenation data///////////////////////
 
-  // hid in suber admin
   function fetchCategories() {
     setLoader(true);
     axios
@@ -125,6 +130,52 @@ function Trippage() {
       })
       .then(function (response) {
         setShowCategories(response.data.data);
+      })
+      .catch(function (error) {
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
+          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
+          console.error("هذا المستخدم ليس له صلاحية التعديل");
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }
+  function fetchAirports() {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}airports/selection/id-name`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setShowAirports(response.data.data);
+      })
+      .catch(function (error) {
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
+          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
+          console.error("هذا المستخدم ليس له صلاحية التعديل");
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }
+  function fetchCurrencies() {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}currencies/selection/id-name`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setShowCurrencies(response.data.data);
       })
       .catch(function (error) {
         if (
@@ -185,6 +236,8 @@ function Trippage() {
           to_countries_id: getValues("tripTo"),
           description: getValues("tripDescription"),
           category_id: getValues("category_id"),
+          airport_id: getValues("airport_id"),
+          currency_id: getValues("currency_id"),
         },
         {
           headers: {
@@ -255,6 +308,8 @@ function Trippage() {
           to_countries_id: getValues("tripTo"),
           description: getValues("tripDescription"),
           category_id: getValues("category_id"),
+          airport_id: getValues("airport_id"),
+          currency_id: getValues("currency_id"),
           status: branchStatus,
         },
         {
@@ -358,6 +413,22 @@ function Trippage() {
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
+                      المطار:
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.airport?.name}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      العملة :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.currency?.name}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
                       الحالة :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
@@ -450,7 +521,52 @@ function Trippage() {
                   )}
                 </div>
               </div>
-
+              <div className="flex gap-4	">
+                <div className="flex-grow w-full">
+                  <select
+                    {...register("airport_id")}
+                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="" disabled selected>
+                      اختر المطار
+                    </option>
+                    {showAirports.map((airport, index) => {
+                      return (
+                        <option key={index} value={airport.id}>
+                          {airport.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.airport_id?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-grow w-full">
+                  <select
+                    {...register("currency_id")}
+                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="" disabled selected>
+                      اختر العملة
+                    </option>
+                    {showCurrencies.map((currency, index) => {
+                      return (
+                        <option key={index} value={currency.id}>
+                          {currency.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.currency_id?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
               <div className="flex gap-2">
                 <select
                   id="countries"
@@ -585,7 +701,7 @@ function Trippage() {
                 handleSearch(e);
               }}
               className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="البحث من عن طريق ID "
+              placeholder="بحث باسم الرحلة"
               required
             />
             <button
@@ -617,7 +733,7 @@ function Trippage() {
                 إلي
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                تاريخ الإقلاع
+                وقت الإقلاع
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 التكلفة
@@ -646,7 +762,7 @@ function Trippage() {
                 إلي
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                تاريخ الإقلاع
+                وقت الإقلاع
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 التكلفة
@@ -669,6 +785,8 @@ function Trippage() {
               to,
               description,
               category,
+              airport,
+              currency,
             } = trip;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
@@ -748,6 +866,18 @@ function Trippage() {
                             "category_id",
                             showCategories
                               .find((cat) => cat.id === category.id)
+                              ?.id.toString()
+                          );
+                          setValue(
+                            "airport_id",
+                            showAirports
+                              .find((airport) => airport.id === airport.id)
+                              ?.id.toString()
+                          );
+                          setValue(
+                            "currency_id",
+                            showCurrencies
+                              .find((currency) => currency.id === currency.id)
                               ?.id.toString()
                           );
                           setBranchStatus(status === "مفعل" ? true : false);
