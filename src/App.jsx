@@ -12,9 +12,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Resetpassword from "./components/registerpages/Resetpassword"
 import Services from "./components/asidepages/servicespage/Services"
-
-// admin  josh.pfannerstill@example.net
-// super admin khairymahmoud795@gmail.com
+ 
 function App() {
   return (
     <>
