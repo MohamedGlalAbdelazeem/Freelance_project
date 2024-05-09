@@ -2,7 +2,7 @@
 
 // this page contain header and asidbar 
 import React from 'react'
- 
+import MenuBookIcon from '@mui/icons-material/MenuBook'; 
 import { useNavigate , Link } from 'react-router-dom';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
  
@@ -27,7 +27,9 @@ function Header() {
     <>
       <div className="navbar bg-black w-full" style={{backgroundColor:"#111827"}} id='headere'>
         <div className="flex-1">
-        
+          <Link to="/Mainpage" className="btn text-blue-600 btn-ghost normal-case bg-gray-200 text-xl">
+            <MenuBookIcon/>
+            التقارير</Link>
         </div>
         <div className="flex-none gap-2">
         

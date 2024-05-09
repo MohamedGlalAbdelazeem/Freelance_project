@@ -5,10 +5,16 @@ import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import SupportAgentIcon from '@mui/icons-material/SupportAgent';
 import { toast } from "react-toastify";
 import CategoryIcon from "@mui/icons-material/Category";
 import LocalAirportIcon from "@mui/icons-material/LocalAirport";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
+import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
+import PaidIcon from '@mui/icons-material/Paid';
+import GroupsIcon from '@mui/icons-material/Groups';
+import SettingsIcon from '@mui/icons-material/Settings';
+import CreditCardIcon from '@mui/icons-material/CreditCard';
 import { useEffect, useState } from "react";
 import axios from "axios";
 function Asidebar() {
@@ -35,7 +41,7 @@ function Asidebar() {
       {
         text: "إدارة العملاء",
         path: "/Mainpage/clientpage",
-        icon: <GroupAddIcon sx={{ fontSize: 35 }} />,
+        icon: <GroupsIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "تصنيف الرحلات ",
@@ -45,22 +51,22 @@ function Asidebar() {
       {
         text: "إدارة المطارات",
         path: "/Mainpage/airports",
-        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
+        icon: <FlightTakeoffIcon sx={{ fontSize: 35 }} />,
       },
       {
-        text: "حجز",
+        text: "إدراة الحجز",
         path: "/Mainpage/booking",
-        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
+        icon: <SupportAgentIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة العملات",
         path: "/Mainpage/currencies",
-        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
+        icon: <PaidIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة طرق الدفع",
         path: "/Mainpage/payments",
-        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
+        icon: <CreditCardIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة الرحلات",
@@ -88,27 +94,27 @@ function Asidebar() {
       {
         text: "إدارة العملاء",
         path: "/Mainpage/clientpage",
-        icon: <GroupAddIcon sx={{ fontSize: 35 }} />,
+        icon: <GroupsIcon sx={{ fontSize: 35 }} />,
       },
       {
-        text: "حجز",
+        text: "إدراة الحجز",
         path: "/Mainpage/booking",
-        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
+        icon: <SupportAgentIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة المطارات",
         path: "/Mainpage/airports",
-        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
+        icon: <FlightTakeoffIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة العملات",
         path: "/Mainpage/currencies",
-        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
+        icon: <PaidIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة طرق الدفع",
         path: "/Mainpage/payments",
-        icon: <LocalAirportIcon sx={{ fontSize: 35 }} />,
+        icon: <CreditCardIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة الرحلات",
@@ -119,6 +125,11 @@ function Asidebar() {
         text: "إدارة الخدمات ",
         path: "/Mainpage/Services",
         icon: <SettingsSuggestIcon sx={{ fontSize: 35 }} />,
+      },
+      {
+        text: "الإعدادات",
+        path: "/Mainpage/Settings",
+        icon: <SettingsIcon sx={{ fontSize: 35 }} />,
       },
     ];
   }

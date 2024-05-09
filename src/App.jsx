@@ -19,6 +19,8 @@ import BookingPage from "./components/asidepages/bookingPage/BookingPage";
 import ProtectedRoute from "./ProtectedRoute";
 import TripBooking from "./components/asidepages/bookingPage/tripBooking";
 import ServiceBooking from "./components/asidepages/bookingPage/serviceBooking";
+import Settings from "./components/asidepages/settings/Settings";
+import Reportpage from "./components/home/Reportpage";
 
 // admin  josh.pfannerstill@example.net
 // super admin khairymahmoud795@gmail.com
@@ -46,6 +48,7 @@ function App() {
             </ProtectedRoute>
           }
         >
+          <Route path="" element={<Reportpage />} />
           <Route path="booking" element={<BookingPage />} />
           <Route path="booking/trip" element={<TripBooking />} />
           <Route path="booking/service" element={<ServiceBooking />} />
@@ -58,6 +61,7 @@ function App() {
           <Route path="payments" element={<PaymentPage />} />
           <Route path="Trippage" element={<Trippage />} />
           <Route path="Services" element={<Services />} />
+          <Route path="Settings" element={<Settings />} />
           <Route path="Userprofilepage" element={<Userprofilepage />} />
         </Route>
       </Routes>
