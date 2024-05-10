@@ -5,6 +5,7 @@ import React from 'react'
 import MenuBookIcon from '@mui/icons-material/MenuBook'; 
 import { useNavigate , Link } from 'react-router-dom';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
  
 import "./home.css"
 import { toast } from 'react-toastify';
@@ -27,10 +28,18 @@ function Header() {
     <>
       <div className="navbar bg-black w-full" style={{backgroundColor:"#111827"}} id='headere'>
         <div className="flex-1">
+        <Link to="/Mainpage/Userprofilepage" className="btn text-blue-600 btn-ghost normal-case mx-2 bg-gray-200 text-xl">
+            <AccountBoxIcon/>
+            الصفحة الشخصية 
+            </Link>
           <Link to="/Mainpage" className="btn text-blue-600 btn-ghost normal-case bg-gray-200 text-xl">
             <MenuBookIcon/>
-            التقارير</Link>
+            التقارير
+            </Link>
+           
+
         </div>
+         
         <div className="flex-none gap-2">
         
           <div className="dropdown dropdown-end ">

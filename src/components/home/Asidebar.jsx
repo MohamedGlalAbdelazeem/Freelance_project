@@ -170,11 +170,7 @@ function Asidebar() {
               </Link>
             </div>
           </div>
-          <div className="text-white mt-3 font-bold hover:text-blue-400 transition-all duration-300">
-            <Link to="/Mainpage/Userprofilepage">
-              <p>الصفحة الشخصية</p>
-            </Link>
-          </div>
+        
           <div className="text-center">
             <p className="font-bold text-lg text-green-400">
               {userProfile.role_name}

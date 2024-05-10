@@ -2,7 +2,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , Link } from "react-router-dom";
 import { Switch } from "@mui/material";
 import axios from "axios";
 import { useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 
 //pagenation
 import ReactPaginate from "react-paginate";
@@ -197,16 +198,15 @@ function tripBooking() {
         },
       })
       .then(function (response) {
-        setLoader(false);
         setBookings(response.data.data);
         console.log(response.data.data[0].bookingTrip);
       })
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
-       // handleUnauthenticated();
+   
       })
       .finally(() => {
-        setLoader(false);
+   setLoader(false);
       });
   };
 
@@ -343,7 +343,14 @@ function tripBooking() {
   };
 
   return (
+   <div className="flex flex-col">
+    <div className="w-full mb-5">
+       <Link className="bg-gray-500 text-white  float-left p-2 rounded-lg" to="/Mainpage/booking">إدارة الحجز
+       <KeyboardDoubleArrowLeftIcon/>
+       </Link>
+    </div>
     <main className="branchTable">
+      
       <dialog id="my_modal_2" className="modal">
         <div className="modal-box relative">
           <div className="modal-action absolute -top-4 left-2">
@@ -896,6 +903,8 @@ function tripBooking() {
         </>
       )}
     </main>
+   </div>
+    
   );
 }
 
