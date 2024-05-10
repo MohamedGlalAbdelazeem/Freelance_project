@@ -26,7 +26,7 @@ function tripBooking() {
   const [updateMode, setUpdateMode] = useState(false);
   const [updateTripsID, setUpdateTripsID] = useState("");
   const [searchValue, setSearchValue] = useState("");
-  const [showCategories, setShowCategories] = useState([]);
+  const [showTripName, setshowTripName] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [singleTrip, setSingleTrip] = useState({});
@@ -38,13 +38,13 @@ function tripBooking() {
 
 
   const schema = z.object({
-    client_id: z.string().min(1, { message: "ادخل اسم العميل" }),
+    client_id: z.string().min(1, { message: "اختر اسم العميل" }),
     cost: z.string().min(1, { message: "يجب تعيين تكلفة الرحلة" }),
     currency_id: z.string().min(1, { message: "اختر العملة" }),
-    payment_id: z.string().min(1, { message: "ادخل طريقة الدفع" }),
+    payment_id: z.string().min(1, { message: "اختر طريقة الدفع" }),
     number_of_tickets: z.string().min(1, { message: "ادخل عدد التذاكر" }),
     type: z.string().min(1, { message: "يجب تعيين نوع الرحلة" }),
-    category_id: z.string().min(1, { message: "اختر نوع الرحلة" }),
+    trip_id: z.string().min(1, { message: "اختر اسم الرحلة " }),
   });
 
   const {
@@ -59,22 +59,22 @@ function tripBooking() {
   useEffect(() => {
     fetchData();
     fetchPayments();
-    fetchCategories();
+    fetchTrip();
     fetchCurrencies();
     fetchClients();
   }, []);
 
-  useEffect(() => {
-    fetchPagenation();
-  }, [currentPage]); // Fetch data whenever currentPage changes
 
- 
 
   const fetchSingleTrip = (id) => {
     let single = trips.filter((trip) => trip.id === id);
     setSingleTrip(...single);
   };
 
+  //pagenation
+  useEffect(() => {
+    fetchPagenation();
+  }, [currentPage]);  
   const fetchPagenation = () => {
     setLoader(true);
     axios
@@ -94,27 +94,26 @@ function tripBooking() {
         setLoader(false);
       });
   };
-
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage.selected + 1);
   };
 
-  function fetchCategories() {
+
+  // fetch trip_id
+  function fetchTrip() {
     setLoader(true);
     axios
-      .get(`${baseUrl}categories/selection/id-name`, {
+      .get(`${baseUrl}trips/selection/id-name`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       })
       .then(function (response) {
-        setShowCategories(response.data.data);
+        setshowTripName(response.data.data);
       })
       .catch(function (error) {
-        if (
-          error.response.data.message === "User does not have the right roles."
-        ) {
-          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
+        if ( error.response.data.message === "User does not have the right roles.") {
+          const erromessage = error.response.data.message;
           console.error("هذا المستخدم ليس له صلاحية التعديل");
         }
       })
@@ -123,7 +122,7 @@ function tripBooking() {
       });
   }
    
-  // fetch data from api
+  // fetch payments method
   const fetchPayments = () => {
     setLoader(true);
     axios
@@ -144,6 +143,7 @@ function tripBooking() {
       });
   };
  
+  // fetch currencies
   function fetchCurrencies() {
     setLoader(true);
     axios
@@ -167,6 +167,7 @@ function tripBooking() {
         setLoader(false);
       });
   }
+  // fetch clients
   const fetchClients = () => {
     setLoader(true);
     axios
@@ -186,7 +187,7 @@ function tripBooking() {
       });
   };
 
-  // fetch data from api
+  // fetch booking trip
   const fetchData = () => {
     setLoader(true);
     axios
@@ -198,7 +199,7 @@ function tripBooking() {
       .then(function (response) {
         setLoader(false);
         setBookings(response.data.data);
-        console.log(response);
+        console.log(response.data.data[0].bookingTrip);
       })
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
@@ -219,22 +220,20 @@ function tripBooking() {
     localStorage.removeItem("user_role_name");
   };
 
-  // store trip
+  // store Booktrip
   const storeTrips = async () => {
     setLoader(true);
     await axios
       .post(
         `${baseUrl}trips`,
         {
-          name: getValues("client_id"),
-          cost: getValues("number_of_tickets").toString(),
-          payment_id: getValues("payment_id"),
-          from_countries_id: getValues("type"),
-          to_countries_id: getValues("tripTo"),
-          description: getValues("tripDescription"),
-          category_id: getValues("category_id"),
           client_id: getValues("client_id"),
+          cost: getValues("cost").toString(),
           currency_id: getValues("currency_id"),
+          payment_id: getValues("payment_id"),
+          number_of_tickets: getValues("number_of_tickets").toString(),
+          type: getValues("type"),
+          trip_id: getValues("trip_id"),
         },
         {
           headers: {
@@ -248,27 +247,14 @@ function tripBooking() {
         reset();
       })
       .catch((error) => {
-        if (error.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
-        }
-        if (
-          error.response.data.message ==
-          "The take off must be a date after now."
-        ) {
-          toast.error("يجب أن يكون وقت الإقلاع بعد الآن");
-        }
-        if (
-          error.response.data.message === "The name has already been taken."
-        ) {
-          toast.error("الرحلة موجود بالفعل");
-        }
+        const errormessage = error.response.data.message;  
         console.log(error);
-        // toast.warning(response.response.data.message);
       })
       .finally(() => {
         setLoader(false);
       });
   };
+
 
   // delete trip
   function deleteTrips(id) {
@@ -304,7 +290,7 @@ function tripBooking() {
           from_countries_id: getValues("type"),
           to_countries_id: getValues("tripTo"),
           description: getValues("tripDescription"),
-          category_id: getValues("category_id"),
+          trip_id: getValues("trip_id"),
           client_id: getValues("client_id"),
           currency_id: getValues("currency_id"),
           status: branchStatus,
@@ -331,7 +317,7 @@ function tripBooking() {
         reset();
         setValue("type", "");
         setValue("tripTo", "");
-        setValue("category_id", "");
+        setValue("trip_id", "");
         setValue("client_id", "");
         setValue("currency_id", "");
       });
@@ -589,23 +575,23 @@ function tripBooking() {
 
                 <select
                   id="countries"
-                  {...register("category_id")}
+                  {...register("trip_id")}
                   className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 >
                   <option value="" disabled selected>
-                    نوع الرحلة
+                    اسم الرحلة 
                   </option>
-                  {showCategories.map((categories, index) => {
+                  {showTripName.map((tripName, index) => {
                     return (
-                      <option key={index} value={categories.id}>
-                        {categories.name}
+                      <option key={index} value={tripName.id}>
+                        {tripName.name}
                       </option>
                     );
                   })}
                 </select>
                 {errors && (
                   <span className="text-red-500 text-sm">
-                    {errors.category_id?.message}
+                    {errors.trip_id?.message}
                   </span>
                 )}
               </div>
@@ -711,6 +697,9 @@ function tripBooking() {
                 طريقة الدفع
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                اسم الرحلة 
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 عدد التذاكر
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
@@ -723,7 +712,7 @@ function tripBooking() {
           </thead>
         ) : (
           <thead>
-            <tr>
+             <tr>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 الترتيب
               </th>
@@ -740,6 +729,9 @@ function tripBooking() {
                 طريقة الدفع
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                اسم الرحلة 
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 عدد التذاكر
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
@@ -751,11 +743,12 @@ function tripBooking() {
         <tbody>
           {bookings.map((booking, index) => {
             const {
-              client_id,
               id,
+              client_id,
               cost,
               currency_id,
               payment_id,
+              trip_id,
               number_of_tickets,
               type
             } = booking;
@@ -790,7 +783,7 @@ function tripBooking() {
                 </td>
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1 text-xs font-bold">
-                    {cost}
+                    {trip_id}
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -811,45 +804,19 @@ function tripBooking() {
                           ScrollUp();
                           setUpdateTripsID(id);
                           setUpdateMode(true);
-                          setValue("client_id", name);
-                          setValue("number_of_tickets", cost.toString());
-                          setValue("payment_id", takeOff);
-                          setValue("tripDescription", description);
-                          setValue(
-                            "tripStatus",
-                            status === "مفعل" ? true : false
-                          );
+                          setValue("client_id", client_id);
+                          setValue("cost", cost.toString());
+                          setValue("currency_id", currency_id);
+                          setValue("payment_id", payment_id);
+                          setValue("number_of_tickets", number_of_tickets.toString());
+                          setValue("trip_id", trip_id);
+                          setValue("type", type.toString());
                           setValue(
                             "type",
                             showCountCountries
                               .find((trip) => trip.id === from.id)
                               ?.id.toString()
                           );
-                          setValue(
-                            "tripTo",
-                            showCountCountries
-                              .find((trip) => trip.id === to.id)
-                              ?.id.toString()
-                          );
-                          setValue(
-                            "category_id",
-                            showCategories
-                              .find((cat) => cat.id === category.id)
-                              ?.id.toString()
-                          );
-                          setValue(
-                            "client_id",
-                            showAirports
-                              .find((airport) => airport.id === airport.id)
-                              ?.id.toString()
-                          );
-                          setValue(
-                            "currency_id",
-                            showCurrencies
-                              .find((currency) => currency.id === currency.id)
-                              ?.id.toString()
-                          );
-                          setBranchStatus(status === "مفعل" ? true : false);
                         }}
                         className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                       >

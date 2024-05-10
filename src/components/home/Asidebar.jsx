@@ -17,6 +17,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import { useEffect, useState } from "react";
 import axios from "axios";
+import BuildIcon from '@mui/icons-material/Build';
 function Asidebar() {
   const Navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
@@ -129,7 +130,7 @@ function Asidebar() {
       {
         text: "الإعدادات",
         path: "/Mainpage/Settings",
-        icon: <SettingsIcon sx={{ fontSize: 35 }} />,
+        icon: <BuildIcon sx={{ fontSize: 35 }} />,
       },
     ];
   }
