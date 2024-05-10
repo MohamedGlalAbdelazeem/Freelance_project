@@ -393,7 +393,7 @@ const TripBooking = () => {
                         الفرع :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingTrip?.client?.branch?.name}
+                        {bookingTrip?.client?.branch?.branch_name}
                       </dd>
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -468,7 +468,7 @@ const TripBooking = () => {
                         عدد التذاكر :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingTrip?.bookingTrip?.number_of_tickets}
+                        {bookingTrip?.bookingTrip?.number_of_ticket}
                       </dd>
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -841,6 +841,7 @@ const TripBooking = () => {
                   <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <span className="rounded  px-1  text-xs font-bold">
                       {currency?.name}
+                      {console.log(currency)}
                     </span>
                   </td>
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -855,7 +856,7 @@ const TripBooking = () => {
                   </td>
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <span className="rounded  px-1 text-xs font-bold">
-                      {bookingTrip?.trip?.number_of_ticket}
+                      {bookingTrip?.number_of_ticket}
                     </span>
                   </td>
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -871,19 +872,19 @@ const TripBooking = () => {
                             ScrollUp();
                             setUpdateTripsID(id);
                             setUpdateMode(true);
-                            setValue("client_id", client?.id);
+                            setValue("client_id", client?.id.toString());
                             setValue(
                               "cost",
-                              bookingTrip?.trip[0]?.cost.toString()
+                              bookingTrip?.trip?.cost.toString()
                             );
-                            setValue("currency_id", currency?.id);
-                            setValue("payment_id", payment?.id);
+                            setValue("currency_id", currency?.id.toString());
+                            setValue("payment_id", payment?.id.toString());
                             setValue(
                               "number_of_tickets",
                               bookingTrip?.number_of_ticket.toString()
                             );
-                            setValue("trip_id", bookingTrip?.trip?.id);
-                            setValue("type", bookingTrip?.type.toString());
+                            setValue("trip_id", bookingTrip?.trip?.id.toString());
+                            setValue("type", (bookingTrip?.type === "ذهاب" ? 1 : 2).toString());
                           }}
                           className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                         >
