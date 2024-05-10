@@ -1,23 +1,22 @@
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import AddHomeWorkOutlinedIcon from "@mui/icons-material/AddHomeWorkOutlined";
 import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
-import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import SupportAgentIcon from '@mui/icons-material/SupportAgent';
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import { toast } from "react-toastify";
 import CategoryIcon from "@mui/icons-material/Category";
 import LocalAirportIcon from "@mui/icons-material/LocalAirport";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
-import FlightTakeoffIcon from '@mui/icons-material/FlightTakeoff';
-import PaidIcon from '@mui/icons-material/Paid';
-import GroupsIcon from '@mui/icons-material/Groups';
-import SettingsIcon from '@mui/icons-material/Settings';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
+import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
+import PaidIcon from "@mui/icons-material/Paid";
+import GroupsIcon from "@mui/icons-material/Groups";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import BuildIcon from '@mui/icons-material/Build';
+import BuildIcon from "@mui/icons-material/Build";
+
 function Asidebar() {
   const Navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
@@ -138,6 +137,7 @@ function Asidebar() {
   useEffect(() => {
     refreshUser();
   }, []);
+
   const refreshUser = () => {
     axios
       .get("http://127.0.0.1:8000/api/refresh", {
@@ -170,7 +170,7 @@ function Asidebar() {
               </Link>
             </div>
           </div>
-        
+
           <div className="text-center">
             <p className="font-bold text-lg text-green-400">
               {userProfile.role_name}
@@ -179,21 +179,25 @@ function Asidebar() {
         </div>
         <div className="flex flex-col justify-between flex-1 mt-6">
           <nav className="flex-1 -mx-3 space-y-3 ">
-            <ul className="space-y-2 font-medium">
+            <ul className=" font-medium">
               {asidebarItems.map((item, index) => {
                 return (
                   <li key={index}>
-                    <Link to={item.path}>
-                      <div
-                        href="#"
-                        className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group"
-                      >
+                    <NavLink
+                      to={item.path}
+                      className={({ isActive }) =>
+                        `${
+                          isActive ? "bg-gray-700  " : null
+                        } flex items-center p-2 text-gray-900 rounded-lg  dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group`
+                      }
+                    >
+                      <div>
                         {item.icon}
                         <span className="ms-6 text-sm font-bold asidbaritems">
                           {item.text}
                         </span>
                       </div>
-                    </Link>
+                    </NavLink>
                     <div className="divider divider-info p-0 m-0"></div>
                   </li>
                 );
