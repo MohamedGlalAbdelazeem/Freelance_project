@@ -4,6 +4,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import PriceChangeIcon from '@mui/icons-material/PriceChange';
 import { useEffect, useState } from 'react';
 import { toast } from "react-toastify";
+import {CurrencyBitcoin, Payment} from '@mui/icons-material';
 
 function Reportpage() {
     const [loader, setLoader] = useState(true);
@@ -12,13 +13,14 @@ function Reportpage() {
     const [payment, setPayment] = useState([]);
     const baseUrl = "http://127.0.0.1:8000/api/";
     const userToken = localStorage.getItem("user_token");
+    const userRoleName = localStorage.getItem("user_role_name");
 
   useEffect(() => {
-    fetchBranches();
+    dailyReport();
   }, []);
 
 //fetch barnches data
-  const fetchBranches = () => {
+  const dailyReport = () => {
     setLoader(true);
     axios
       .get(`${baseUrl}report/daily`, {
@@ -27,15 +29,8 @@ function Reportpage() {
         },
       })
       .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        } else {
           setLoader(false);
-          setCurrency(response.data.currency);
-          setPayment(response.data.payment);
-          setBranches(response.data.data);
           console.log(response.data.data);
-        }
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
@@ -71,8 +66,115 @@ function Reportpage() {
                <input type="date" className='text-xl w-full  mt-3 p-2 rounded-lg text-center border-2 border-slate-700  text-black' />
                </div>
            </form>
-            
-            <div className='text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full'>عرض الفروع 
+
+
+
+      {
+        userRoleName === "admin" ? (
+          <>
+             {/* Currency */}
+             <div className='text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full'>عرض العملة 
+            <CurrencyExchangeIcon sx={{ fontSize: 40 , mx:2 }}/>
+            </div>
+            <table className="border-collapse w-full">
+              <thead>
+                <tr>
+                  <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                    الترتيب
+                  </th>
+                  <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                    الاسم
+                  </th>
+                  <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                    الحالة
+                  </th>
+                  <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                    التاريخ/الوقت
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                    <tr  className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0" >
+                      <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                     
+                      </td>
+                      <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                        
+                      </td>
+                    
+                      
+                      <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
+                        {"status" === "مفعل" ? (
+                          <div className="bg-green-500 min-w-20 py-1 text-white text-sm rounded-lg">
+                            مفعل
+                          </div>
+                        ) : (
+                          <div className="bg-red-500 min-w-20 py-1 text-white rounded-lg text-sm">
+                            غير مفعل
+                          </div>
+                        )}
+                      </td>
+                      <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                      
+                      </td>
+                    </tr>
+              </tbody> 
+            </table>
+             
+             {/* Paymentmethod */}
+            <div className="divider"></div>
+            <div className='text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full'>عرض طرق الدفع
+            <PriceChangeIcon sx={{ fontSize: 40 , mx:2 }}/>
+            </div>
+                <table className="border-collapse w-full">
+            <thead>
+            <tr>
+                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                الترتيب
+                </th>
+                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                الاسم
+                </th>
+                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                الحالة
+                </th>
+                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                التاريخ/الوقت
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+                <tr className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0">
+                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                
+                    </td>
+                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                    
+                    </td>
+                
+                    <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
+                    {"status" === "مفعل" ? (
+                        <div className="bg-green-500 min-w-20 py-1 text-white text-sm rounded-lg">
+                        مفعل
+                        </div>
+                    ) : (
+                        <div className="bg-red-500 min-w-20 py-1 text-white rounded-lg text-sm">
+                        غير مفعل
+                        </div>
+                    )}
+                    </td>
+                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                    
+                    </td>
+                </tr>
+            </tbody> 
+                </table>
+          </>
+        ):
+        (
+          <>
+           {/* branch */}
+           <div className='text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full'>عرض الفروع 
             <AccountBalanceIcon sx={{ fontSize: 40 , mx:2 }}/>
             </div>
             <table className="border-collapse w-full">
@@ -172,8 +274,7 @@ function Reportpage() {
             </table>
             <div className="divider"></div>
 
-
-
+             {/* Currency */}
             <div className='text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full'>عرض العملة 
             <CurrencyExchangeIcon sx={{ fontSize: 40 , mx:2 }}/>
             </div>
@@ -221,9 +322,8 @@ function Reportpage() {
                     </tr>
               </tbody> 
             </table>
-
-
-
+             
+             {/* Paymentmethod */}
             <div className="divider"></div>
             <div className='text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full'>عرض طرق الدفع
             <PriceChangeIcon sx={{ fontSize: 40 , mx:2 }}/>
@@ -272,6 +372,10 @@ function Reportpage() {
             </tbody> 
                 </table>
 
+          </>
+        )
+      }
+           
 
            
     </div>
