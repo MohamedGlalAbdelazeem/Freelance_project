@@ -344,11 +344,11 @@ function tripBooking() {
 
   return (
     <main className="branchTable">
-      <dialog id="my_modal_2" classclient_id="modal">
-        <div classclient_id="modal-box relative">
-          <div classclient_id="modal-action absolute -top-4 left-2">
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box relative">
+          <div className="modal-action absolute -top-4 left-2">
             <form method="dialog">
-              <button classclient_id="btn rounded-full w-12 h-10">X</button>
+              <button className="btn rounded-full w-12 h-10">X</button>
             </form>
           </div>
           <div className="text-center flex flex-col justify-center">
