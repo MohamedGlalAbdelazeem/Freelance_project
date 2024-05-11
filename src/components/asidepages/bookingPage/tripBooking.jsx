@@ -428,19 +428,39 @@ const TripBooking = () => {
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        حالة العملة :
+                      حالة العملة :
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                       {
+                         bookingTrip?.currency?.status=== "مفعل" ?
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
                         {bookingTrip?.currency?.status}
                       </dd>
+                       ):
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
+                        {bookingTrip?.currency?.status}
+                      </dd>
+                       )
+                       }
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        حالة طريقة الدفع :
+                      حالة طريقة الدفع :
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                       {
+                          bookingTrip?.payment?.status === "مفعل" ?
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
                         {bookingTrip?.payment?.status}
                       </dd>
+                       ):
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
+                        {bookingTrip?.payment?.status}
+                      </dd>
+                       )
+                       }
                     </div>
                   </dl>
                 </div>
@@ -493,13 +513,24 @@ const TripBooking = () => {
                         {bookingTrip?.bookingTrip?.trip?.cost}
                       </dd>
                     </div>
+                 
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        حالة الرحلة :
+                      حالة الرحلة :
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                       {
+                       bookingTrip?.bookingTrip?.trip?.status === "مفعل" ?
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
                         {bookingTrip?.bookingTrip?.trip?.status}
                       </dd>
+                       ):
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
+                        {bookingTrip?.bookingTrip?.trip?.status}
+                      </dd>
+                       )
+                       }
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
