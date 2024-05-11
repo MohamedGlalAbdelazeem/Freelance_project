@@ -16,7 +16,6 @@ import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrow
 
 const TripBooking = () => {
   const baseUrl = "http://127.0.0.1:8000/api/";
-
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem("user_token");
@@ -31,10 +30,8 @@ const TripBooking = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [singleTrip, setSingleTrip] = useState({});
   const [bookingTrip, setBookingTrip] = useState([]);
-  const [paymentStatus, setPaymentsStatus] = useState(false);
   const [clients, setClients] = useState([]);
   const [payments, setPayments] = useState([]);
-  const [showAirports, setShowAirports] = useState([]);
   const [showCurrencies, setShowCurrencies] = useState([]);
 
   const schema = z.object({
@@ -195,8 +192,8 @@ const TripBooking = () => {
         },
       })
       .then(function (response) {
-        // console.log(response.data.data);
-        setBookings(response.data.data);
+         setBookings(response.data.data);
+        console.log(response.data.data);
       })
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
@@ -255,7 +252,7 @@ const TripBooking = () => {
   function deleteTrips(id) {
     setLoader(true);
     axios
-      .delete(`${baseUrl}trips/${id}`, {
+      .delete(`${baseUrl}bookings/${id}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -277,7 +274,7 @@ const TripBooking = () => {
     setLoader(true);
     await axios
       .post(
-        `${baseUrl}trips/${updateTripsID}`,
+        `${baseUrl}bookings/trip/${updateTripsID}`,
         {
           client_id: getValues("client_id"),
           cost: getValues("number_of_tickets").toString(),
@@ -670,7 +667,7 @@ const TripBooking = () => {
                   )}
                 </div>
 
-                <div className="pt-3">
+                {/* <div className="pt-3">
                   <div className="-mx-3 flex flex-wrap">
                     {updateMode && (
                       <div className="w-full px-3 sm:w-1/2">
@@ -687,7 +684,7 @@ const TripBooking = () => {
                       </div>
                     )}
                   </div>
-                </div>
+                </div> */}
 
                 <div>
                   {updateMode ? (
@@ -819,7 +816,7 @@ const TripBooking = () => {
               const { id, employee, client, currency, payment, bookingTrip } =
                 booking;
               const tableIndex = (currentPage - 1) * 15 + index + 1;
-
+           console.log(bookings)
               return (
                 <tr
                   key={id}
@@ -873,16 +870,10 @@ const TripBooking = () => {
                             setUpdateTripsID(id);
                             setUpdateMode(true);
                             setValue("client_id", client?.id.toString());
-                            setValue(
-                              "cost",
-                              bookingTrip?.trip?.cost.toString()
-                            );
+                            setValue( "cost", bookingTrip?.trip?.cost.toString());
                             setValue("currency_id", currency?.id.toString());
                             setValue("payment_id", payment?.id.toString());
-                            setValue(
-                              "number_of_tickets",
-                              bookingTrip?.number_of_ticket.toString()
-                            );
+                            setValue(  "number_of_tickets", bookingTrip?.number_of_ticket.toString());
                             setValue("trip_id", bookingTrip?.trip?.id.toString());
                             setValue("type", (bookingTrip?.type === "ذهاب" ? 1 : 2).toString());
                           }}
