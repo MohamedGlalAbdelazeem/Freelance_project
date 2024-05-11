@@ -42,7 +42,7 @@ const TripBooking = () => {
     cost: z.string().min(1, { message: "يجب تعيين تكلفة الرحلة" }),
     currency_id: z.string().min(1, { message: "اختر العملة" }),
     payment_id: z.string().min(1, { message: "اختر طريقة الدفع" }),
-    number_of_tickets: z.string().min(1, { message: "ادخل عدد التذاكر" }).toString(),
+    number_of_tickets: z.string().min(1, { message: "ادخل عدد التذاكر" }),
     type: z.string().min(1, { message: "يجب تعيين نوع الرحلة" }),
     trip_id: z.string().min(1, { message: "اختر اسم الرحلة " }),
   });
@@ -224,10 +224,10 @@ const TripBooking = () => {
         `${baseUrl}bookings/trip`,
         {
           client_id: getValues("client_id"),
-          cost: getValues("cost").toString(),
-          currency_id: getValues("currency_id").toString(),
-          payment_id: getValues("payment_id").toString(),
-          number_of_tickets: getValues("number_of_tickets").toString(),
+          cost: getValues("cost"),
+          currency_id: getValues("currency_id"),
+          payment_id: getValues("payment_id"),
+          number_of_tickets: getValues("number_of_tickets"),
           type: getValues("type"),
           trip_id: getValues("trip_id"),
         },
@@ -255,7 +255,7 @@ const TripBooking = () => {
   function deleteTrips(id) {
     setLoader(true);
     axios
-      .delete(`${baseUrl}trips/${id}`, {
+      .delete(`${baseUrl}bookings/${id}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -738,7 +738,7 @@ const TripBooking = () => {
                   handleSearch(e);
                 }}
                 className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="بحث باسم الرحلة"
+                placeholder="بحث باسم العميل"
                 required
               />
               <button
