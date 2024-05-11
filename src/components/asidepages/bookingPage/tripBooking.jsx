@@ -10,6 +10,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
+import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports';
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ReactPaginate from "react-paginate";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
@@ -109,11 +110,8 @@ const TripBooking = () => {
         setshowTripName(response.data.data);
       })
       .catch(function (error) {
-        if (
-          error.response.data.message === "User does not have the right roles."
-        ) {
-          console.error("هذا المستخدم ليس له صلاحية التعديل");
-        }
+       const errorMessage = error.response.data.message;
+       console.log("Error fetching trips:", errorMessage);
       })
       .finally(() => {
         setLoader(false);
@@ -133,8 +131,8 @@ const TripBooking = () => {
         setPayments(response.data.data);
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-        handleUnauthenticated();
+        const errorMessage = error.response.data.message;
+        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", errorMessage);
       })
       .finally(() => {
         setLoader(false);
@@ -154,12 +152,8 @@ const TripBooking = () => {
         setShowCurrencies(response.data.data);
       })
       .catch(function (error) {
-        if (
-          error.response.data.message === "User does not have the right roles."
-        ) {
-          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
-          console.error("هذا المستخدم ليس له صلاحية التعديل");
-        }
+        const errorMessage = error.response.data.message;
+        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", errorMessage);
       })
       .finally(() => {
         setLoader(false);
@@ -195,7 +189,6 @@ const TripBooking = () => {
         },
       })
       .then(function (response) {
-        // console.log(response.data.data);
         setBookings(response.data.data);
       })
       .catch(function (error) {
@@ -241,6 +234,12 @@ const TripBooking = () => {
         toast("تم حجز الرحلة  بنجاح", { type: "success" });
         fetchData();
         reset();
+        setValue("type", "");
+        setValue("tripTo", "");
+        setValue("trip_id", "");
+        setValue("client_id", "");
+        setValue("currency_id", "");
+        setValue("payment_id", "");
       })
       .catch((error) => {
         const errorMessage = error.response.data.message;
@@ -314,6 +313,7 @@ const TripBooking = () => {
         setValue("trip_id", "");
         setValue("client_id", "");
         setValue("currency_id", "");
+        setValue("payment_id", "");
       });
   };
 
@@ -348,6 +348,10 @@ const TripBooking = () => {
           إدارة الحجز
           <KeyboardDoubleArrowLeftIcon />
         </Link>
+        <div className="w-44 mb-5 bg-gray-500 text-white text-center  p-2 rounded-lg">
+          حجز  رحلة  
+          <ConnectingAirportsIcon sx={{ fontSize: 30 }}/>
+      </div>
       </div>
       <main className="branchTable">
         <dialog id="my_modal_2" className="modal">
@@ -539,7 +543,7 @@ const TripBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("client_id")}
-                      className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر العميل
@@ -563,7 +567,7 @@ const TripBooking = () => {
                       type="number"
                       {...register("cost")}
                       placeholder="تكلفة الرحلة "
-                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-lg font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                     {errors && (
                       <span className="text-red-500 text-sm">
@@ -576,7 +580,7 @@ const TripBooking = () => {
                       type="number"
                       {...register("number_of_tickets")}
                       placeholder="عدد التذاكر "
-                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-lg font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                     {errors && (
                       <span className="text-red-500 text-sm">
@@ -589,7 +593,7 @@ const TripBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("payment_id")}
-                      className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900  text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر طريقة الدفع
@@ -611,7 +615,7 @@ const TripBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("currency_id")}
-                      className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر العملة
@@ -632,27 +636,29 @@ const TripBooking = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <select
-                    id="countries"
-                    {...register("type")}
-                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >
-                    <option value="" disabled selected>
-                      نوع الرحلة
-                    </option>
-                    <option value="1">ذهاب</option>
-                    <option value="2">ذهاب وعودة</option>
-                  </select>
-                  {errors && (
+                    <div className="w-1/2">
+                    <select
+                          id="countries"
+                          {...register("type")}
+                          className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                        >
+                          <option value="" disabled selected>
+                            نوع الرحلة
+                          </option>
+                          <option value="1">ذهاب</option>
+                          <option value="2">ذهاب وعودة</option>
+                        </select>
+                        {errors && (
                     <span className="text-red-500 text-sm">
                       {errors.type?.message}
                     </span>
                   )}
-
+                    </div>
+                  <div className="w-1/2">
                   <select
                     id="countries"
                     {...register("trip_id")}
-                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="" disabled selected>
                       اسم الرحلة
@@ -670,6 +676,8 @@ const TripBooking = () => {
                       {errors.trip_id?.message}
                     </span>
                   )}
+                  </div>
+                 
                 </div>
 
                 <div className="pt-3">
@@ -937,10 +945,10 @@ const TripBooking = () => {
               "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
             }
             nextClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
             }
             pageClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
             }
           />
         </div>

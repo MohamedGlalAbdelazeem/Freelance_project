@@ -8,6 +8,8 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -31,10 +33,8 @@ const ServiceBooking = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [singleSrv, setSingleSrv] = useState({});
   const [bookingService, setBookingService] = useState([]);
-  const [paymentStatus, setPaymentsStatus] = useState(false);
   const [clients, setClients] = useState([]);
   const [payments, setPayments] = useState([]);
-  const [showAirports, setShowAirports] = useState([]);
   const [showCurrencies, setShowCurrencies] = useState([]);
 
   const schema = z.object({
@@ -56,7 +56,7 @@ const ServiceBooking = () => {
 
   useEffect(() => {
     fetchPayments();
-    fetchTrip();
+    serviceName();
     fetchCurrencies();
     fetchClients();
     fetchData();
@@ -74,7 +74,7 @@ const ServiceBooking = () => {
   const fetchPagination = () => {
     setLoader(true);
     axios
-      .get(`http://127.0.0.1:8000/api/services?page=${currentPage}`, {
+      .get(`http://127.0.0.1:8000/api/bookings?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -94,11 +94,11 @@ const ServiceBooking = () => {
     setCurrentPage(selectedPage.selected + 1);
   };
 
-  // fetch trip_id
-  function fetchTrip() {
+  // fetch service_id
+  function serviceName() {
     setLoader(true);
     axios
-      .get(`${baseUrl}trips/selection/id-name`, {
+      .get(`${baseUrl}services/selection/id-name`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -193,8 +193,8 @@ const ServiceBooking = () => {
         },
       })
       .then(function (response) {
-        console.log(response.data.data);
         setServices(response.data.data);
+      
       })
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
@@ -234,9 +234,15 @@ const ServiceBooking = () => {
         }
       )
       .then(() => {
-        toast("تم حجز الرحلة  بنجاح", { type: "success" });
+        toast("تم حجز الخدمة بنجاح", { type: "success" });
         fetchData();
         reset();
+        setValue("client_id", "");
+        setValue("cost", "" );
+        setValue("currency_id","");
+        setValue("payment_id","");
+        setValue( "service_id","");
+       
       })
       .catch((error) => {
         const errorMessage = error.response.data.message;
@@ -303,16 +309,16 @@ const ServiceBooking = () => {
         reset();
         setValue("type", "");
         setValue("tripTo", "");
-        setValue("trip_id", "");
+        setValue("service_id", "");
         setValue("client_id", "");
         setValue("currency_id", "");
+        setValue("payment_id", "");
       });
   };
 
   const handleSearch = (e) => {
     e.preventDefault();
     setLoader(true);
-
     if (!searchValue.trim()) {
       fetchData();
       return;
@@ -340,7 +346,12 @@ const ServiceBooking = () => {
           إدارة الحجز
           <KeyboardDoubleArrowLeftIcon />
         </Link>
+        <div className="w-44 mb-5 bg-gray-500 text-white text-center  p-2 rounded-lg">
+          حجز خدمات أخري  
+          <ManageAccountsIcon sx={{ fontSize: 30 }} />
       </div>
+      </div>
+     
       <main className="branchTable">
         <dialog id="my_modal_2" className="modal">
           <div className="modal-box max-w-4xl relative">
@@ -392,7 +403,7 @@ const ServiceBooking = () => {
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        ايميل العميل :
+                        الإيميل الخاص بالعميل :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                         {bookingService?.client?.email}
@@ -414,21 +425,42 @@ const ServiceBooking = () => {
                         {bookingService?.client?.address}
                       </dd>
                     </div>
+                   
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        حالة العملة :
+                      حالة العملة :
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                       {
+                         bookingService?.currency?.status=== "مفعل" ?
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
                         {bookingService?.currency?.status}
                       </dd>
+                       ):
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
+                        {bookingService?.currency?.status}
+                      </dd>
+                       )
+                       }
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        حالة طريقة الدفع :
+                      حالة طريقة الدفع :
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                       {
+                          bookingService?.payment?.status === "مفعل" ?
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
                         {bookingService?.payment?.status}
                       </dd>
+                       ):
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
+                        {bookingService?.payment?.status}
+                      </dd>
+                       )
+                       }
                     </div>
                   </dl>
                 </div>
@@ -438,39 +470,15 @@ const ServiceBooking = () => {
                   <dl className="sm:divide-y sm:divide-gray-200">
                     <div className="py-1 sm:py-5 mx-0 sm:gap-4 sm:px-6 bg-gray-200 font-bold ">
                       <dt className="text-lg font-medium text-gray-500">
-                        بيانات الرحلة
+                        بيانات الخدمة
                       </dt>
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        اسم الرحلة :
+                        اسم الخدمة :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.trip?.name}
-                      </dd>
-                    </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        نوع التذكرة :
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.type}
-                      </dd>
-                    </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        عدد التذاكر :
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.number_of_ticket}
-                      </dd>
-                    </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        وقت الاقلاع :
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.trip?.takeOff}
+                        {bookingService?.bookingService?.service?.name}
                       </dd>
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -478,39 +486,33 @@ const ServiceBooking = () => {
                         التكلفة :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.trip?.cost}
+                        {bookingService?.bookingService?.service?.cost}
                       </dd>
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        حالة الرحلة :
+                        حالة الخدمة :
                       </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.trip?.status}
+                       {
+                       bookingService?.bookingService?.service?.status === "مفعل" ?
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
+                        {bookingService?.bookingService?.service?.status}
                       </dd>
+                       ):
+                       (
+                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
+                        {bookingService?.bookingService?.service?.status}
+                      </dd>
+                       )
+                       }
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        من :
+                        وقت انشاء الخدمة :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.trip?.from?.en_short_name}
-                      </dd>
-                    </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        إلى :
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.trip?.to?.en_short_name}
-                      </dd>
-                    </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        وقت انشاء الرحلة :
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.trip?.created_at}
+                        {bookingService?.bookingService?.service?.created_at}
                       </dd>
                     </div>
                   </dl>
@@ -531,7 +533,7 @@ const ServiceBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("client_id")}
-                      className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر العميل
@@ -555,7 +557,7 @@ const ServiceBooking = () => {
                       type="number"
                       {...register("cost")}
                       placeholder="تكلفة الرحلة "
-                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-lg font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                     {errors && (
                       <span className="text-red-500 text-sm">
@@ -563,25 +565,13 @@ const ServiceBooking = () => {
                       </span>
                     )}
                   </div>
-                  <div className="flex-grow w-full">
-                    <input
-                      type="number"
-                      {...register("service_id")}
-                      placeholder="عدد التذاكر "
-                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                    />
-                    {errors && (
-                      <span className="text-red-500 text-sm">
-                        {errors.service_id?.message}
-                      </span>
-                    )}
-                  </div>
+                
                 </div>
                 <div className="flex gap-4	">
                   <div className="flex-grow w-full">
                     <select
                       {...register("payment_id")}
-                      className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر طريقة الدفع
@@ -603,7 +593,7 @@ const ServiceBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("currency_id")}
-                      className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر العملة
@@ -623,53 +613,36 @@ const ServiceBooking = () => {
                     )}
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="gap-2">
                   <select
                     id="countries"
-                    {...register("type")}
-                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    {...register("service_id")}
+                    className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="" disabled selected>
-                      نوع الرحلة
+                      اسم الخدمة
                     </option>
-                    <option value="1">ذهاب</option>
-                    <option value="2">ذهاب وعودة</option>
-                  </select>
-                  {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.type?.message}
-                    </span>
-                  )}
-
-                  <select
-                    id="countries"
-                    {...register("trip_id")}
-                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >
-                    <option value="" disabled selected>
-                      اسم الرحلة
-                    </option>
-                    {showSrvName.map((tripName, index) => {
+                    {showSrvName.map((serviceName, index) => {
                       return (
-                        <option key={index} value={tripName.id}>
-                          {tripName.name}
+                        <option key={index} value={serviceName.id}>
+                          {serviceName.name}
                         </option>
                       );
                     })}
                   </select>
                   {errors && (
                     <span className="text-red-500 text-sm">
-                      {errors.trip_id?.message}
+                      {errors.service_id?.message}
                     </span>
                   )}
                 </div>
 
-                <div className="pt-3">
+                {/* <div className="pt-3">
                   <div className="-mx-3 flex flex-wrap">
                     {updateMode && (
                       <div className="w-full px-3 sm:w-1/2">
                         <label className="text-white">
-                          تفعيل الرحلة أو إلفاء تفعيل الرحلة ؟
+                          تفعيل الخدمة أو إلفاء تفعيل الخدمة ؟
                         </label>
                         <div className="mb-5">
                           <Switch
@@ -681,7 +654,7 @@ const ServiceBooking = () => {
                       </div>
                     )}
                   </div>
-                </div>
+                </div> */}
 
                 <div>
                   {updateMode ? (
@@ -691,7 +664,7 @@ const ServiceBooking = () => {
                       disabled={isSubmitting}
                       className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                     >
-                      تحديث الرحلة
+                      تحديث الخدمة
                     </button>
                   ) : (
                     <button
@@ -700,7 +673,7 @@ const ServiceBooking = () => {
                       onClick={handleSubmit(storeSrv)}
                       className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                     >
-                      حجز الرحلة
+                      حجز الخدمة
                     </button>
                   )}
                 </div>
@@ -756,7 +729,7 @@ const ServiceBooking = () => {
                   اسم العميل
                 </th>
                 <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  تكلفة الرحلة
+                  تكلفة الخدمة
                 </th>
                 <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                   نوع العملة
@@ -765,13 +738,7 @@ const ServiceBooking = () => {
                   طريقة الدفع
                 </th>
                 <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  اسم الرحلة
-                </th>
-                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  عدد التذاكر
-                </th>
-                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  نوع الرحلة
+                  اسم الخدمة
                 </th>
                 <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                   التعديل
@@ -788,7 +755,7 @@ const ServiceBooking = () => {
                   اسم العميل
                 </th>
                 <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  تكلفة الرحلة
+                  تكلفة الخدمة
                 </th>
                 <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                   نوع العملة
@@ -797,13 +764,7 @@ const ServiceBooking = () => {
                   طريقة الدفع
                 </th>
                 <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  اسم الرحلة
-                </th>
-                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  عدد التذاكر
-                </th>
-                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  نوع الرحلة
+                  اسم الخدمة
                 </th>
               </tr>
             </thead>
@@ -829,7 +790,7 @@ const ServiceBooking = () => {
                   </td>
                   <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <span className="rounded  px-1  text-xs font-bold">
-                      {bookingService?.trip?.cost}
+                      {bookingService?.service?.cost}
                     </span>
                   </td>
                   <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -844,55 +805,29 @@ const ServiceBooking = () => {
                   </td>
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <span className="rounded  px-1 text-xs font-bold">
-                      {bookingService?.trip?.name}
-                    </span>
-                  </td>
-                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                    <span className="rounded  px-1 text-xs font-bold">
-                      {bookingService?.number_of_ticket}
-                    </span>
-                  </td>
-                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                    <span className="rounded  px-1 text-xs font-bold">
-                      {bookingService?.type}
+                      {bookingService?.service?.name}
                     </span>
                   </td>
                   {userRoleName === "admin" ? (
                     <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                       <div className="flex gap-2 justify-center items-center">
                         <button
-                          onClick={() => {
-                            ScrollUp();
-                            setUpdateSrvID(id);
-                            setUpdateMode(true);
-                            setValue("client_id", client?.id.toString());
-                            setValue(
-                              "cost",
-                              bookingService?.trip?.cost.toString()
-                            );
-                            setValue("currency_id", currency?.id.toString());
-                            setValue("payment_id", payment?.id.toString());
-                            setValue(
-                              "service_id",
-                              bookingService?.number_of_ticket.toString()
-                            );
-                            setValue(
-                              "trip_id",
-                              bookingService?.trip?.id.toString()
-                            );
-                            setValue(
-                              "type",
-                              (bookingService?.type === "ذهاب" ? 1 : 2).toString()
-                            );
-                          }}
-                          className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
-                        >
-                          <DriveFileRenameOutlineIcon />
+                            onClick={() => {
+                              ScrollUp();
+                              setUpdateSrvID(id);
+                              setUpdateMode(true);
+                              setValue("client_id", client?.id.toString());
+                              setValue( "cost", bookingService?.services?.cost.toString() );
+                              setValue("currency_id", currency?.id.toString());
+                              setValue("payment_id", payment?.id.toString());
+                              setValue( "service_id",bookingService?.service?.id.toString());
+                            }}
+                            className="bg-green-700 text-white p-2 rounded hover:bg-green-500">
+                            <DriveFileRenameOutlineIcon />
                         </button>
                         <button
                           onClick={() => deleteSrv(id)}
-                          className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
-                        >
+                          className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500" >
                           <DeleteForeverIcon />
                         </button>
                         <button
@@ -900,8 +835,7 @@ const ServiceBooking = () => {
                             document.getElementById("my_modal_2").showModal();
                             fetchSingleBookingService(id);
                           }}
-                          className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
-                        >
+                          className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500">
                           <VisibilityIcon />
                         </button>
                       </div>
@@ -926,13 +860,13 @@ const ServiceBooking = () => {
             previousLabel={"السابق"}
             nextLabel={"التالي"}
             previousClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
             }
             nextClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
             }
             pageClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
             }
           />
         </div>
