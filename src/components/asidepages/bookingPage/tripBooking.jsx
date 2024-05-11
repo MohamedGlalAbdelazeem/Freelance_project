@@ -39,7 +39,7 @@ const TripBooking = () => {
     cost: z.string().min(1, { message: "يجب تعيين تكلفة الرحلة" }),
     currency_id: z.string().min(1, { message: "اختر العملة" }),
     payment_id: z.string().min(1, { message: "اختر طريقة الدفع" }),
-    number_of_tickets: z.string().min(1, { message: "ادخل عدد التذاكر" }).toString(),
+    number_of_tickets: z.string().min(1, { message: "ادخل عدد التذاكر" }),
     type: z.string().min(1, { message: "يجب تعيين نوع الرحلة" }),
     trip_id: z.string().min(1, { message: "اختر اسم الرحلة " }),
   });
@@ -221,10 +221,10 @@ const TripBooking = () => {
         `${baseUrl}bookings/trip`,
         {
           client_id: getValues("client_id"),
-          cost: getValues("cost").toString(),
-          currency_id: getValues("currency_id").toString(),
-          payment_id: getValues("payment_id").toString(),
-          number_of_tickets: getValues("number_of_tickets").toString(),
+          cost: getValues("cost"),
+          currency_id: getValues("currency_id"),
+          payment_id: getValues("payment_id"),
+          number_of_tickets: getValues("number_of_tickets"),
           type: getValues("type"),
           trip_id: getValues("trip_id"),
         },
@@ -322,14 +322,16 @@ const TripBooking = () => {
       fetchData();
       return;
     }
-    let allTrips = [...trips];
-    let filteredTrips = [];
-    allTrips.forEach((trip) => {
-      if (trip.client_id.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredTrips.push(trip);
+    let allBookings = [...bookings];
+    let filteredBookings = [];
+    allBookings.forEach((booking) => {
+      if (
+        booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
+      ) {
+        filteredBookings.push(booking);
       }
     });
-    setBookings(filteredTrips);
+    setBookings(filteredBookings);
     setLoader(false);
   };
 
@@ -733,7 +735,7 @@ const TripBooking = () => {
                   handleSearch(e);
                 }}
                 className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="بحث باسم الرحلة"
+                placeholder="بحث باسم العميل"
                 required
               />
               <button
@@ -838,7 +840,6 @@ const TripBooking = () => {
                   <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <span className="rounded  px-1  text-xs font-bold">
                       {currency?.name}
-                      {console.log(currency)}
                     </span>
                   </td>
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -873,9 +874,18 @@ const TripBooking = () => {
                             setValue( "cost", bookingTrip?.trip?.cost.toString());
                             setValue("currency_id", currency?.id.toString());
                             setValue("payment_id", payment?.id.toString());
-                            setValue(  "number_of_tickets", bookingTrip?.number_of_ticket.toString());
-                            setValue("trip_id", bookingTrip?.trip?.id.toString());
-                            setValue("type", (bookingTrip?.type === "ذهاب" ? 1 : 2).toString());
+                            setValue(
+                              "number_of_tickets",
+                              bookingTrip?.number_of_ticket.toString()
+                            );
+                            setValue(
+                              "trip_id",
+                              bookingTrip?.trip?.id.toString()
+                            );
+                            setValue(
+                              "type",
+                              (bookingTrip?.type === "ذهاب" ? 1 : 2).toString()
+                            );
                           }}
                           className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                         >
