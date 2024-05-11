@@ -42,7 +42,7 @@ const TripBooking = () => {
     cost: z.string().min(1, { message: "يجب تعيين تكلفة الرحلة" }),
     currency_id: z.string().min(1, { message: "اختر العملة" }),
     payment_id: z.string().min(1, { message: "اختر طريقة الدفع" }),
-    number_of_tickets: z.string().min(1, { message: "ادخل عدد التذاكر" }),
+    number_of_tickets: z.string().min(1, { message: "ادخل عدد التذاكر" }).toString(),
     type: z.string().min(1, { message: "يجب تعيين نوع الرحلة" }),
     trip_id: z.string().min(1, { message: "اختر اسم الرحلة " }),
   });
@@ -73,7 +73,6 @@ const TripBooking = () => {
   useEffect(() => {
     fetchPagenation();
   }, [currentPage]);
-
   const fetchPagenation = () => {
     setLoader(true);
     axios
@@ -225,10 +224,10 @@ const TripBooking = () => {
         `${baseUrl}bookings/trip`,
         {
           client_id: getValues("client_id"),
-          cost: getValues("cost"),
-          currency_id: getValues("currency_id"),
-          payment_id: getValues("payment_id"),
-          number_of_tickets: getValues("number_of_tickets"),
+          cost: getValues("cost").toString(),
+          currency_id: getValues("currency_id").toString(),
+          payment_id: getValues("payment_id").toString(),
+          number_of_tickets: getValues("number_of_tickets").toString(),
           type: getValues("type"),
           trip_id: getValues("trip_id"),
         },
