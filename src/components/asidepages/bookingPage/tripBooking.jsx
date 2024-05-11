@@ -326,14 +326,16 @@ const TripBooking = () => {
       fetchData();
       return;
     }
-    let allTrips = [...trips];
-    let filteredTrips = [];
-    allTrips.forEach((trip) => {
-      if (trip.client_id.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredTrips.push(trip);
+    let allBookings = [...bookings];
+    let filteredBookings = [];
+    allBookings.forEach((booking) => {
+      if (
+        booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
+      ) {
+        filteredBookings.push(booking);
       }
     });
-    setBookings(filteredTrips);
+    setBookings(filteredBookings);
     setLoader(false);
   };
 
@@ -842,7 +844,6 @@ const TripBooking = () => {
                   <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <span className="rounded  px-1  text-xs font-bold">
                       {currency?.name}
-                      {console.log(currency)}
                     </span>
                   </td>
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -884,8 +885,14 @@ const TripBooking = () => {
                               "number_of_tickets",
                               bookingTrip?.number_of_ticket.toString()
                             );
-                            setValue("trip_id", bookingTrip?.trip?.id.toString());
-                            setValue("type", (bookingTrip?.type === "ذهاب" ? 1 : 2).toString());
+                            setValue(
+                              "trip_id",
+                              bookingTrip?.trip?.id.toString()
+                            );
+                            setValue(
+                              "type",
+                              (bookingTrip?.type === "ذهاب" ? 1 : 2).toString()
+                            );
                           }}
                           className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                         >
