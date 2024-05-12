@@ -339,8 +339,7 @@ const ServiceBooking = () => {
       <div className="w-full mb-5">
         <Link
           className="bg-gray-500 text-white  float-left p-2 rounded-lg"
-          to="/Mainpage/booking"
-        >
+          to="/Mainpage/booking">
           إدارة الحجز
           <KeyboardDoubleArrowLeftIcon />
         </Link>
@@ -355,7 +354,7 @@ const ServiceBooking = () => {
           <div className="modal-box max-w-4xl relative">
             <div className="modal-action absolute -top-4 left-2">
               <form method="dialog">
-                <button className="btn rounded-full w-12 h-10">X</button>
+                <button className="btn rounded-full w-12 h-10 text-white bg-red-500">X</button>
               </form>
             </div>
             <div className="text-center flex justify-center">
@@ -393,6 +392,14 @@ const ServiceBooking = () => {
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
+                        رقم هاتف العميل :
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {bookingService?.client?.phone_number}
+                      </dd>
+                    </div>
+                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                      <dt className="text-sm font-medium text-gray-500">
                         الفرع :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
@@ -407,14 +414,7 @@ const ServiceBooking = () => {
                         {bookingService?.client?.email}
                       </dd>
                     </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        رقم هاتف العميل :
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.client?.phone_number}
-                      </dd>
-                    </div>
+                 
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
                         عنوان العميل :
@@ -423,35 +423,8 @@ const ServiceBooking = () => {
                         {bookingService?.client?.address}
                       </dd>
                     </div>
-
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        حالة العملة :
-                      </dt>
-                      {bookingService?.currency?.status === "مفعل" ? (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                          {bookingService?.currency?.status}
-                        </dd>
-                      ) : (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                          {bookingService?.currency?.status}
-                        </dd>
-                      )}
-                    </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        حالة طريقة الدفع :
-                      </dt>
-                      {bookingService?.payment?.status === "مفعل" ? (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                          {bookingService?.payment?.status}
-                        </dd>
-                      ) : (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                          {bookingService?.payment?.status}
-                        </dd>
-                      )}
-                    </div>
+ 
+                  
                   </dl>
                 </div>
               </div>
@@ -478,21 +451,6 @@ const ServiceBooking = () => {
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                         {bookingService?.bookingService?.service?.cost}
                       </dd>
-                    </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        حالة الخدمة :
-                      </dt>
-                      {bookingService?.bookingService?.service?.status ===
-                      "مفعل" ? (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                          {bookingService?.bookingService?.service?.status}
-                        </dd>
-                      ) : (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                          {bookingService?.bookingService?.service?.status}
-                        </dd>
-                      )}
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
@@ -622,26 +580,6 @@ const ServiceBooking = () => {
                     </span>
                   )}
                 </div>
-
-                {/* <div className="pt-3">
-                  <div className="-mx-3 flex flex-wrap">
-                    {updateMode && (
-                      <div className="w-full px-3 sm:w-1/2">
-                        <label className="text-white">
-                          تفعيل الخدمة أو إلفاء تفعيل الخدمة ؟
-                        </label>
-                        <div className="mb-5">
-                          <Switch
-                            checked={branchStatus}
-                            onChange={(e) => setBranchStatus(e.target.checked)}
-                            color="success"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div> */}
-
                 <div>
                   {updateMode ? (
                     <button
@@ -810,10 +748,7 @@ const ServiceBooking = () => {
                             setUpdateSrvID(id);
                             setUpdateMode(true);
                             setValue("client_id", client?.id.toString());
-                            setValue(
-                              "cost",
-                              bookingService?.services?.cost.toString()
-                            );
+                            setValue( "cost",  bookingService?.services?.cost.toString());
                             setValue("currency_id", currency?.id.toString());
                             setValue("payment_id", payment?.id.toString());
                             setValue(

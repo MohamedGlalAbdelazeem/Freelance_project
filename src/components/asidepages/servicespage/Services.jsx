@@ -20,6 +20,7 @@ function Services() {
   const [updateMode, setUpdateMode] = useState(false);
   const [updateEmpID, setUpdateEmpID] = useState("");
   const [showCategories, setShowCategories] = useState([]);
+  const [showCurrency, setShowCurrency] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const userToken = localStorage.getItem("user_token");
   const [services, setServices] = useState([]);
@@ -42,6 +43,7 @@ function Services() {
     cost: z.string().min(1, "ادخل تكلفة الخدمة "),
     description: z.string().min(1, "ادخل وصف الخدمة"),
     category_id: z.string().min(1, "اختر تصنيف الخدمة"),
+    currency_id: z.string().min(1, "اختر العملة"),
   });
 
   const {
@@ -56,6 +58,7 @@ function Services() {
   useEffect(() => {
     fetchServices();
     fetchCategories();
+    fetchCurrency();
   }, []);
   // fetch pagenation data///////////////////////
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,6 +109,22 @@ function Services() {
       });
   }
 
+  function fetchCurrency() {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}currencies/selection/id-name`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setShowCurrency(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+        // handleUnauthenticated();
+      });
+  }
   const fetchServices = () => {
     setLoader(true);
     axios
@@ -132,6 +151,7 @@ function Services() {
       cost: getValues("cost"),
       description: getValues("description"),
       category_id: getValues("category_id"),
+      currency_id :getValues("currency_id")
     };
     axios
       .post(`${baseUrl}services`, servicesData, {
@@ -143,6 +163,11 @@ function Services() {
         toast.success("تم تسجيل الخدمة  بنجاح");
         fetchServices();
         reset();
+        setValue("name", "");
+        setValue("cost", "");
+        setValue("description", "");
+        setValue("category_id", "");
+        setValue("cucurrency_id ","")
       })
       .catch(function (error) {
         if (
@@ -189,6 +214,7 @@ function Services() {
           cost: getValues("cost"),
           description: getValues("description"),
           category_id: getValues("category_id"),
+          currency_id :getValues("currency_id"),
           status: showSrv,
         },
         {
@@ -240,7 +266,7 @@ function Services() {
         <div className="modal-box relative">
           <div className="modal-action absolute -top-4 left-2">
             <form method="dialog">
-              <button className="btn rounded-full w-12 h-10">X</button>
+              <button className="btn rounded-full w-12 h-10 bg-red-600 text-white">X</button>
             </form>
           </div>
           <div className="text-center flex flex-col justify-center">
@@ -255,6 +281,18 @@ function Services() {
                       {singleSrv?.name}
                     </dd>
                   </div>
+
+                  {showCurrency.map(currency => (
+                      <div key={currency.id} className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                        <dt className="text-sm font-medium text-gray-500">
+                          اسم العملة :
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          {currency.name}
+                        </dd>
+                      </div>
+                    ))}
+
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       التكلفة :
@@ -336,6 +374,28 @@ function Services() {
                     </span>
                   )}
                 </div>
+                <div className="flex-grow w-full">
+                  <select
+                    {...register("currency_id")}
+                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="" disabled selected>
+                      اختر العملة
+                    </option>
+                    {showCurrency.map((currency, index) => {
+                      return (
+                        <option key={index} value={currency.id}>
+                          {currency.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.currency_id?.message}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-4">
@@ -362,6 +422,7 @@ function Services() {
                     </span>
                   )}
                 </div>
+             
                 <div className="w-[49%] flex flex-wrap gap-3">
                   <div className="w-[49%] flex-grow">
                     <textarea
@@ -378,6 +439,7 @@ function Services() {
                     )}
                   </div>
                 </div>
+                
               </div>
               {updateMode ? (
                 <div className="px-2">
@@ -444,21 +506,7 @@ function Services() {
               className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               بحث
-            </button>
-            {/* <div className="absolute end-2.5 bottom-2">
-              <select
-                id="select"
-                onChange={(e) => setSearchWay(e.target.value)}
-                className="py-2 px-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="ID" className="bg-zinc-900">
-                  ID
-                </option>
-                <option value="branch ID" className="bg-zinc-900">
-                  Branch ID
-                </option>
-              </select>
-            </div> */}
+            </button> 
           </div>
         </form>
       </div>
@@ -558,6 +606,7 @@ function Services() {
                           setValue("cost", cost.toString());
                           setValue("description", description);
                           setValue("category_id", category.id.toString());
+                          setValue("currency_id", currency.id.toString());
                         }}
                         className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                       >
@@ -589,27 +638,27 @@ function Services() {
         </tbody>
       </table>
       <div>
-        {/* Render pagination */}
-        <ReactPaginate
-          pageCount={totalPages}
-          pageRangeDisplayed={3}
-          marginPagesDisplayed={2}
-          onPageChange={handlePageClick}
-          containerClassName={"flex justify-center mt-4 text-2xl"}
-          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-          previousLabel={"السابق"}
-          nextLabel={"التالي"}
-          previousClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
-          nextClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
-          pageClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
-        />
-      </div>
+          {/* Render pagination */}
+          <ReactPaginate
+            pageCount={totalPages}
+            pageRangeDisplayed={3}
+            marginPagesDisplayed={2}
+            onPageChange={handlePageClick}
+            containerClassName={"flex justify-center mt-4 text-2xl"}
+            activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+            previousLabel={"السابق"}
+            nextLabel={"التالي"}
+            previousClassName={
+              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+            }
+            nextClassName={
+              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+            }
+            pageClassName={
+              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
+            }
+          />
+        </div>
       {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>

@@ -23,7 +23,6 @@ const TripBooking = () => {
   const userToken = localStorage.getItem("user_token");
   const userRoleName = localStorage.getItem("user_role_name");
   const [bookings, setBookings] = useState([]);
-  const [branchStatus, setBranchStatus] = useState(false);
   const [updateMode, setUpdateMode] = useState(false);
   const [updateTripsID, setUpdateTripsID] = useState("");
   const [searchValue, setSearchValue] = useState("");
@@ -286,7 +285,6 @@ const TripBooking = () => {
           description: getValues("tripDescription"),
           trip_id: getValues("trip_id"),
           currency_id: getValues("currency_id"),
-          status: branchStatus,
         },
         {
           headers: {
@@ -317,26 +315,26 @@ const TripBooking = () => {
       });
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
+const handleSearch = (e) => {
+  e.preventDefault();
+  setLoader(true);
 
-    if (!searchValue.trim()) {
-      fetchData();
-      return;
+  if (!searchValue.trim()) {
+    fetchData();
+    return;
+  }
+  let allBookings = [...bookings];
+  let filteredBookings = [];
+  allBookings.forEach((booking) => {
+    if (
+      booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
+    ) {
+      filteredBookings.push(booking);
     }
-    let allBookings = [...bookings];
-    let filteredBookings = [];
-    allBookings.forEach((booking) => {
-      if (
-        booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        filteredBookings.push(booking);
-      }
-    });
-    setBookings(filteredBookings);
-    setLoader(false);
-  };
+  });
+  setBookings(filteredBookings);
+  setLoader(false);
+};
 
   return (
     <div className="flex flex-col">
@@ -396,12 +394,13 @@ const TripBooking = () => {
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        الفرع :
+                        رقم هاتف العميل :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingTrip?.client?.branch?.branch_name}
+                        {bookingTrip?.client?.phone_number}
                       </dd>
                     </div>
+                  
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
                         ايميل العميل :
@@ -410,14 +409,7 @@ const TripBooking = () => {
                         {bookingTrip?.client?.email}
                       </dd>
                     </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        رقم هاتف العميل :
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingTrip?.client?.phone_number}
-                      </dd>
-                    </div>
+                  
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
                         عنوان العميل :
@@ -428,31 +420,11 @@ const TripBooking = () => {
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        حالة العملة :
+                        الفرع :
                       </dt>
-                      {bookingTrip?.currency?.status === "مفعل" ? (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                          {bookingTrip?.currency?.status}
-                        </dd>
-                      ) : (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                          {bookingTrip?.currency?.status}
-                        </dd>
-                      )}
-                    </div>
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        حالة طريقة الدفع :
-                      </dt>
-                      {bookingTrip?.payment?.status === "مفعل" ? (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                          {bookingTrip?.payment?.status}
-                        </dd>
-                      ) : (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                          {bookingTrip?.payment?.status}
-                        </dd>
-                      )}
+                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {bookingTrip?.client?.branch?.branch_name}
+                      </dd>
                     </div>
                   </dl>
                 </div>
@@ -504,21 +476,6 @@ const TripBooking = () => {
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                         {bookingTrip?.bookingTrip?.trip?.cost}
                       </dd>
-                    </div>
-
-                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                      <dt className="text-sm font-medium text-gray-500">
-                        حالة الرحلة :
-                      </dt>
-                      {bookingTrip?.bookingTrip?.trip?.status === "مفعل" ? (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                          {bookingTrip?.bookingTrip?.trip?.status}
-                        </dd>
-                      ) : (
-                        <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                          {bookingTrip?.bookingTrip?.trip?.status}
-                        </dd>
-                      )}
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
@@ -698,24 +655,6 @@ const TripBooking = () => {
                   </div>
                 </div>
 
-                <div className="pt-3">
-                  <div className="-mx-3 flex flex-wrap">
-                    {updateMode && (
-                      <div className="w-full px-3 sm:w-1/2">
-                        <label className="text-white">
-                          تفعيل الرحلة أو إلفاء تفعيل الرحلة ؟
-                        </label>
-                        <div className="mb-5">
-                          <Switch
-                            checked={branchStatus}
-                            onChange={(e) => setBranchStatus(e.target.checked)}
-                            color="success"
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
 
                 <div>
                   {updateMode ? (
@@ -745,7 +684,6 @@ const TripBooking = () => {
         ) : (
           ""
         )}
-
         {/* Search input form */}
         <div className="my-3">
           <form className="w-full">

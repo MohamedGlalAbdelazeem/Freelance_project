@@ -349,7 +349,7 @@ function Branchpage() {
                 <div className="w-full px-3 sm:w-1/2">
                   <div className="mb-5">
                     <input
-                      type="text"
+                      type="number"
                       {...register("hotline")}
                       placeholder="الخط الساخن"
                       className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
@@ -708,26 +708,27 @@ function Branchpage() {
       </dialog>
 
       <div>
-        <ReactPaginate
-          pageCount={totalPages}
-          pageRangeDisplayed={3}
-          marginPagesDisplayed={2}
-          onPageChange={handlePageClick}
-          containerClassName={"flex justify-center mt-4 text-2xl"}
-          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-          previousLabel={"السابق"}
-          nextLabel={"التالي"}
-          previousClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
-          nextClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
-          pageClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
-        />
-      </div>
+          {/* Render pagination */}
+          <ReactPaginate
+            pageCount={totalPages}
+            pageRangeDisplayed={3}
+            marginPagesDisplayed={2}
+            onPageChange={handlePageClick}
+            containerClassName={"flex justify-center mt-4 text-2xl"}
+            activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+            previousLabel={"السابق"}
+            nextLabel={"التالي"}
+            previousClassName={
+              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+            }
+            nextClassName={
+              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+            }
+            pageClassName={
+              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
+            }
+          />
+        </div>
       {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
