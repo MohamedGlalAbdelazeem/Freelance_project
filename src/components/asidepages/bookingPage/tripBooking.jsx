@@ -10,7 +10,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
-import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports';
+import ConnectingAirportsIcon from "@mui/icons-material/ConnectingAirports";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import ReactPaginate from "react-paginate";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
@@ -110,8 +110,8 @@ const TripBooking = () => {
         setshowTripName(response.data.data);
       })
       .catch(function (error) {
-       const errorMessage = error.response.data.message;
-       console.log("Error fetching trips:", errorMessage);
+        const errorMessage = error.response.data.message;
+        console.log("Error fetching trips:", errorMessage);
       })
       .finally(() => {
         setLoader(false);
@@ -349,9 +349,9 @@ const TripBooking = () => {
           <KeyboardDoubleArrowLeftIcon />
         </Link>
         <div className="w-44 mb-5 bg-gray-500 text-white text-center  p-2 rounded-lg">
-          حجز  رحلة  
-          <ConnectingAirportsIcon sx={{ fontSize: 30 }}/>
-      </div>
+          حجز رحلة
+          <ConnectingAirportsIcon sx={{ fontSize: 30 }} />
+        </div>
       </div>
       <main className="branchTable">
         <dialog id="my_modal_2" className="modal">
@@ -428,39 +428,31 @@ const TripBooking = () => {
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                      حالة العملة :
+                        حالة العملة :
                       </dt>
-                       {
-                         bookingTrip?.currency?.status=== "مفعل" ?
-                       (
+                      {bookingTrip?.currency?.status === "مفعل" ? (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                        {bookingTrip?.currency?.status}
-                      </dd>
-                       ):
-                       (
+                          {bookingTrip?.currency?.status}
+                        </dd>
+                      ) : (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                        {bookingTrip?.currency?.status}
-                      </dd>
-                       )
-                       }
+                          {bookingTrip?.currency?.status}
+                        </dd>
+                      )}
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                      حالة طريقة الدفع :
+                        حالة طريقة الدفع :
                       </dt>
-                       {
-                          bookingTrip?.payment?.status === "مفعل" ?
-                       (
+                      {bookingTrip?.payment?.status === "مفعل" ? (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                        {bookingTrip?.payment?.status}
-                      </dd>
-                       ):
-                       (
+                          {bookingTrip?.payment?.status}
+                        </dd>
+                      ) : (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                        {bookingTrip?.payment?.status}
-                      </dd>
-                       )
-                       }
+                          {bookingTrip?.payment?.status}
+                        </dd>
+                      )}
                     </div>
                   </dl>
                 </div>
@@ -513,24 +505,20 @@ const TripBooking = () => {
                         {bookingTrip?.bookingTrip?.trip?.cost}
                       </dd>
                     </div>
-                 
+
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                      حالة الرحلة :
+                        حالة الرحلة :
                       </dt>
-                       {
-                       bookingTrip?.bookingTrip?.trip?.status === "مفعل" ?
-                       (
+                      {bookingTrip?.bookingTrip?.trip?.status === "مفعل" ? (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                        {bookingTrip?.bookingTrip?.trip?.status}
-                      </dd>
-                       ):
-                       (
+                          {bookingTrip?.bookingTrip?.trip?.status}
+                        </dd>
+                      ) : (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                        {bookingTrip?.bookingTrip?.trip?.status}
-                      </dd>
-                       )
-                       }
+                          {bookingTrip?.bookingTrip?.trip?.status}
+                        </dd>
+                      )}
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
@@ -667,48 +655,47 @@ const TripBooking = () => {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                    <div className="w-1/2">
-                    <select
-                          id="countries"
-                          {...register("type")}
-                          className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                        >
-                          <option value="" disabled selected>
-                            نوع الرحلة
-                          </option>
-                          <option value="1">ذهاب</option>
-                          <option value="2">ذهاب وعودة</option>
-                        </select>
-                        {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.type?.message}
-                    </span>
-                  )}
-                    </div>
                   <div className="w-1/2">
-                  <select
-                    id="countries"
-                    {...register("trip_id")}
-                    className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >
-                    <option value="" disabled selected>
-                      اسم الرحلة
-                    </option>
-                    {showTripName.map((tripName, index) => {
-                      return (
-                        <option key={index} value={tripName.id}>
-                          {tripName.name}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.trip_id?.message}
-                    </span>
-                  )}
+                    <select
+                      id="countries"
+                      {...register("type")}
+                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
+                      <option value="" disabled selected>
+                        نوع الرحلة
+                      </option>
+                      <option value="1">ذهاب</option>
+                      <option value="2">ذهاب وعودة</option>
+                    </select>
+                    {errors && (
+                      <span className="text-red-500 text-sm">
+                        {errors.type?.message}
+                      </span>
+                    )}
                   </div>
-                 
+                  <div className="w-1/2">
+                    <select
+                      id="countries"
+                      {...register("trip_id")}
+                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
+                      <option value="" disabled selected>
+                        اسم الرحلة
+                      </option>
+                      {showTripName.map((tripName, index) => {
+                        return (
+                          <option key={index} value={tripName.id}>
+                            {tripName.name}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    {errors && (
+                      <span className="text-red-500 text-sm">
+                        {errors.trip_id?.message}
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="pt-3">
@@ -857,10 +844,17 @@ const TripBooking = () => {
           )}
           <tbody>
             {bookings.map((booking, index) => {
-              const { id, employee, client, currency, payment, bookingTrip } =
-                booking;
+              const {
+                id,
+                employee,
+                client,
+                currency,
+                payment,
+                bookingTrip,
+                bookingService,
+              } = booking;
               const tableIndex = (currentPage - 1) * 15 + index + 1;
-
+              if (bookingService !== null) return;
               return (
                 <tr
                   key={id}

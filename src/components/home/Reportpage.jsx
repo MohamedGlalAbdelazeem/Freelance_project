@@ -198,7 +198,7 @@ function Reportpage() {
                 );
               })}
               {data.length === 0 && (
-                 <tr className="w-full text-center">لايوجد بيانات للعرض</tr>
+               <tr className="w-full text-center">لايوجد بيانات للعرض</tr>
               )}
             </tbody>
           </table>

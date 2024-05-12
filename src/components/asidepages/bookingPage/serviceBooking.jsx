@@ -8,7 +8,7 @@ import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
@@ -194,7 +194,6 @@ const ServiceBooking = () => {
       })
       .then(function (response) {
         setServices(response.data.data);
-      
       })
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
@@ -238,11 +237,10 @@ const ServiceBooking = () => {
         fetchData();
         reset();
         setValue("client_id", "");
-        setValue("cost", "" );
-        setValue("currency_id","");
-        setValue("payment_id","");
-        setValue( "service_id","");
-       
+        setValue("cost", "");
+        setValue("currency_id", "");
+        setValue("payment_id", "");
+        setValue("service_id", "");
       })
       .catch((error) => {
         const errorMessage = error.response.data.message;
@@ -347,11 +345,11 @@ const ServiceBooking = () => {
           <KeyboardDoubleArrowLeftIcon />
         </Link>
         <div className="w-44 mb-5 bg-gray-500 text-white text-center  p-2 rounded-lg">
-          حجز خدمات أخري  
+          حجز خدمات أخري
           <ManageAccountsIcon sx={{ fontSize: 30 }} />
+        </div>
       </div>
-      </div>
-     
+
       <main className="branchTable">
         <dialog id="my_modal_2" className="modal">
           <div className="modal-box max-w-4xl relative">
@@ -425,42 +423,34 @@ const ServiceBooking = () => {
                         {bookingService?.client?.address}
                       </dd>
                     </div>
-                   
+
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                      حالة العملة :
+                        حالة العملة :
                       </dt>
-                       {
-                         bookingService?.currency?.status=== "مفعل" ?
-                       (
+                      {bookingService?.currency?.status === "مفعل" ? (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                        {bookingService?.currency?.status}
-                      </dd>
-                       ):
-                       (
+                          {bookingService?.currency?.status}
+                        </dd>
+                      ) : (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                        {bookingService?.currency?.status}
-                      </dd>
-                       )
-                       }
+                          {bookingService?.currency?.status}
+                        </dd>
+                      )}
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                      حالة طريقة الدفع :
+                        حالة طريقة الدفع :
                       </dt>
-                       {
-                          bookingService?.payment?.status === "مفعل" ?
-                       (
+                      {bookingService?.payment?.status === "مفعل" ? (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                        {bookingService?.payment?.status}
-                      </dd>
-                       ):
-                       (
+                          {bookingService?.payment?.status}
+                        </dd>
+                      ) : (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                        {bookingService?.payment?.status}
-                      </dd>
-                       )
-                       }
+                          {bookingService?.payment?.status}
+                        </dd>
+                      )}
                     </div>
                   </dl>
                 </div>
@@ -493,19 +483,16 @@ const ServiceBooking = () => {
                       <dt className="text-sm font-medium text-gray-500">
                         حالة الخدمة :
                       </dt>
-                       {
-                       bookingService?.bookingService?.service?.status === "مفعل" ?
-                       (
+                      {bookingService?.bookingService?.service?.status ===
+                      "مفعل" ? (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-green-500">
-                        {bookingService?.bookingService?.service?.status}
-                      </dd>
-                       ):
-                       (
+                          {bookingService?.bookingService?.service?.status}
+                        </dd>
+                      ) : (
                         <dd className="p-1 rounded-lg  text-sm text-white sm:mt-0 sm:col-span-2 bg-red-500">
-                        {bookingService?.bookingService?.service?.status}
-                      </dd>
-                       )
-                       }
+                          {bookingService?.bookingService?.service?.status}
+                        </dd>
+                      )}
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
@@ -565,7 +552,6 @@ const ServiceBooking = () => {
                       </span>
                     )}
                   </div>
-                
                 </div>
                 <div className="flex gap-4	">
                   <div className="flex-grow w-full">
@@ -771,10 +757,17 @@ const ServiceBooking = () => {
           )}
           <tbody>
             {services.map((booking, index) => {
-              const { id, employee, client, currency, payment, bookingService } =
-                booking;
+              const {
+                id,
+                employee,
+                client,
+                currency,
+                payment,
+                bookingTrip,
+                bookingService,
+              } = booking;
               const tableIndex = (currentPage - 1) * 15 + index + 1;
-
+              if (bookingTrip !== null) return;
               return (
                 <tr
                   key={id}
@@ -812,22 +805,30 @@ const ServiceBooking = () => {
                     <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                       <div className="flex gap-2 justify-center items-center">
                         <button
-                            onClick={() => {
-                              ScrollUp();
-                              setUpdateSrvID(id);
-                              setUpdateMode(true);
-                              setValue("client_id", client?.id.toString());
-                              setValue( "cost", bookingService?.services?.cost.toString() );
-                              setValue("currency_id", currency?.id.toString());
-                              setValue("payment_id", payment?.id.toString());
-                              setValue( "service_id",bookingService?.service?.id.toString());
-                            }}
-                            className="bg-green-700 text-white p-2 rounded hover:bg-green-500">
-                            <DriveFileRenameOutlineIcon />
+                          onClick={() => {
+                            ScrollUp();
+                            setUpdateSrvID(id);
+                            setUpdateMode(true);
+                            setValue("client_id", client?.id.toString());
+                            setValue(
+                              "cost",
+                              bookingService?.services?.cost.toString()
+                            );
+                            setValue("currency_id", currency?.id.toString());
+                            setValue("payment_id", payment?.id.toString());
+                            setValue(
+                              "service_id",
+                              bookingService?.service?.id.toString()
+                            );
+                          }}
+                          className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
+                        >
+                          <DriveFileRenameOutlineIcon />
                         </button>
                         <button
                           onClick={() => deleteSrv(id)}
-                          className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500" >
+                          className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
+                        >
                           <DeleteForeverIcon />
                         </button>
                         <button
@@ -835,7 +836,8 @@ const ServiceBooking = () => {
                             document.getElementById("my_modal_2").showModal();
                             fetchSingleBookingService(id);
                           }}
-                          className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500">
+                          className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
+                        >
                           <VisibilityIcon />
                         </button>
                       </div>
