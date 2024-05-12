@@ -1,17 +1,30 @@
 import axios from "axios";
-import { useRef } from "react";
 import { toast } from "react-toastify";
+import { useState } from "react";
 
 function Settings() {
   const userToken = localStorage.getItem("user_token");
-  const updateValue = useRef(null);
+  const [value , setValue] = useState("")
+
+
+  useEffect(() => {  
+  
+  },[])
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (value === "") {
+      toast.error("ادخل عدد الايام المسموح بالتعديل خلالها");
+      return;
+    }
+    if (value > 365 || value < 0) {
+      toast.error("ادخل عدد الايام بين 0 و 365");
+      return;
+    }
     axios
       .post(
         "http://127.0.0.1:8000/api/settings/allow_updated",
         {
-          days: updateValue.current.value,
+          days:value,
         },
         {
           headers: {
@@ -22,6 +35,8 @@ function Settings() {
       .then((res) => {
         if (res.data.message === "Update Successfully")
           toast.success("تم التحديث بنجاح");
+        console.log(res.data);
+
       })
       .catch((err) => {
         console.log(err);
@@ -38,7 +53,8 @@ function Settings() {
                   عدد الايام المسموح بالتعديل خلالها
                 </label>
                 <input
-                  ref={updateValue}
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
                   id="settingsNum"
                   type="number"
                   placeholder="عدد الايام"
