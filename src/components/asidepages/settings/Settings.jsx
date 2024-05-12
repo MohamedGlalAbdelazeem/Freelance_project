@@ -1,10 +1,29 @@
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function Settings() {
   const userToken = localStorage.getItem("user_token");
-  const [value , setValue] = useState("")
+  const [value, setValue] = useState("");
+
+  useEffect(() => {
+    fetchNumber();
+  }, []);
+
+  const fetchNumber = () => {
+    axios
+      .get("http://127.0.0.1:8000/api/settings/allow_updated", {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then((res) => {
+        setValue(res.data.data.value);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,7 +39,7 @@ function Settings() {
       .post(
         "http://127.0.0.1:8000/api/settings/allow_updated",
         {
-          days:value,
+          days: value,
         },
         {
           headers: {
@@ -32,7 +51,6 @@ function Settings() {
         if (res.data.message === "Update Successfully")
           toast.success("تم التحديث بنجاح");
         console.log(res.data);
-
       })
       .catch((err) => {
         console.log(err);
