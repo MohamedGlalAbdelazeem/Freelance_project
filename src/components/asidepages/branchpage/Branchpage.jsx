@@ -590,7 +590,6 @@ function Branchpage() {
                           <button
                           onClick={() => {
                             document.getElementById("my_modal_2").showModal();
-                        
                             fetchBranchClients(id);
                           }}
                           className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
