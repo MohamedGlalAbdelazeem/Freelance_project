@@ -6,10 +6,6 @@ function Settings() {
   const userToken = localStorage.getItem("user_token");
   const [value , setValue] = useState("")
 
-
-  useEffect(() => {  
-  
-  },[])
   const handleSubmit = (e) => {
     e.preventDefault();
     if (value === "") {
