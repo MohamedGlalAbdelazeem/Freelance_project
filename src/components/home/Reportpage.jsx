@@ -90,9 +90,8 @@ function Reportpage() {
   // };
   return (
     <div>
-      <div className="divider divider-info ">
-        <h1 className="text-4xl font-bold text-center ">التقارير </h1>
-      </div>
+        <h1 className="text-3xl font-bold text-center ">التقرير اليومي  </h1>
+        <hr class="my-3 h-1.5 w-28 mx-auto border-t-0 rounded-full bg-gray-500" />
       <form className="flex justify-center mt-10 gap-5 items-center">
         <div className="flex-grow ">
           <label className=" text-2xl"> من</label>
