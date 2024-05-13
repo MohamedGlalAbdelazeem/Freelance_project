@@ -376,7 +376,7 @@ function Services() {
                   <div className="flex-grow w-[49%]">
                     <select
                       {...register("currency_id")}
-                      className=" border border-gray-300 text-gray-900 text-sm rounded-lg p-3.5 focus:ring-blue-500 focus:border-blue-500 block w-full dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-md rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 block w-full dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر العملة
@@ -403,7 +403,7 @@ function Services() {
                   <select
                     id="countries"
                     {...register("category_id")}
-                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="" disabled selected>
                       نوع الرحلة

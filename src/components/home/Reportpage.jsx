@@ -88,7 +88,7 @@ function Reportpage() {
   return (
     <div>
       <h1 className="text-center text-3xl font-bold text-gray-900 -mb-5 underline underline-offset-8 decoration-blue-500">
-        التقرير اليومي{" "}
+        الصندوق اليومي{" "}
       </h1>
       <form className="flex justify-center mt-10 gap-5 items-center">
         <div className="flex-grow ">

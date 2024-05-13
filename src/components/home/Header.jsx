@@ -45,7 +45,7 @@ function Header() {
             className="btn text-blue-600 hover:bg-gray-600 hover:text-white rounded-xl btn-ghost normal-case bg-gray-200 text-lg"
           >
             <MenuBookIcon />
-            التقارير
+            الصندوق اليومي
           </Link>
         </div>
 

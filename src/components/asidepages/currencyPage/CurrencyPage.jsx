@@ -145,7 +145,7 @@ function CurrencyPage() {
         `${baseUrl}currencies/${updateCurrencyID}`,
         {
           name: getValues("currencyName"),
-          status: currencyStatus ? "1" : "0",
+          status: currencyStatus,
         },
         {
           headers: {

@@ -273,18 +273,18 @@ const TripBooking = () => {
 
   const updateTrips = async () => {
     setLoader(true);
+    console.log("updateTripsID", updateTripsID);
     await axios
       .post(
-        `${baseUrl}trips/${updateTripsID}`,
+        `${baseUrl}bookings/trip/${updateTripsID}`,
         {
           client_id: getValues("client_id"),
-          cost: getValues("number_of_tickets").toString(),
-          payment_id: getValues("payment_id"),
-          from_countries_id: getValues("type"),
-          to_countries_id: getValues("tripTo"),
-          description: getValues("tripDescription"),
-          trip_id: getValues("trip_id"),
+          cost: getValues("cost"),
           currency_id: getValues("currency_id"),
+          payment_id: getValues("payment_id"),
+          trip_id: getValues("trip_id"),
+          number_of_tickets: getValues("number_of_tickets"),
+          type: getValues("type"),
         },
         {
           headers: {
@@ -295,15 +295,6 @@ const TripBooking = () => {
       .then(() => {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
         fetchData();
-      })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
-        }
-        console.log("Error updating branch:", response.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
         setUpdateMode(false);
         reset();
         setValue("type", "");
@@ -312,6 +303,16 @@ const TripBooking = () => {
         setValue("client_id", "");
         setValue("currency_id", "");
         setValue("payment_id", "");
+      })
+      .catch((response) => {
+        if (response.response.data.message == "Already_exist") {
+          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
+        } else {
+          console.log("Error updating branch:", response);
+        }
+      })
+      .finally(() => {
+        setLoader(false);
       });
   };
 

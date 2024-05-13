@@ -39,7 +39,7 @@ const ServiceBooking = () => {
 
   const schema = z.object({
     client_id: z.string().min(1, { message: "اختر اسم العميل" }),
-    cost: z.string().min(1, { message: "يجب تعيين تكلفة الرحلة" }),
+    cost: z.string().min(1, { message: "يجب تعيين تكلفة الخدمة" }),
     currency_id: z.string().min(1, { message: "اختر العملة" }),
     payment_id: z.string().min(1, { message: "اختر طريقة الدفع" }),
     service_id: z.string().min(1, { message: "ادخل نوع الخدمة" }),
@@ -261,7 +261,7 @@ const ServiceBooking = () => {
         },
       })
       .then(function () {
-        toast.success("تم حذف الرحلة بنجاح");
+        toast.success("تم حذف الخدمة بنجاح");
         fetchData();
       })
       .catch(function (error) {
@@ -292,12 +292,12 @@ const ServiceBooking = () => {
         }
       )
       .then(() => {
-        toast("تم تحديث الرحلة  بنجاح", { type: "success" });
+        toast("تم تحديث الخدمة  بنجاح", { type: "success" });
         fetchData();
       })
       .catch((response) => {
         if (response.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
+          toast("هذة الخدمة موجودة بالعفل ", { type: "error" });
         }
         console.log("Error updating branch:", response.response.data.message);
       })
@@ -450,7 +450,7 @@ const ServiceBooking = () => {
                         التكلفة :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingService?.bookingService?.service?.cost}
+                        {bookingService?.cost}
                       </dd>
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -502,7 +502,7 @@ const ServiceBooking = () => {
                     <input
                       type="number"
                       {...register("cost")}
-                      placeholder="تكلفة الرحلة "
+                      placeholder="تكلفة الخدمة "
                       className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-md font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                     {errors && (
@@ -704,6 +704,7 @@ const ServiceBooking = () => {
                 payment,
                 bookingTrip,
                 bookingService,
+                cost
               } = booking;
               const tableIndex = (currentPage - 1) * 15 + index + 1;
               if (bookingTrip !== null) return;
@@ -722,7 +723,7 @@ const ServiceBooking = () => {
                   </td>
                   <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <span className="rounded  px-1  text-xs font-bold">
-                      {bookingService?.service?.cost}
+                      {cost}
                     </span>
                   </td>
                   <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
@@ -751,7 +752,7 @@ const ServiceBooking = () => {
                             setValue("client_id", client?.id.toString());
                             setValue(
                               "cost",
-                              bookingService?.services?.cost.toString()
+                              cost.toString()
                             );
                             setValue("currency_id", currency?.id.toString());
                             setValue("payment_id", payment?.id.toString());
