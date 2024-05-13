@@ -338,14 +338,15 @@ const ServiceBooking = () => {
     <div className="flex flex-col">
       <div className="w-full mb-5">
         <Link
-          className="bg-gray-500 text-white  float-left p-2 rounded-lg"
-          to="/Mainpage/booking">
-          إدارة الحجز
+          className="bg-gray-500 text-white  float-left p-2 rounded-lg hover:bg-gray-700 hover:shadow-lg transition duration-200"
+          to="/Mainpage/booking/trip"
+        >
+          انتقل إلى حجز رحلة
           <KeyboardDoubleArrowLeftIcon />
         </Link>
-        <div className="w-44 mb-5 bg-gray-500 text-white text-center  p-2 rounded-lg">
-          حجز خدمات أخري
-          <ManageAccountsIcon sx={{ fontSize: 30 }} />
+        <div className=" text-3xl font-bold text-gray-900 -mb-5 underline underline-offset-8 decoration-blue-500">
+          {/* <ManageAccountsIcon sx={{ fontSize: 30 }} className="text-blue-500"/> */}
+          صفحة حجز الخدمات
         </div>
       </div>
 
@@ -354,7 +355,9 @@ const ServiceBooking = () => {
           <div className="modal-box max-w-4xl relative">
             <div className="modal-action absolute -top-4 left-2">
               <form method="dialog">
-                <button className="btn rounded-full w-12 h-10 text-white bg-red-500">X</button>
+                <button className="btn rounded-full w-12 h-10 text-white bg-red-500">
+                  X
+                </button>
               </form>
             </div>
             <div className="text-center flex justify-center">
@@ -414,7 +417,7 @@ const ServiceBooking = () => {
                         {bookingService?.client?.email}
                       </dd>
                     </div>
-                 
+
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
                         عنوان العميل :
@@ -423,8 +426,6 @@ const ServiceBooking = () => {
                         {bookingService?.client?.address}
                       </dd>
                     </div>
- 
-                  
                   </dl>
                 </div>
               </div>
@@ -478,7 +479,7 @@ const ServiceBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("client_id")}
-                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر العميل
@@ -502,7 +503,7 @@ const ServiceBooking = () => {
                       type="number"
                       {...register("cost")}
                       placeholder="تكلفة الرحلة "
-                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-lg font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-md font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                     {errors && (
                       <span className="text-red-500 text-sm">
@@ -515,7 +516,7 @@ const ServiceBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("payment_id")}
-                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر طريقة الدفع
@@ -537,7 +538,7 @@ const ServiceBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("currency_id")}
-                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر العملة
@@ -561,7 +562,7 @@ const ServiceBooking = () => {
                   <select
                     id="countries"
                     {...register("service_id")}
-                    className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="" disabled selected>
                       اسم الخدمة
@@ -748,7 +749,10 @@ const ServiceBooking = () => {
                             setUpdateSrvID(id);
                             setUpdateMode(true);
                             setValue("client_id", client?.id.toString());
-                            setValue( "cost",  bookingService?.services?.cost.toString());
+                            setValue(
+                              "cost",
+                              bookingService?.services?.cost.toString()
+                            );
                             setValue("currency_id", currency?.id.toString());
                             setValue("payment_id", payment?.id.toString());
                             setValue(

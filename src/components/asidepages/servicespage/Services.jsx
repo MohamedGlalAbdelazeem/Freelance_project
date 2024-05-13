@@ -105,7 +105,6 @@ function Services() {
       })
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-        // handleUnauthenticated();
       });
   }
 
@@ -122,7 +121,6 @@ function Services() {
       })
       .catch(function (error) {
         console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-        // handleUnauthenticated();
       });
   }
   const fetchServices = () => {
@@ -138,6 +136,7 @@ function Services() {
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
+        handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
@@ -151,7 +150,7 @@ function Services() {
       cost: getValues("cost"),
       description: getValues("description"),
       category_id: getValues("category_id"),
-      currency_id :getValues("currency_id")
+      currency_id: getValues("currency_id"),
     };
     axios
       .post(`${baseUrl}services`, servicesData, {
@@ -167,7 +166,7 @@ function Services() {
         setValue("cost", "");
         setValue("description", "");
         setValue("category_id", "");
-        setValue("cucurrency_id ","")
+        setValue("currency_id", "");
       })
       .catch(function (error) {
         if (
@@ -197,7 +196,6 @@ function Services() {
       .catch(function (error) {
         console.error("Error deleting service:", error);
         setLoader(true);
-        handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
@@ -214,7 +212,7 @@ function Services() {
           cost: getValues("cost"),
           description: getValues("description"),
           category_id: getValues("category_id"),
-          currency_id :getValues("currency_id"),
+          currency_id: getValues("currency_id"),
           status: showSrv,
         },
         {
@@ -266,7 +264,9 @@ function Services() {
         <div className="modal-box relative">
           <div className="modal-action absolute -top-4 left-2">
             <form method="dialog">
-              <button className="btn rounded-full w-12 h-10 bg-red-600 text-white">X</button>
+              <button className="btn rounded-full w-12 h-10 bg-red-600 text-white">
+                X
+              </button>
             </form>
           </div>
           <div className="text-center flex flex-col justify-center">
@@ -282,16 +282,14 @@ function Services() {
                     </dd>
                   </div>
 
-                  {showCurrency.map(currency => (
-                      <div key={currency.id} className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                        <dt className="text-sm font-medium text-gray-500">
-                          اسم العملة :
-                        </dt>
-                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                          {currency.name}
-                        </dd>
-                      </div>
-                    ))}
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      اسم العملة :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleSrv?.currency?.name}
+                    </dd>
+                  </div>
 
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
@@ -348,7 +346,7 @@ function Services() {
           <div className="mx-auto w-full ">
             <form className="space-y-3">
               <div className=" flex flex-wrap gap-3">
-                <div className="w-[49%] flex-grow">
+                <div className="flex-grow w-full">
                   <input
                     type="text"
                     {...register("name")}
@@ -361,40 +359,42 @@ function Services() {
                     </span>
                   )}
                 </div>
-                <div className="w-[49%] flex-grow">
-                  <input
-                    type="number"
-                    {...register("cost")}
-                    placeholder="تكلفة الخدمة"
-                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                  />
-                  {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.cost?.message}
-                    </span>
-                  )}
-                </div>
-                <div className="flex-grow w-full">
-                  <select
-                    {...register("currency_id")}
-                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  >
-                    <option value="" disabled selected>
-                      اختر العملة
-                    </option>
-                    {showCurrency.map((currency, index) => {
-                      return (
-                        <option key={index} value={currency.id}>
-                          {currency.name}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.currency_id?.message}
-                    </span>
-                  )}
+                <div className="flex gap-4 flex-grow">
+                  <div className="flex-grow w-[49%]">
+                    <input
+                      type="number"
+                      {...register("cost")}
+                      placeholder="تكلفة الخدمة"
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                    />
+                    {errors && (
+                      <span className="text-red-500 text-sm">
+                        {errors.cost?.message}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex-grow w-[49%]">
+                    <select
+                      {...register("currency_id")}
+                      className=" border border-gray-300 text-gray-900 text-sm rounded-lg p-3.5 focus:ring-blue-500 focus:border-blue-500 block w-full dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    >
+                      <option value="" disabled selected>
+                        اختر العملة
+                      </option>
+                      {showCurrency.map((currency, index) => {
+                        return (
+                          <option key={index} value={currency.id}>
+                            {currency.name}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    {errors && (
+                      <span className="text-red-500 text-sm">
+                        {errors.currency_id?.message}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -403,7 +403,7 @@ function Services() {
                   <select
                     id="countries"
                     {...register("category_id")}
-                    className=" border  border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="" disabled selected>
                       نوع الرحلة
@@ -422,7 +422,7 @@ function Services() {
                     </span>
                   )}
                 </div>
-             
+
                 <div className="w-[49%] flex flex-wrap gap-3">
                   <div className="w-[49%] flex-grow">
                     <textarea
@@ -439,24 +439,21 @@ function Services() {
                     )}
                   </div>
                 </div>
-                
               </div>
               {updateMode ? (
                 <div className="px-2">
-                  <label className="text-white ">
-                   تفعيل الخدمة أم لا؟ 
-                  </label>
+                  <label className="text-white ">تفعيل الخدمة أم لا؟</label>
                   <div className="mb-5">
                     <Switch
                       checked={showSrv}
-                      onChange={(e) => setShowSrv(e.target.checked)}
+                      onChange={(e) => {
+                        setShowSrv(e.target.checked);
+                      }}
                       color="success"
                     />
                   </div>
                 </div>
-              ) : (
-                null
-              )}
+              ) : null}
 
               <div>
                 {updateMode ? (
@@ -506,7 +503,7 @@ function Services() {
               className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
             >
               بحث
-            </button> 
+            </button>
           </div>
         </form>
       </div>
@@ -561,6 +558,7 @@ function Services() {
               status,
               category,
               created_at,
+              currency,
             } = service;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
@@ -607,6 +605,7 @@ function Services() {
                           setValue("description", description);
                           setValue("category_id", category.id.toString());
                           setValue("currency_id", currency.id.toString());
+                          setShowSrv(status === "مفعل" ? true : false);
                         }}
                         className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                       >
@@ -638,27 +637,25 @@ function Services() {
         </tbody>
       </table>
       <div>
-          {/* Render pagination */}
-          <ReactPaginate
-            pageCount={totalPages}
-            pageRangeDisplayed={3}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageClick}
-            containerClassName={"flex justify-center mt-4 text-2xl"}
-            activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-            previousLabel={"السابق"}
-            nextLabel={"التالي"}
-            previousClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            nextClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            pageClassName={
-              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
-            }
-          />
-        </div>
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          pageClassName={"mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "}
+        />
+      </div>
       {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>

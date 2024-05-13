@@ -41,7 +41,7 @@ function ClientPage() {
   const schema = z.object({
     name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
     email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
-    phone_number: z.string().min(1, { message: "يجب ادخال رقم الهاتف" }),
+    phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
     address: z.string().min(1, { message: "يجب ادخال العنوان" }),
     countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
     image: z.any(),

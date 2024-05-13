@@ -315,40 +315,40 @@ const TripBooking = () => {
       });
   };
 
-const handleSearch = (e) => {
-  e.preventDefault();
-  setLoader(true);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setLoader(true);
 
-  if (!searchValue.trim()) {
-    fetchData();
-    return;
-  }
-  let allBookings = [...bookings];
-  let filteredBookings = [];
-  allBookings.forEach((booking) => {
-    if (
-      booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
-    ) {
-      filteredBookings.push(booking);
+    if (!searchValue.trim()) {
+      fetchData();
+      return;
     }
-  });
-  setBookings(filteredBookings);
-  setLoader(false);
-};
+    let allBookings = [...bookings];
+    let filteredBookings = [];
+    allBookings.forEach((booking) => {
+      if (
+        booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
+      ) {
+        filteredBookings.push(booking);
+      }
+    });
+    setBookings(filteredBookings);
+    setLoader(false);
+  };
 
   return (
     <div className="flex flex-col">
       <div className="w-full mb-5">
         <Link
-          className="bg-gray-500 text-white  float-left p-2 rounded-lg"
-          to="/Mainpage/booking"
+          className="bg-gray-500 text-white  float-left p-2 rounded-lg hover:bg-gray-700 hover:shadow-lg transition duration-200"
+          to="/Mainpage/booking/service"
         >
-          إدارة الحجز
+          انتقل إلى حجز خدمة أخري
           <KeyboardDoubleArrowLeftIcon />
         </Link>
-        <div className="w-44 mb-5 bg-gray-500 text-white text-center  p-2 rounded-lg">
-          حجز رحلة
-          <ConnectingAirportsIcon sx={{ fontSize: 30 }} />
+        <div className=" text-3xl font-bold text-gray-900 -mb-5 underline underline-offset-8 decoration-blue-500">
+          {/* <ConnectingAirportsIcon sx={{ fontSize: 30 }}  className="text-blue-500"/> */}
+          صفحة حجز الرحلات
         </div>
       </div>
       <main className="branchTable">
@@ -400,7 +400,7 @@ const handleSearch = (e) => {
                         {bookingTrip?.client?.phone_number}
                       </dd>
                     </div>
-                  
+
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
                         ايميل العميل :
@@ -409,7 +409,7 @@ const handleSearch = (e) => {
                         {bookingTrip?.client?.email}
                       </dd>
                     </div>
-                  
+
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
                         عنوان العميل :
@@ -519,7 +519,7 @@ const handleSearch = (e) => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("client_id")}
-                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-3.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2  dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر العميل
@@ -543,7 +543,7 @@ const handleSearch = (e) => {
                       type="number"
                       {...register("cost")}
                       placeholder="تكلفة الرحلة "
-                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-lg font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-md font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                     {errors && (
                       <span className="text-red-500 text-sm">
@@ -556,7 +556,7 @@ const handleSearch = (e) => {
                       type="number"
                       {...register("number_of_tickets")}
                       placeholder="عدد التذاكر "
-                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-lg font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-md font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                     {errors && (
                       <span className="text-red-500 text-sm">
@@ -569,7 +569,7 @@ const handleSearch = (e) => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("payment_id")}
-                      className=" border border-gray-300 text-gray-900  text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900  text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر طريقة الدفع
@@ -591,7 +591,7 @@ const handleSearch = (e) => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("currency_id")}
-                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اختر العملة
@@ -611,12 +611,12 @@ const handleSearch = (e) => {
                     )}
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-4">
                   <div className="w-1/2">
                     <select
                       id="countries"
                       {...register("type")}
-                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         نوع الرحلة
@@ -634,7 +634,7 @@ const handleSearch = (e) => {
                     <select
                       id="countries"
                       {...register("trip_id")}
-                      className=" border border-gray-300 text-gray-900 text-lg rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                      className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
                       <option value="" disabled selected>
                         اسم الرحلة
@@ -654,7 +654,6 @@ const handleSearch = (e) => {
                     )}
                   </div>
                 </div>
-
 
                 <div>
                   {updateMode ? (

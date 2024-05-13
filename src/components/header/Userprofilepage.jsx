@@ -25,8 +25,11 @@ function UserProfilePage() {
       return;
     }
     refreshUser();
-    getBranch();
   }, []);
+
+  useEffect(() => {
+    getBranch();
+  }, [branchID]);
 
   const refreshUser = async () => {
     setLoader(true);
@@ -54,7 +57,7 @@ function UserProfilePage() {
         setLoader(false);
       });
   };
-  
+
   const getBranch = async () => {
     await axios
       .get(`http://127.0.0.1:8000/api/branches/select-name-id`, {
@@ -63,12 +66,13 @@ function UserProfilePage() {
         },
       })
       .then((res) => {
-        let branchName = res.data.data.filter((item) => item.id === branchID)[0]?.name;
+        let branchName = res.data.data.filter((item) => item.id === branchID)[0]
+          ?.name;
         setBranch(branchName);
-        console.log(branchName);
-      }).catch((err) => {
-        console.log(err);
       })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const handleUpdate = (e) => {
@@ -307,7 +311,7 @@ function UserProfilePage() {
       {/* change passwrod  */}
       <h3 className="flex items-center w-full">
         <span className="flex-grow bg-gray-200 rounded h-1"></span>
-        <button className="mx-2 text-md font-medium  border-2 rounded-full hover:bg-gray-200">
+        <button className="mx-2 px-3 py-1 text-md font-medium  border-2 rounded-full hover:bg-gray-200">
           تغيير كلمة السر
         </button>
         <span className="flex-grow bg-gray-200 rounded h-1"></span>
@@ -341,12 +345,10 @@ function UserProfilePage() {
               <input
                 type="password"
                 value={newPassword}
-                onChange={(e) => 
-                 {
-                  setNewPassword(e.target.value)
+                onChange={(e) => {
+                  setNewPassword(e.target.value);
                   setIsError(false);
-                 }}
-
+                }}
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
               {isError && (
@@ -364,7 +366,7 @@ function UserProfilePage() {
                 type="password"
                 value={confirmNewPassword}
                 onChange={(e) => {
-                  setConfirmNewPassword(e.target.value)
+                  setConfirmNewPassword(e.target.value);
                   setIsError(false);
                 }}
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"

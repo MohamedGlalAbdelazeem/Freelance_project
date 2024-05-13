@@ -11,9 +11,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 import VisibilityIcon from "@mui/icons-material/Visibility";
-
-//pagenation
 import ReactPaginate from "react-paginate";
+
 function Trippage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [trips, setTrips] = useState([]);
@@ -32,7 +31,6 @@ function Trippage() {
   const [singleTrip, setSingleTrip] = useState({});
   const [showAirports, setShowAirports] = useState([]);
   const [showCurrencies, setShowCurrencies] = useState([]);
-
 
   const schema = z.object({
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
@@ -65,7 +63,7 @@ function Trippage() {
 
   useEffect(() => {
     fetchPagenation();
-  }, [currentPage]); // Fetch data whenever currentPage changes
+  }, [currentPage]);
 
   function fetchCountries() {
     setLoader(true);
@@ -249,6 +247,11 @@ function Trippage() {
         toast("تم إنشاء الرحلة  بنجاح", { type: "success" });
         fetchData();
         reset();
+        setValue("tripFrom", "");
+        setValue("tripTo", "");
+        setValue("category_id", "");
+        setValue("airport_id", "");
+        setValue("currency_id", "");
       })
       .catch((error) => {
         if (error.response.data.message == "Already_exist") {
@@ -321,22 +324,23 @@ function Trippage() {
       .then(() => {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
         fetchData();
-      })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
-        }
-        console.log("Error updating branch:", response.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
-        setUpdateMode(false);
         reset();
         setValue("tripFrom", "");
         setValue("tripTo", "");
         setValue("category_id", "");
         setValue("airport_id", "");
         setValue("currency_id", "");
+        setUpdateMode(false);
+      })
+      .catch((response) => {
+        if (response.response.data.message == "Already_exist") {
+          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
+        } else {
+          toast.error(response.response.data.message);
+        }
+      })
+      .finally(() => {
+        setLoader(false);
       });
   };
 
@@ -365,7 +369,9 @@ function Trippage() {
         <div className="modal-box relative">
           <div className="modal-action absolute -top-4 left-2">
             <form method="dialog">
-              <button className="btn rounded-full w-12 h-10">X</button>
+              <button className="btn rounded-full w-12 h-10 bg-red-500 text-white">
+                X
+              </button>
             </form>
           </div>
           <div className="text-center flex flex-col justify-center">
@@ -573,71 +579,75 @@ function Trippage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <select
-                  id="countries"
-                  {...register("tripFrom")}
-                  className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                  <option value="" disabled selected>
-                    من
-                  </option>
-                  {showCountCountries.map((trip, index) => {
-                    return (
-                      <option key={index} value={trip.id}>
-                        {trip.en_short_name}
-                      </option>
-                    );
-                  })}
-                </select>
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.tripFrom?.message}
-                  </span>
-                )}
-
-                <select
-                  id="countries"
-                  {...register("tripTo")}
-                  className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                  <option value="" disabled selected>
-                    إلى
-                  </option>
-                  {showCountCountries.map((trip, index) => {
-                    return (
-                      <option key={index} value={trip.id}>
-                        {trip.en_short_name}
-                      </option>
-                    );
-                  })}
-                </select>
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.tripTo?.message}
-                  </span>
-                )}
-
-                <select
-                  id="countries"
-                  {...register("category_id")}
-                  className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                >
-                  <option value="" disabled selected>
-                    نوع الرحلة
-                  </option>
-                  {showCategories.map((categories, index) => {
-                    return (
-                      <option key={index} value={categories.id}>
-                        {categories.name}
-                      </option>
-                    );
-                  })}
-                </select>
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.category_id?.message}
-                  </span>
-                )}
+                <div className="flex-grow w-full">
+                  <select
+                    id="countries"
+                    {...register("tripFrom")}
+                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="" disabled selected>
+                      من
+                    </option>
+                    {showCountCountries.map((trip, index) => {
+                      return (
+                        <option key={index} value={trip.id}>
+                          {trip.en_short_name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.tripFrom?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-grow w-full">
+                  <select
+                    id="countries"
+                    {...register("tripTo")}
+                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="" disabled selected>
+                      إلى
+                    </option>
+                    {showCountCountries.map((trip, index) => {
+                      return (
+                        <option key={index} value={trip.id}>
+                          {trip.en_short_name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.tripTo?.message}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-grow w-full">
+                  <select
+                    id="countries"
+                    {...register("category_id")}
+                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="" disabled selected>
+                      نوع الرحلة
+                    </option>
+                    {showCategories.map((categories, index) => {
+                      return (
+                        <option key={index} value={categories.id}>
+                          {categories.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.category_id?.message}
+                    </span>
+                  )}
+                </div>
               </div>
 
               <div className="pt-3">
@@ -650,7 +660,10 @@ function Trippage() {
                       <div className="mb-5">
                         <Switch
                           checked={branchStatus}
-                          onChange={(e) => setBranchStatus(e.target.checked)}
+                          onChange={(e) => {
+                            console.log(branchStatus);
+                            setBranchStatus(e.target.checked);
+                          }}
                           color="success"
                         />
                       </div>
@@ -849,12 +862,12 @@ function Trippage() {
                           setUpdateMode(true);
                           setValue("tripName", name);
                           setValue("tripCost", cost.toString());
-                          setValue("take_off", takeOff);
+                          const [datePart] = takeOff.split(" ");
+                          const [year, month, day] = datePart.split("-");
+                          const formattedDateString = `${year}-${month}-${day}`;
+                          setValue("take_off", formattedDateString);
                           setValue("tripDescription", description);
-                          setValue(
-                            "tripStatus",
-                            status === "مفعل" ? true : false
-                          );
+                          setBranchStatus(status === "مفعل" ? true : false);
                           setValue(
                             "tripFrom",
                             showCountCountries
@@ -885,7 +898,6 @@ function Trippage() {
                               .find((currency) => currency.id === currency.id)
                               ?.id.toString()
                           );
-                          setBranchStatus(status === "مفعل" ? true : false);
                         }}
                         className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                       >
@@ -928,14 +940,12 @@ function Trippage() {
           previousLabel={"السابق"}
           nextLabel={"التالي"}
           previousClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
           }
           nextClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
           }
-          pageClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
+          pageClassName={"mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "}
         />
       </div>
       {/* loader */}

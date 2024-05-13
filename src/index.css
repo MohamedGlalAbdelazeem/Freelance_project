@@ -47,5 +47,8 @@ html {
 }
 
 body {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
+  /* font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
+   */
+font-family: "Cairo", sans-serif !important;
+
 }

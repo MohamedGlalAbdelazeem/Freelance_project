@@ -26,7 +26,6 @@ function Reportpage() {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
-
   useEffect(() => {
     dailyReport();
   }, []);
@@ -69,11 +68,9 @@ function Reportpage() {
       .then(function (response) {
         setLoader(false);
         setData(response.data.data);
-        console.log(response.data.data);
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
-        handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
@@ -90,8 +87,9 @@ function Reportpage() {
   // };
   return (
     <div>
-        <h1 className="text-3xl font-bold text-center ">التقرير اليومي  </h1>
-        <hr class="my-3 h-1.5 w-28 mx-auto border-t-0 rounded-full bg-gray-500" />
+      <h1 className="text-center text-3xl font-bold text-gray-900 -mb-5 underline underline-offset-8 decoration-blue-500">
+        التقرير اليومي{" "}
+      </h1>
       <form className="flex justify-center mt-10 gap-5 items-center">
         <div className="flex-grow ">
           <label className=" text-2xl"> من</label>
@@ -120,71 +118,74 @@ function Reportpage() {
             type="submit"
             onClick={handleSubmit(onSubmit)}
             disabled={isSubmitting}
-            className="py-3 px-5 w-full font-bold text-lg bg-gray-900 rounded-lg text-white h-fit mt-12"
+            className="py-3 px-5 w-full font-bold text-lg bg-gray-600 hover:bg-gray-900 transition rounded-lg text-white h-fit mt-12"
           >
             بحث
           </button>
         </div>
       </form>
-        <>
-          <div className="text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full">
-                عرض الصندوق اليومي للفروع
-            <CurrencyExchangeIcon sx={{ fontSize: 40, mx: 2 }} />
-          </div>
-          <table className="border-collapse w-full">
-            <thead>
-              <tr>
+      <>
+        <div className="text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full">
+          عرض الصندوق اليومي للفروع
+          <CurrencyExchangeIcon sx={{ fontSize: 40, mx: 2 }} />
+        </div>
+        <table className="border-collapse w-full">
+          <thead>
+            <tr>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                الترتيب
+              </th>
+              {userRoleName === "super_admin" && (
                 <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  الترتيب
-                </th>
-               {
-                userRoleName === "super_admin" && <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                   الفرع
                 </th>
-               }
-                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  التكلفة اليومية 
-                </th>
-                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  العملة
-                </th>
-                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  طريقة الدفع
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.map((item, index) => {
-                return (
-                  <tr
-                    key={index}
-                    className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0" >
-                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                      {index + 1}
-                    </td>
-                    {
-                    userRoleName === "super_admin" &&  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                    {item.brnach?.name}
-                    </td>
-                    }
-                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                      {item.totoalCost}
-                    </td>
-                    <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
-                      {item.currency?.name}
-                    </td>
-                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                      {item.payment?.name}
-                    </td>
-                  </tr>
-                );
-              })}
-              {data.length === 0 && (
-               <tr className="w-full text-center">لايوجد بيانات للعرض</tr>
               )}
-            </tbody>
-          </table>
-        </>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                التكلفة اليومية
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                العملة
+              </th>
+              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+                طريقة الدفع
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.map((item, index) => {
+              return (
+                <tr
+                  key={index}
+                  className="bg-white lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0"
+                >
+                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                    {index + 1}
+                  </td>
+                  {userRoleName === "super_admin" && (
+                    <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                      {item.brnach?.name}
+                    </td>
+                  )}
+                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                    {item.totoalCost}
+                  </td>
+                  <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
+                    {item.currency?.name}
+                  </td>
+                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                    {item.payment?.name}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {data.length === 0 && (
+          <p className="w-full p-3 text-lg bg-gray-200 rounded-b-full text-center">
+            لايوجد بيانات للعرض
+          </p>
+        )}
+      </>
       {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
@@ -211,5 +212,6 @@ function Reportpage() {
         </>
       )}
     </div>
-);}
+  );
+}
 export default Reportpage;
