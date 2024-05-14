@@ -126,7 +126,7 @@ function Reportpage() {
       </form>
       <>
         <div className="text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full">
-          عرض الصندوق اليومي للفروع
+          التحصيل  اليومي  
           <CurrencyExchangeIcon sx={{ fontSize: 40, mx: 2 }} />
         </div>
         <table className="border-collapse w-full">
@@ -145,9 +145,6 @@ function Reportpage() {
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 العملة
-              </th>
-              <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                طريقة الدفع
               </th>
             </tr>
           </thead>
@@ -171,9 +168,6 @@ function Reportpage() {
                   </td>
                   <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                     {item.currency?.name}
-                  </td>
-                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                    {item.payment?.name}
                   </td>
                 </tr>
               );
