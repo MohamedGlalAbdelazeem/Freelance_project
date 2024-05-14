@@ -69,6 +69,13 @@ const TripBooking = () => {
     setBookingTrip(...single);
   };
 
+  // Get Today's Date
+  const fullDate = new Date();
+  const year = fullDate.getFullYear();
+  const month = fullDate.getMonth() + 1;
+  const day = fullDate.getDate();
+  const formattedDate = `${year}-${month}-${day}`;
+  
   //pagenation
   useEffect(() => {
     fetchPagenation();
@@ -839,6 +846,7 @@ const TripBooking = () => {
                   {userRoleName === "admin" ? (
                     <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                       <div className="flex gap-2 justify-center items-center">
+                        
                         <button
                           onClick={() => {
                             ScrollUp();
