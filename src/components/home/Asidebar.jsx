@@ -198,7 +198,7 @@ function Asidebar() {
                         </span>
                       </div>
                     </NavLink>
-                    <div className="divider divider-info p-0 m-0"></div>
+                    <div className="h-0.5 mt-0.5 w-full bg-gray-700"></div>
                   </li>
                 );
               })}
