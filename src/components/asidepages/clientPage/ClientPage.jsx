@@ -60,17 +60,14 @@ function ClientPage() {
   useEffect(() => {
     fetchClients();
     fetchNationalities();
-    fetchPagenation();
   }, []);
 
   // fetch pagenation data///////////////////////
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   useEffect(() => {
     fetchPagenation();
   }, [currentPage]); // Fetch data whenever currentPage changes
-
   const fetchPagenation = () => {
     setLoader(true);
     axios
@@ -95,17 +92,16 @@ function ClientPage() {
     setCurrentPage(selectedPage.selected + 1);
   };
   // fetch pagenation data///////////////////////
-
   const fetchNationalities = () => {
     setLoader(true);
     axios
-      .get(`${baseUrl}countries`, {
+      .get(`${baseUrl}nationality`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       })
       .then(function (response) {
-        setNationalities(response.data.data);
+        setNationalities(response.data.data); 
       })
       .catch(function (error) {
         console.error("Error fetching nationalities:", error);
@@ -133,7 +129,9 @@ function ClientPage() {
         setLoader(false);
       });
   };
-  const storeClient = () => {
+
+
+const storeClient = () => {
     setLoader(true);
     const clientData = {
       name: getValues("name"),
@@ -302,14 +300,7 @@ function ClientPage() {
                       {singleClient?.address}
                     </dd>
                   </div>
-                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      الفرع :
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient?.branch?.branch_name}
-                    </dd>
-                  </div>
+                  
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       الجنسية :
@@ -372,7 +363,7 @@ function ClientPage() {
               <div className=" flex flex-wrap gap-3">
                 <div className="w-[49%] flex-grow ">
                   <input
-                    type="tel"
+                    type="number"
                     {...register("phone_number")}
                     placeholder="رقم الهاتف"
                     dir="rtl"
@@ -410,7 +401,7 @@ function ClientPage() {
                     {nationalities.map((nat) => {
                       const { id, en_short_name } = nat;
                       return (
-                        <option key={id} value={id} label={en_short_name} />
+                        <option key={id}   value={id} label={en_short_name} />
                       );
                     })}
                   </select>
@@ -496,20 +487,6 @@ function ClientPage() {
             >
               بحث
             </button>
-            {/* <div className="absolute end-2.5 bottom-2">
-              <select
-                id="select"
-                onChange={(e) => setSearchWay(e.target.value)}
-                className="py-2 px-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="ID" className="bg-zinc-900">
-                  ID
-                </option>
-                <option value="branch ID" className="bg-zinc-900">
-                  Branch ID
-                </option>
-              </select>
-            </div> */}
           </div>
         </form>
       </div>
@@ -518,7 +495,7 @@ function ClientPage() {
         <thead>
           {userRoleName === "admin" ? (
             <tr>
-              {["الترتيب", "الاسم", "رقم الموبايل", "الفرع", "تعديل"].map(
+              {["الترتيب", "الاسم", "رقم الموبايل", "تعديل"].map(
                 (header, index) => (
                   <th
                     key={index}
@@ -531,7 +508,7 @@ function ClientPage() {
             </tr>
           ) : (
             <tr>
-              {["الترتيب", "الاسم", "رقم الموبايل", "الفرع"].map(
+              {["الترتيب", "الاسم", "رقم الموبايل"].map(
                 (header, index) => (
                   <th
                     key={index}
@@ -560,11 +537,6 @@ function ClientPage() {
               image,
             } = client;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
-
-            {
-              /* const imageUrl = "http://127.0.0.1:8000" + imagePath + "/" + image; */
-            }
-
             return (
               <tr
                 key={id}
@@ -573,50 +545,18 @@ function ClientPage() {
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
                   {tableIndex}
                 </td>
-                {/* <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded flex justify-center items-center  px-2 text-xs font-bold">
-                    <img
-                      src={imageUrl}
-                      alt="avatar"
-                      className="w-[40px] h-[40px] rounded-full border-4 border-white"
-                    />
-                  </span>
-                </td> */}
+              
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
                     {name}
                   </span>
                 </td>
-                {/* <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {nationality.nationality}
-                  </span>
-                </td>
-                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {address}
-                  </span>
-                </td>
-                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {email}
-                  </span>
-                </td> */}
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {phone_number}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {branch.branch_name}
-                  </span>
-                </td>
-                {/* <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <span className="rounded  px-1  text-xs font-bold">
-                    {created_at}
-                  </span>
-                </td> */}
+          
                 {userRoleName === "admin" ? (
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <div className="flex gap-2 justify-center items-center">
@@ -631,9 +571,7 @@ function ClientPage() {
                           setValue("phone_number", phone_number.toString());
                           setValue("branch_id", branch.branch_name.toString());
                           setValue("countries_id", nationality.id.toString());
-                          setValue("notes", notes);
-                          
-                         
+                          setValue("notes", notes); 
                         }}
                         className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                       >
@@ -665,27 +603,27 @@ function ClientPage() {
         </tbody>
       </table>
       <div>
-        {/* Render pagination */}
-        <ReactPaginate
-          pageCount={totalPages}
-          pageRangeDisplayed={3}
-          marginPagesDisplayed={2}
-          onPageChange={handlePageClick}
-          containerClassName={"flex justify-center mt-4 text-2xl"}
-          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-          previousLabel={"السابق"}
-          nextLabel={"التالي"}
-          previousClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
-          nextClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
-          pageClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
-        />
-      </div>
+          {/* Render pagination */}
+          <ReactPaginate
+            pageCount={totalPages}
+            pageRangeDisplayed={3}
+            marginPagesDisplayed={2}
+            onPageChange={handlePageClick}
+            containerClassName={"flex justify-center mt-4 text-2xl"}
+            activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+            previousLabel={"السابق"}
+            nextLabel={"التالي"}
+            previousClassName={
+              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+            }
+            nextClassName={
+              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+            }
+            pageClassName={
+              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
+            }
+          />
+        </div>
       {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
