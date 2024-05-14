@@ -141,7 +141,7 @@ function Reportpage() {
                 </th>
               )}
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                التكلفة اليومية
+                التحصيل اليومي
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 العملة
