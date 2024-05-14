@@ -66,8 +66,9 @@ function UserProfilePage() {
         },
       })
       .then((res) => {
-        let branchName = res.data.data.filter((item) => item.id === branchID)[0]
-          ?.name;
+        let branchName =
+          res.data.data.filter((item) => item.id === branchID)[0]?.name ||
+          "الفرع غير موجود";
         setBranch(branchName);
       })
       .catch((err) => {

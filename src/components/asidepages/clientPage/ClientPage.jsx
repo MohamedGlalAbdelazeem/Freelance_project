@@ -16,7 +16,7 @@ import ReactPaginate from "react-paginate";
 function ClientPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [loader, setLoader] = useState(false);
-  const [nationalities, setNationalities] = useState([]);
+  const [countries, setCountries] = useState([]);
 
   const userToken = localStorage.getItem("user_token");
   const userRoleName = localStorage.getItem("user_role_name");
@@ -59,7 +59,7 @@ function ClientPage() {
 
   useEffect(() => {
     fetchClients();
-    fetchNationalities();
+    fetchCountries();
   }, []);
 
   // fetch pagenation data///////////////////////
@@ -92,19 +92,19 @@ function ClientPage() {
     setCurrentPage(selectedPage.selected + 1);
   };
   // fetch pagenation data///////////////////////
-  const fetchNationalities = () => {
+  const fetchCountries = () => {
     setLoader(true);
     axios
-      .get(`${baseUrl}nationality`, {
+      .get(`${baseUrl}countries`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       })
       .then(function (response) {
-        setNationalities(response.data.data); 
+        setCountries(response.data.data);
       })
       .catch(function (error) {
-        console.error("Error fetching nationalities:", error);
+        console.error("Error fetching countries:", error);
       })
       .finally(() => {
         setLoader(false);
@@ -130,8 +130,7 @@ function ClientPage() {
       });
   };
 
-
-const storeClient = () => {
+  const storeClient = () => {
     setLoader(true);
     const clientData = {
       name: getValues("name"),
@@ -300,7 +299,7 @@ const storeClient = () => {
                       {singleClient?.address}
                     </dd>
                   </div>
-                  
+
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       الجنسية :
@@ -396,12 +395,12 @@ const storeClient = () => {
                     className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   >
                     <option value="" disabled selected>
-                      الجنسية
+                      الدولة
                     </option>
-                    {nationalities.map((nat) => {
+                    {countries.map((nat) => {
                       const { id, en_short_name } = nat;
                       return (
-                        <option key={id}   value={id} label={en_short_name} />
+                        <option key={id} value={id} label={en_short_name} />
                       );
                     })}
                   </select>
@@ -508,16 +507,14 @@ const storeClient = () => {
             </tr>
           ) : (
             <tr>
-              {["الترتيب", "الاسم", "رقم الموبايل"].map(
-                (header, index) => (
-                  <th
-                    key={index}
-                    className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
-                  >
-                    {header}
-                  </th>
-                )
-              )}
+              {["الترتيب", "الاسم", "رقم الموبايل"].map((header, index) => (
+                <th
+                  key={index}
+                  className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell"
+                >
+                  {header}
+                </th>
+              ))}
             </tr>
           )}
         </thead>
@@ -545,7 +542,7 @@ const storeClient = () => {
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg</td>:static">
                   {tableIndex}
                 </td>
-              
+
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-2 text-xs font-bold">
                     {name}
@@ -556,7 +553,7 @@ const storeClient = () => {
                     {phone_number}
                   </span>
                 </td>
-          
+
                 {userRoleName === "admin" ? (
                   <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                     <div className="flex gap-2 justify-center items-center">
@@ -571,14 +568,14 @@ const storeClient = () => {
                           setValue("phone_number", phone_number.toString());
                           setValue("branch_id", branch.branch_name.toString());
                           setValue("countries_id", nationality.id.toString());
-                          setValue("notes", notes); 
+                          setValue("notes", notes);
                         }}
                         className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                       >
                         <DriveFileRenameOutlineIcon />
                       </button>
                       <button
-                        onClick={() => deleteClient(id)}    
+                        onClick={() => deleteClient(id)}
                         className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
                       >
                         <DeleteForeverIcon />
@@ -603,27 +600,25 @@ const storeClient = () => {
         </tbody>
       </table>
       <div>
-          {/* Render pagination */}
-          <ReactPaginate
-            pageCount={totalPages}
-            pageRangeDisplayed={3}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageClick}
-            containerClassName={"flex justify-center mt-4 text-2xl"}
-            activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-            previousLabel={"السابق"}
-            nextLabel={"التالي"}
-            previousClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            nextClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            pageClassName={
-              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
-            }
-          />
-        </div>
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          pageClassName={"mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "}
+        />
+      </div>
       {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
