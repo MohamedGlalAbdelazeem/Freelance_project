@@ -3,7 +3,7 @@ import { Link , useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Resetpassword from "./Resetpassword";
-
+import VpnKeyIcon from '@mui/icons-material/VpnKey';
 function Forgetpasssword() {
     const [email, setEmail] = useState("");
     const [loader , setLoader ] = useState(false);
@@ -25,6 +25,7 @@ function Forgetpasssword() {
         toast("تم إرسال رسالة إليك برجاء التوجة إلي البريد الإلكتروني الخاص بك", { type: "success"});
       }
     } catch (error) {
+      console.log(error);
       toast("يجب كتابة البريد الإلكتروني الخاص بك  ", { type: "error"});
     }
     finally {
@@ -38,9 +39,9 @@ function Forgetpasssword() {
   <section className="bg-white dark:bg-gray-900">
     <div className="container flex flex-col items-center justify-center min-h-screen px-6 mx-auto">
         <div className="flex justify-center mx-auto">
-            <img className="w-auto h-7 sm:h-8" src="https://merakiui.com/images/logo.svg" alt=""/>
-        </div>
-        <p className="mt-4 text-sm font-semibold tracking-wide text-center text-gray-800 capitalize dark:text-white">
+          <VpnKeyIcon sx={{ fontSize: 55 , color:"white"}}/>
+         </div>
+        <p className="mt-4 text-lg font-semibold tracking-wide text-center text-gray-800 capitalize dark:text-white">
             سوف يتم إرسال رسالة إلي البريد الإلكتروني الخاص بك
         </p>
 

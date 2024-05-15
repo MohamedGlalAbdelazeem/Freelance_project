@@ -54,11 +54,6 @@ function Asidebar() {
         icon: <FlightTakeoffIcon sx={{ fontSize: 35 }} />,
       },
       {
-        text: "إدراة الحجز",
-        path: "/Mainpage/booking",
-        icon: <SupportAgentIcon sx={{ fontSize: 35 }} />,
-      },
-      {
         text: "إدارة العملات",
         path: "/Mainpage/currencies",
         icon: <PaidIcon sx={{ fontSize: 35 }} />,
@@ -67,6 +62,11 @@ function Asidebar() {
         text: "إدارة طرق الدفع",
         path: "/Mainpage/payments",
         icon: <CreditCardIcon sx={{ fontSize: 35 }} />,
+      },
+      {
+        text: "إدراة الحجز",
+        path: "/Mainpage/booking",
+        icon: <SupportAgentIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة الرحلات",
@@ -100,21 +100,6 @@ function Asidebar() {
         text: "إدراة الحجز",
         path: "/Mainpage/booking",
         icon: <SupportAgentIcon sx={{ fontSize: 35 }} />,
-      },
-      {
-        text: "إدارة المطارات",
-        path: "/Mainpage/airports",
-        icon: <FlightTakeoffIcon sx={{ fontSize: 35 }} />,
-      },
-      {
-        text: "إدارة العملات",
-        path: "/Mainpage/currencies",
-        icon: <PaidIcon sx={{ fontSize: 35 }} />,
-      },
-      {
-        text: "إدارة طرق الدفع",
-        path: "/Mainpage/payments",
-        icon: <CreditCardIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة الرحلات",

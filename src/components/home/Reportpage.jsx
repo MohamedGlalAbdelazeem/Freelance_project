@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
+import InventoryIcon from '@mui/icons-material/Inventory';
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function Reportpage() {
@@ -51,7 +52,7 @@ function Reportpage() {
       })
       .catch((error) => {
         console.log(error);
-        toast.error(error.response.data.message);
+        handleUnauthenticated();
       })
       .finally(() => {
         setLoader(false);
@@ -76,38 +77,40 @@ function Reportpage() {
         setLoader(false);
       });
   };
-  // const handleUnauthenticated = () => {
-  //   toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-  //     type: "error",
-  //     autoClose: 4000,
-  //   });
-  //   Naviagate("/Login");
-  //   localStorage.removeItem("user_token");
-  //   localStorage.removeItem("user_role_name");
-  // };
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
+    });
+    Naviagate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
   return (
-    <div>
+    <div className="bg-gray-300 p-9 rounded-xl">
       <h1 className="text-center text-3xl font-bold text-gray-900 -mb-5 underline underline-offset-8 decoration-blue-500">
+        <InventoryIcon sx={{ fontSize: 50 }}/>
         الصندوق اليومي{" "}
+
       </h1>
       <form className="flex justify-center mt-10 gap-5 items-center">
         <div className="flex-grow ">
-          <label className=" text-2xl"> من</label>
+          <label className=" text-2xl text-center font-bold"> من</label>
           <input
             type="date"
             {...register("from")}
-            className="text-xl w-full mt-3 p-2 rounded-lg text-center border-2 border-slate-700  text-black"
+            className="text-xl w-full mt-3 p-2 rounded-lg text-center border-2 border-slate-500  text-black"
           />
           {errors && (
             <span className="text-red-500 text-sm">{errors.from?.message}</span>
           )}
         </div>
         <div className="flex-grow ">
-          <label className=" text-2xl"> إلي </label>
+          <label className=" text-2xl font-bold"> إلي </label>
           <input
             type="date"
             {...register("to")}
-            className="text-xl w-full  mt-3 p-2 rounded-lg text-center border-2 border-slate-700  text-black"
+            className="text-xl w-full  mt-3 p-2 rounded-lg text-center border-2 border-slate-500  text-black"
           />
           {errors && (
             <span className="text-red-500 text-sm">{errors.to?.message}</span>
@@ -125,11 +128,11 @@ function Reportpage() {
         </div>
       </form>
       <>
-        <div className="text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-t-full">
-          التحصيل  اليومي  
+        <div className="text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-sm">
+           التحصيل  اليومي  
           <CurrencyExchangeIcon sx={{ fontSize: 40, mx: 2 }} />
         </div>
-        <table className="border-collapse w-full">
+        <table className="border-collapse w-full ">
           <thead>
             <tr>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
@@ -175,7 +178,7 @@ function Reportpage() {
           </tbody>
         </table>
         {data.length === 0 && (
-          <p className="w-full p-3 text-lg bg-gray-200 rounded-b-full text-center">
+          <p className="w-full p-3 text-lg bg-gray-200 rounded-lg text-center">
             لايوجد بيانات للعرض
           </p>
         )}

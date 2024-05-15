@@ -3,15 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import "./register.css";
 import axios from "axios";
 import { toast } from "react-toastify";
-
- 
+import LockOpenIcon from '@mui/icons-material/LockOpen'; 
 function Login() {
   const Navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [accept, setAccetp] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);
-  const [successMess, setSuccessMess] = useState(false);
+
   const [loader, setLoader] = useState(false);
 
 
@@ -31,44 +30,32 @@ function Login() {
       setLoader(false);
 
       if (res.status === 200) {
+      
         localStorage.setItem("user_token", res.data.access_token);
         localStorage.setItem("user_role_name", res.data.user.role_name);
         Navigate("/Mainpage");
         toast("تم تسجيل الدخول بنجاح", { type: "success"});
       }
     } catch (error) {
+      if (error.response.data.error === "Unauthorized") {
+        toast("كلمة السر غير صحيحة", { type: "error"});
+      }
       setLoader(false);
-      toast("خطأ فى تسجيل الدخول", { type: "error"});
     }
   };
 
   return (
     <section className="bg-white dark:bg-gray-900">
-      <div className="container flex items-center justify-center min-h-screen px-6 mx-auto">
-        {successMess && (
-          <div role="alert" className="alert alert-success  text-red-50 ">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="stroke-current shrink-0 h-6 w-6 text-red-50"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinejoin="round" />
-            </svg>
-            <span>تم تسجيل الدخول بنجاح</span>
-          </div>
-        )}
+      <div className="container flex items-center justify-center min-h-screen px-6 mx-auto"> 
         <form
           className="w-full max-w-md"
           onSubmit={(e) => submitForm(e)}
           dir="rtl"
         >
-          <img
-            className="w-auto h-7 sm:h-8"
-            src="https://merakiui.com/images/logo.svg"
-            alt=""
-          />
-          <h1 className="mt-3 text-2xl font-semibold text-gray-800 capitalize sm:text-3xl dark:text-white">
+         <div className="flex justify-center">
+         <LockOpenIcon sx={{ fontSize: 52 , color:"white"}}/>
+         </div>
+          <h1 className="text-center mt-3 text-2xl font-semibold text-gray-800 capitalize sm:text-3xl dark:text-white">
             تسجيل الدخول
           </h1>
           <div className="relative flex items-center mt-8">

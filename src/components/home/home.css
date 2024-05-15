@@ -9,7 +9,7 @@
 
 
 aside li{
-    background-color: rgba(128, 128, 128, 0.107);
+    margin: 1rem 0;
 }
 
 @media (max-width:600px) {

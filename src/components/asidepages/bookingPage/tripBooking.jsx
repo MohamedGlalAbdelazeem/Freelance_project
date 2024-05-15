@@ -198,6 +198,7 @@ const TripBooking = () => {
         setBookings(response.data.data);
       })
       .catch(function (error) {
+        handleUnauthenticated();
         console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
       })
       .finally(() => {
@@ -364,7 +365,7 @@ const TripBooking = () => {
           <div className="modal-box max-w-4xl relative">
             <div className="modal-action absolute -top-4 left-2">
               <form method="dialog">
-                <button className="btn rounded-full w-12 h-10">X</button>
+                <button className="btn rounded-full w-12 h-10 bg-red-600 text-white">X</button>
               </form>
             </div>
             <div className="text-center flex justify-center">
@@ -428,7 +429,7 @@ const TripBooking = () => {
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                        الفرع :
+                        الفرع المسجل به العميل :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                         {bookingTrip?.client?.branch?.branch_name}

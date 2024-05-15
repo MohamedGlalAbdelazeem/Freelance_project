@@ -34,9 +34,7 @@ function App() {
         <Route
           path="/Resetpassword"
           element={
-            <ProtectedRoute>
               <Resetpassword />
-            </ProtectedRoute>
           }
         />
         <Route path="/Forgetpasssword" element={<Forgetpasssword />} />

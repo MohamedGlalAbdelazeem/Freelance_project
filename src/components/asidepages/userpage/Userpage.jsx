@@ -160,6 +160,7 @@ function Userpage() {
         toast.success("تم تسجيل الموظف بنجاح");
         fetchEmployees();
         reset();
+        setValue("branch_id","");
       })
       .catch(function (error) {
         if (
@@ -408,20 +409,7 @@ function Userpage() {
             >
               بحث
             </button>
-            {/* <div className="absolute end-2.5 bottom-2">
-              <select
-                id="select"
-                onChange={(e) => setSearchWay(e.target.value)}
-                className="py-2 px-3 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="ID" className="bg-zinc-900">
-                  ID
-                </option>
-                <option value="branch ID" className="bg-zinc-900">
-                  Branch ID
-                </option>
-              </select>
-            </div> */}
+          
           </div>
         </form>
       </div>

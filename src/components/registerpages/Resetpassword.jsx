@@ -2,6 +2,7 @@ import React from 'react'
 import { Link , useNavigate } from "react-router-dom";
 import { useState , useEffect } from "react";
 import { toast } from "react-toastify";
+import LoginIcon from '@mui/icons-material/Login';
 import axios from "axios";
 function Resetpassword() {
     const [loader , setLoader ] = useState(false);
@@ -53,7 +54,7 @@ function Resetpassword() {
     <section className="bg-white dark:bg-gray-900">
     <div className="container flex flex-col items-center justify-center min-h-screen px-6 mx-auto">
         <div className="flex justify-center mx-auto">
-            <img className="w-auto h-7 sm:h-8" src="https://merakiui.com/images/logo.svg" alt=""/>
+          <LoginIcon sx={{ fontSize: 50 , color:"white"}}/>
         </div>
         <p className="mt-4 text-sm font-semibold tracking-wide text-center text-gray-800 capitalize dark:text-white">
               ادخل كلمة المرور الجديدة 

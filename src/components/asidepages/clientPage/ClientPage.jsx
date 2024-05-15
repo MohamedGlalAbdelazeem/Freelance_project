@@ -8,6 +8,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 import { z } from "zod";
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 //pagenation
@@ -87,7 +88,6 @@ function ClientPage() {
         setLoader(false);
       });
   };
-
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage.selected + 1);
   };
@@ -155,7 +155,10 @@ function ClientPage() {
         reset();
       })
       .catch(function (error) {
-        toast.error(error.response.data.message);
+        if (error.response.data.message === "The email has already been taken.") {
+          
+          toast.error("هذا البريد الإلكتروني موجود بالفعل");
+        }
         console.log(error);
       })
       .finally(() => {
@@ -172,7 +175,7 @@ function ClientPage() {
       })
       .then(function () {
         fetchClients();
-        toast.success("تم حذف العميل بنجاح");
+        toast.success(`تم حذف العميل بنجاح`);
       })
       .catch(function (error) {
         toast.error(error.response.data.message);
@@ -203,9 +206,6 @@ function ClientPage() {
         notes: getValues("notes"),
       };
     }
-    // console.log(updateClientData);
-    // setLoader(false);
-    // return;
     axios
       .post(`${baseUrl}clients/${updateClientID}`, updateClientData, {
         headers: {

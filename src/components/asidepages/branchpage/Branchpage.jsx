@@ -561,7 +561,7 @@ function Branchpage() {
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-3 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  <div className="flex gap-2 justify-center items-center">
+                  <div className="flex gap-2  items-center">
                     <button
                       onClick={() => {
                         ScrollUp();
@@ -621,7 +621,7 @@ function Branchpage() {
                   className="text-2xl font-bold mb-6"
                 >
                   الموظفين الموجودين فى الفرع
-                  {/* {branchClients[0].branch.branch_name} */}
+                 
                 </h1>
                 <table>
                   <thead>
@@ -665,17 +665,7 @@ function Branchpage() {
                             <span className="rounded  px-2 text-xs font-bold">
                               {name}
                             </span>
-                          </td>
-                          {/* <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                            <span className="rounded  py-1 px-3 text-xs font-bold">
-                              {nationality.nationality}
-                            </span>
                           </td> 
-                          <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                            <span className="rounded  py-1 px-3 text-xs font-bold">
-                              {address}
-                            </span>
-                          </td> */}
                           <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  py-1 px-3 text-xs font-bold">
                               {email}
