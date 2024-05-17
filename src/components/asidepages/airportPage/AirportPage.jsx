@@ -95,12 +95,9 @@ function AirportPage() {
         if (error.response.data.message == "Already_exist") {
           toast("هذا المطار موجود بالفعل ", { type: "error" });
         }
-        if (
-          error.response.data.message === "The name has already been taken."
-        ) {
+        if ( error.response.data.message === "The name has already been taken."  ) {
           toast.error("المطار مسجل بالفعل");
         }
-        console.log(error);
       })
       .finally(() => {
         setLoader(false);
@@ -159,10 +156,9 @@ function AirportPage() {
         fetchAirports();
       })
       .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
+        if (response.response.data.message == "The name has already been taken.") {
           toast("هذا المطار مسجل بالعفل ", { type: "error" });
         }
-        console.log("Error updating airport:", response.response.data.message);
       })
       .finally(() => {
         setLoader(false);

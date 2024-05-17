@@ -63,9 +63,7 @@ function UserProfilePage() {
         },
       })
       .then((res) => {
-        let branchName =
-          res.data.data.filter((item) => item.id === branchID)[0]?.name ||
-          "الفرع غير موجود";
+        let branchName = res.data.data.filter((item) => item.id === branchID)[0]?.name || "الفرع غير موجود";
         setBranch(branchName);
       })
       .catch((err) => {
@@ -158,6 +156,7 @@ function UserProfilePage() {
       });
   };
 
+
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
       type: "error",
@@ -221,6 +220,7 @@ function UserProfilePage() {
                           </dt>
                           <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                             {branch}
+                          
                           </dd>
                         </div>
                       )}

@@ -53,7 +53,7 @@ function Login() {
           onSubmit={(e) => submitForm(e)}
           dir="rtl"
         >
-         <div className="flex justify-center">
+         <div className="flex justify-center bg-blue-500 rounded-full p-3 w-fit mx-auto">
          <LockOpenIcon sx={{ fontSize: 52 , color:"white"}}/>
          </div>
           <h1 className="text-center mt-3 text-2xl font-semibold text-gray-800 capitalize sm:text-3xl dark:text-white">

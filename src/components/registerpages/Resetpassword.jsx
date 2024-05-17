@@ -53,7 +53,7 @@ function Resetpassword() {
   return (
     <section className="bg-white dark:bg-gray-900">
     <div className="container flex flex-col items-center justify-center min-h-screen px-6 mx-auto">
-        <div className="flex justify-center mx-auto">
+    <div className="flex justify-center bg-blue-500 rounded-full p-3 w-fit mx-auto">
           <LoginIcon sx={{ fontSize: 50 , color:"white"}}/>
         </div>
         <p className="mt-4 text-sm font-semibold tracking-wide text-center text-gray-800 capitalize dark:text-white">
