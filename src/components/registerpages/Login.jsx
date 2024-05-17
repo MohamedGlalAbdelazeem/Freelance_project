@@ -4,6 +4,7 @@ import "./register.css";
 import axios from "axios";
 import { toast } from "react-toastify";
 import LockOpenIcon from '@mui/icons-material/LockOpen'; 
+import LoginIcon from '@mui/icons-material/Login';
 function Login() {
   const Navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -80,8 +81,8 @@ function Login() {
           </div>
           {email == "" && accept && (
             <p className="text-red-600 my-5">
-              {" "}
-              الرجاء إدخال البريد الإلكتروني{" "}
+            
+              الرجاء إدخال البريد الإلكتروني 
             </p>
           )}
 
@@ -137,6 +138,7 @@ function Login() {
           <div className="mt-6">
             <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
               سجل الدخول
+              <LoginIcon sx={{ fontSize: 30 }}/>
             </button>
           </div>
         </form>

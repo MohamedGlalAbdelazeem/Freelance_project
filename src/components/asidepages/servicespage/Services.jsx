@@ -81,7 +81,9 @@ function Services() {
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
-        console.error("Error fetching branches:", error);
+        if(error.response.data.message === "User does not have the right roles."){
+          return null;
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -104,7 +106,9 @@ function Services() {
         setShowCategories(response.data.data);
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+        if(error.response.data.message === "User does not have the right roles."){
+          return null;
+        }
       });
   }
 
@@ -120,7 +124,9 @@ function Services() {
         setShowCurrency(response.data.data);
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+        if(error.response.data.message === "User does not have the right roles."){
+          return null;
+        }
       });
   }
   const fetchServices = () => {
@@ -135,8 +141,12 @@ function Services() {
         setServices(response.data.data);
       })
       .catch(function (error) {
-        console.error("Error fetching branches:", error);
-        handleUnauthenticated();
+        if(error.response.data.message === "Unauthorized"){
+          handleUnauthenticated();
+       }
+        if(error.response.data.message === "User does not have the right roles."){
+          return null;
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -169,14 +179,13 @@ function Services() {
         setValue("currency_id", "");
       })
       .catch(function (error) {
-        if (
-          error.response.data.message === "The name has already been taken."
-        ) {
+        if (error.response.data.message === "The name has already been taken." ) {
           toast.error("الخدمة موجودة بالفعل");
         }
-        console.error("Error fetching", error);
-      })
-      .finally(() => {
+        if(error.response.data.message === "User does not have the right roles."){
+          return null;
+        }
+      }) .finally(() => {
         setLoader(false);
       });
   };
@@ -194,8 +203,8 @@ function Services() {
         fetchServices();
       })
       .catch(function (error) {
-        console.error("Error deleting service:", error);
         setLoader(true);
+        console.error("Error deleting service:", error);
       })
       .finally(() => {
         setLoader(false);

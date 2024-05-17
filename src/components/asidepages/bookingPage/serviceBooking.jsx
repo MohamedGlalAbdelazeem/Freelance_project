@@ -3,13 +3,10 @@ import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Switch } from "@mui/material";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -24,7 +21,6 @@ const ServiceBooking = () => {
   const userToken = localStorage.getItem("user_token");
   const userRoleName = localStorage.getItem("user_role_name");
   const [services, setServices] = useState([]);
-  const [branchStatus, setBranchStatus] = useState(false);
   const [updateMode, setUpdateMode] = useState(false);
   const [updateSrvID, setUpdateSrvID] = useState("");
   const [searchValue, setSearchValue] = useState("");
@@ -84,7 +80,9 @@ const ServiceBooking = () => {
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
-        console.error("Error fetching branches:", error);
+        if (error.response.data.message === "User does not have the right roles." ) {
+          return null;
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -97,8 +95,7 @@ const ServiceBooking = () => {
   // fetch service_id
   function serviceName() {
     setLoader(true);
-    axios
-      .get(`${baseUrl}services/selection/id-name`, {
+    axios.get(`${baseUrl}services/selection/id-name`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -107,10 +104,8 @@ const ServiceBooking = () => {
         setShowSrvName(response.data.data);
       })
       .catch(function (error) {
-        if (
-          error.response.data.message === "User does not have the right roles."
-        ) {
-          console.error("هذا المستخدم ليس له صلاحية التعديل");
+        if (error.response.data.message === "User does not have the right roles." ) {
+          return null;
         }
       })
       .finally(() => {
@@ -121,8 +116,7 @@ const ServiceBooking = () => {
   // fetch payments method
   const fetchPayments = () => {
     setLoader(true);
-    axios
-      .get(`${baseUrl}payments`, {
+    axios.get(`${baseUrl}payments`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -131,8 +125,9 @@ const ServiceBooking = () => {
         setPayments(response.data.data);
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-        handleUnauthenticated();
+        if(error.response.data.message === "User does not have the right roles."){
+          return null;
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -152,11 +147,8 @@ const ServiceBooking = () => {
         setShowCurrencies(response.data.data);
       })
       .catch(function (error) {
-        if (
-          error.response.data.message === "User does not have the right roles."
-        ) {
-          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
-          console.error("هذا المستخدم ليس له صلاحية التعديل");
+        if (  error.response.data.message === "User does not have the right roles." ) {
+          return null;
         }
       })
       .finally(() => {
@@ -176,7 +168,9 @@ const ServiceBooking = () => {
         setClients(response.data.data);
       })
       .catch(function (error) {
-        console.error("Error:", error);
+        if(error.response.data.message === "User does not have the right roles."){
+          return null;
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -196,7 +190,13 @@ const ServiceBooking = () => {
         setServices(response.data.data);
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
+        if(error.response.data.message === "Unauthorized"){
+           handleUnauthenticated();
+        }
+        if(error.response.data.message === "User does not have the right roles."){
+          return null;
+        }
+      
       })
       .finally(() => {
         setLoader(false);
@@ -243,8 +243,9 @@ const ServiceBooking = () => {
         setValue("service_id", "");
       })
       .catch((error) => {
-        const errorMessage = error.response.data.message;
-        console.log(errorMessage);
+        if (error.response.data.message === "The name has already been taken." ) {
+          toast.error("الخدمة موجودة بالفعل");
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -265,7 +266,6 @@ const ServiceBooking = () => {
         fetchData();
       })
       .catch(function (error) {
-        console.error("Error deleting branch:", error);
         setLoader(true);
       })
       .finally(() => {

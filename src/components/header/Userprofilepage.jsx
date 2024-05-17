@@ -47,11 +47,8 @@ function UserProfilePage() {
         setBranchID(response.data.Admin.branch_id);
       })
       .catch(function (error) {
-        if (error.response && error.response.status === 401) {
-          handleUnauthenticated();
-        } else {
           console.error("Error refreshing token:", error);
-        }
+     
       })
       .finally(() => {
         setLoader(false);
@@ -238,24 +235,7 @@ function UserProfilePage() {
                     </dl>
                   </div>
                 </div>
-              </div>
-              {/* <input type="file" name="file" id="file" className="sr-only" />
-              <label
-                htmlFor="file"
-                className="cursor-pointer relative flex min-h-[50px] items-center justify-center rounded-xl border border-dashed border-[#e0e0e0] p-5 text-center"
-              >
-                <div>
-                  <span className="mb-2 block text-sm font-semibold text-[#07074D]">
-                    تغيير الصورة الشخصية
-                  </span>
-                  <span className="mb-2 block text-base font-medium text-[#6B7280]">
-                    Or
-                  </span>
-                  <span className="inline-flex rounded border border-[#e0e0e0] py-2 px-2 text-base font-medium text-[#07074D]">
-                    Browse
-                  </span>
-                </div>
-              </label> */}
+              </div> 
             </div>
 
             {/* Rest of the form */}
