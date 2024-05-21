@@ -65,37 +65,37 @@ function Userpage() {
   } = useForm({ resolver: zodResolver(schema) });
 
  
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  useEffect(() => {
-    fetchEmployees();
-    fetchBranchesInSelection();
-    fetchPagenation();
-  }, []);
-
-  const fetchPagenation = () => {
-    setLoader(true);
-    axios
-      .get(`http://127.0.0.1:8000/api/employees?page=${currentPage}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setEmployees(response.data.data);
-        setTotalPages(response.data.meta.pagination.last_page);
-      })
-      .catch(function (error) {
-        console.error("Error fetching branches:", error);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-  
-  const handlePageClick = (selectedPage) => {
-    setCurrentPage(selectedPage.selected + 1);  
-  };
+//start pagenation
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+useEffect(() => {
+  fetchEmployees();
+  fetchBranchesInSelection();
+  fetchPagenation();
+}, []);
+const fetchPagenation = () => {
+  setLoader(true);
+  axios
+    .get(`http://127.0.0.1:8000/api/employees?page=${currentPage}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setEmployees(response.data.data);
+      setTotalPages(response.data.meta.pagination.last_page);
+    })
+    .catch(function (error) {
+      console.error("Error fetching branches:", error);
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+const handlePageClick = (selectedPage) => {
+  setCurrentPage(selectedPage.selected + 1);  
+};
+//end pagenation
 
   const fetchEmployees = () => {
     setLoader(true);
@@ -521,7 +521,6 @@ function Userpage() {
           })}
         </tbody>
       </table>
-      {loader && <div className="spinner"></div>}
       <div>
         {/* Render pagination */}
         <ReactPaginate

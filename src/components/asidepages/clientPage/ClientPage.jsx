@@ -8,7 +8,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import { toast } from "react-toastify";
 import { ScrollUp } from "../../ScrollUp";
 import { z } from "zod";
-import DeleteIcon from '@mui/icons-material/Delete';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 //pagenation
@@ -63,35 +62,37 @@ function ClientPage() {
     fetchCountries();
   }, []);
 
-  // fetch pagenation data///////////////////////
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  useEffect(() => {
-    fetchPagenation();
-  }, [currentPage]); // Fetch data whenever currentPage changes
-  const fetchPagenation = () => {
-    setLoader(true);
-    axios
-      .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setClients(response.data.data);
-        setTotalPages(response.data.meta.pagination.last_page);
-      })
-      .catch(function (error) {
-        console.error("Error fetching branches:", error);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-  const handlePageClick = (selectedPage) => {
-    setCurrentPage(selectedPage.selected + 1);
-  };
-  // fetch pagenation data///////////////////////
+// pagenation
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+useEffect(() => {
+  fetchPagenation();
+}, [currentPage]); // Fetch data whenever currentPage changes
+const fetchPagenation = () => {
+  setLoader(true);
+  axios
+    .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setClients(response.data.data);
+      setTotalPages(response.data.meta.pagination.last_page);
+    })
+    .catch(function (error) {
+      console.error("Error fetching branches:", error);
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+const handlePageClick = (selectedPage) => {
+  setCurrentPage(selectedPage.selected + 1);
+};
+// pagenation
+
+
   const fetchCountries = () => {
     setLoader(true);
     axios
@@ -121,6 +122,7 @@ function ClientPage() {
       })
       .then(function (response) {
         setClients(response.data.data);
+       
       })
       .catch(function (error) {
         console.error("Error:", error);
@@ -153,6 +155,7 @@ function ClientPage() {
         toast.success("تم تسجيل العميل بنجاح");
         fetchClients();
         reset();
+        setValue("countries_id", "");
       })
       .catch(function (error) {
         if (error.response.data.message === "The email has already been taken.") {
@@ -412,8 +415,7 @@ function ClientPage() {
                 </div>
                 <div className="w-[49%] flex-grow ">
                   <div className="flex items-center justify-center w-full">
-                    {/* <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="file_input">Upload file</label> */}
-                    <input
+                     <input
                       {...register("image")}
                       accept="image/*"
                       className="file-input file-input-bordered w-full"
