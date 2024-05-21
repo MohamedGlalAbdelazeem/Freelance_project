@@ -97,122 +97,124 @@ const handlePageClick = (selectedPage) => {
 };
 //end pagenation
 
-  const fetchEmployees = () => {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}employees`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        } else {
-          setLoader(false);
-          setEmployees(response.data.data);
-        }
-      })
-      .catch(function (error) {
-        console.error("Error fetching branches:", error);
+const fetchEmployees = () => {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}employees`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      if (response.status === 401) {
         handleUnauthenticated();
+      } else {
+        setLoader(false);
+        setEmployees(response.data.data);
+      }
+    })
+    .catch(function (error) {
+      console.error("Error fetching branches:", error);
+      handleUnauthenticated();
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+
+};
+
+const fetchBranchesInSelection = () => {
+    axios
+      .get(`${baseUrl}branches/select-name-id`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then((response) => {
+        setBranches(response.data.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching branches:", error);
       })
       .finally(() => {
         setLoader(false);
       });
-
-  };
-  const fetchBranchesInSelection = () => {
-      axios
-        .get(`${baseUrl}branches/select-name-id`, {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        })
-        .then((response) => {
-          setBranches(response.data.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching branches:", error);
-        })
-        .finally(() => {
-          setLoader(false);
-        });
 }
-  const storeEmployee = () => {
-    setLoader(true);
-    const employeeData = {
-      name: getValues("name"),
-      email: getValues("email"),
-      password: getValues("password"),
-      password_confirmation: getValues("password_confirmation"),
-      phone_number: getValues("phone_number"),
-      branch_id: getValues("branch_id").toString(),
-    };
-    axios
-      .post(`${baseUrl}employees`, employeeData, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      })
-      .then(function () {
-        toast.success("تم تسجيل الموظف بنجاح");
-        fetchEmployees();
-        reset();
-        setValue("branch_id","");
-      })
-      .catch(function (error) {
-        if (
-          error.response.data.message === "The email has already been taken."
-        ) {
-          toast.error("الموظف موجود بالفعل");
-        }
-        console.error("Error fetching", error.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
 
-  const deleteEmp = (id) => {
-    setLoader(true);
-    axios
-      .delete(`${baseUrl}employees/${id}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        } else if (response.status === 204) {
-          toast.success("تم حذف الموظف بنجاح");
-          fetchEmployees();
-        } else {
-          console.error("Unexpected response status:", response.status);
-          toast.warning("حدث خطأ غير متوقع");
-        }
-      })
-      .catch(function (error) {
-        console.error("Error deleting branch:", error);
-        setLoader(true);
-        if (
-          error.response &&
-          error.response.status === 401 &&
-          error.response.data.message === "Unauthenticated"
-        ) {
-          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-            type: "error",
-          });
-        } else {
-          console.log("Error deleting branch:", error);
-        }
-      })
-      .finally(() => {
-        setLoader(false);
-      });
+const storeEmployee = () => {
+  setLoader(true);
+  const employeeData = {
+    name: getValues("name"),
+    email: getValues("email"),
+    password: getValues("password"),
+    password_confirmation: getValues("password_confirmation"),
+    phone_number: getValues("phone_number"),
+    branch_id: getValues("branch_id").toString(),
   };
+  axios
+    .post(`${baseUrl}employees`, employeeData, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        "Content-Type": "multipart/form-data",
+      },
+    })
+    .then(function () {
+      toast.success("تم تسجيل الموظف بنجاح");
+      fetchEmployees();
+      reset();
+      setValue("branch_id","");
+    })
+    .catch(function (error) {
+      if (
+        error.response.data.message === "The email has already been taken."
+      ) {
+        toast.error("الموظف موجود بالفعل");
+      }
+      console.error("Error fetching", error.response.data.message);
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+
+const deleteEmp = (id) => {
+  setLoader(true);
+  axios
+    .delete(`${baseUrl}employees/${id}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      if (response.status === 401) {
+        handleUnauthenticated();
+      } else if (response.status === 204) {
+        toast.success("تم حذف الموظف بنجاح");
+        fetchEmployees();
+      } else {
+        console.error("Unexpected response status:", response.status);
+        toast.warning("حدث خطأ غير متوقع");
+      }
+    })
+    .catch(function (error) {
+      console.error("Error deleting branch:", error);
+      setLoader(true);
+      if (
+        error.response &&
+        error.response.status === 401 &&
+        error.response.data.message === "Unauthenticated"
+      ) {
+        toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+          type: "error",
+        });
+      } else {
+        console.log("Error deleting branch:", error);
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
 
   const handleEmpUpdate = () => {
     setLoader(true);

@@ -11,11 +11,15 @@ import LocalAirportIcon from "@mui/icons-material/LocalAirport";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import FlightTakeoffIcon from "@mui/icons-material/FlightTakeoff";
 import PaidIcon from "@mui/icons-material/Paid";
+import ConnectingAirportsIcon from '@mui/icons-material/ConnectingAirports';
 import GroupsIcon from "@mui/icons-material/Groups";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import SensorOccupiedIcon from '@mui/icons-material/SensorOccupied';
+import SummarizeIcon from '@mui/icons-material/Summarize';
 import BuildIcon from "@mui/icons-material/Build";
+import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 
 function Asidebar() {
   const Navigate = useNavigate();
@@ -39,6 +43,16 @@ function Asidebar() {
   if (userrolename === "admin") {
     asidebarItems = [
       {
+        text: "تقارير العملاء ",
+        path:"/Mainpage/Clientsreport",
+        icon: <SummarizeIcon sx={{ fontSize: 35 }} />,
+      },
+      {
+        text: "تقارير كشف حساب ",
+        path:"/Mainpage/Billsummarypage",
+        icon: <StickyNote2Icon sx={{ fontSize: 35 }} />,
+      },
+      {
         text: "إدارة العملاء",
         path: "/Mainpage/clientpage",
         icon: <GroupsIcon sx={{ fontSize: 35 }} />,
@@ -52,6 +66,11 @@ function Asidebar() {
         text: "إدارة المطارات",
         path: "/Mainpage/airports",
         icon: <FlightTakeoffIcon sx={{ fontSize: 35 }} />,
+      },
+      {
+        text: "إدارة خطوط الطيران",
+        path: "/Mainpage/Airlines",
+        icon: <ConnectingAirportsIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة العملات",
@@ -115,6 +134,11 @@ function Asidebar() {
         text: "الإعدادات",
         path: "/Mainpage/Settings",
         icon: <BuildIcon sx={{ fontSize: 35 }} />,
+      },
+      {
+        text: "إضافة سوبر أدمن جديد",
+        path: "/Mainpage/Addsupueradminpage",
+        icon: <SensorOccupiedIcon sx={{ fontSize: 35 }} />,
       },
     ];
   }

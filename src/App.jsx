@@ -20,17 +20,22 @@ import ProtectedRoute from "./ProtectedRoute";
 import TripBooking from "./components/asidepages/bookingPage/tripBooking";
 import ServiceBooking from "./components/asidepages/bookingPage/serviceBooking";
 import Settings from "./components/asidepages/settings/Settings";
+import Addsupueradminpage from "./components/asidepages/addsuperadmin/Addsupueradminpage";
 import Reportpage from "./components/home/Reportpage";
-
-// admin  josh.pfannerstill@example.net
-// super admin khairymahmoud795@gmail.com
+import Airlines from "./components/asidepages/airlines/Airlines";
+import Clientsreport from "./components/asidepages/clientsreport/Clientsreport";
+import Billsummarypage from "./components/billsummaryresports/Billsummarypage";
+import Rangeclientreports from "./components/asidepages/clientsreport/Rangeclientreports";
+import Dailyclientsreports from "./components/asidepages/clientsreport/Dailyclientsreports";
+import Billsummaryrespotsdaily from "./components/billsummaryresports/Billsummaryrespotsdaily";
+ 
 function App() {
+
   return (
     <>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/Login" element={<Login />} />
-
         <Route
           path="/Resetpassword"
           element={
@@ -50,16 +55,28 @@ function App() {
           <Route path="booking" element={<BookingPage />} />
           <Route path="booking/trip" element={<TripBooking />} />
           <Route path="booking/service" element={<ServiceBooking />} />
+          
+          <Route path="Clientsreport" element={<Clientsreport />} />
+          <Route path="Clientsreport/Dailyclientsreports" element={<Dailyclientsreports />} />
+          <Route path="Clientsreport/Rangeclientreports" element={<Rangeclientreports />} />
+
+
+
+          <Route path="Billsummarypage" element={<Billsummarypage />} />
+          <Route path="Billsummarypage/Billsummaryrespotsdaily" element={<Billsummaryrespotsdaily />} />
+ 
           <Route path="Userpage" element={<Userpage />} />
           <Route path="clientpage" element={<ClientPage />} />
           <Route path="Branchpage" element={<Branchpage />} />
           <Route path="Categoriespage" element={<Categoriespage />} />
           <Route path="airports" element={<AirportPage />} />
+          <Route path="Airlines" element={<Airlines />} />
           <Route path="currencies" element={<CurrencyPage />} />
           <Route path="payments" element={<PaymentPage />} />
           <Route path="Trippage" element={<Trippage />} />
           <Route path="Services" element={<Services />} />
           <Route path="Settings" element={<Settings />} />
+          <Route path="Addsupueradminpage" element={<Addsupueradminpage />} />
           <Route path="Userprofilepage" element={<Userprofilepage />} />
         </Route>
       </Routes>

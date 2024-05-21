@@ -12,281 +12,233 @@ import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { ScrollUp } from "../../ScrollUp";
 
-function AirportPage() {
-  const baseUrl = "http://127.0.0.1:8000/api/";
-  const [airports, setAirports] = useState([]);
-  const [airlines , setAirlines ] = useState([]);
-  const [loader, setLoader] = useState(true);
-  const Navigate = useNavigate();
-  const userToken = localStorage.getItem("user_token");
-  const [airportStatus, setAirportStatus] = useState(false);
-  const [updateMode, setUpdateMode] = useState(false);
-  const [updateAirportID, setUpdateAirportID] = useState("");
-  const [searchValue, setSearchValue] = useState("");
 
-  const schema = z.object({
-    airportName: z.string().min(1, { message: "ادخل اسم المطار" }),
-    airlineSelection: z.string().min(1, { message: "اختر خط الطيران" }),
-  });
+function Airlines() {
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    getValues,
-    formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema) });
+const baseUrl = "http://127.0.0.1:8000/api/";
+const [airlines, setAirlines] = useState([]);
+const [loader, setLoader] = useState(true);
+const Navigate = useNavigate();
+const userToken = localStorage.getItem("user_token");
+const [airlinestatus, setAirlinestatus] = useState(false);
+const [updateMode, setUpdateMode] = useState(false);
+const [updateAirportID, setUpdateAirportID] = useState("");
+const [searchValue, setSearchValue] = useState("");
+
+const schema = z.object({
+name: z.string().min(1, { message: "ادخل اسم خط الطيران" }),
+});
+
+const {
+register,
+handleSubmit,
+setValue,
+reset,
+getValues,
+formState: { errors, isSubmitting },
+} = useForm({ resolver: zodResolver(schema) });
+
+
+const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+        type: "error",
+        autoClose: 4000,
+    });
+    Navigate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+};
 
 useEffect(() => {
-  fetchAirports();
-  fetchPagination();
-  fetchAirlinesInSelection();
+  fetchAirlines();
 }, []);
 
 
-const fetchAirports = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}airports`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setAirports(response.data.data);
-    })
-    .catch(function (error) {
-      console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-      handleUnauthenticated();
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-
-const handleUnauthenticated = () => {
-  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-    type: "error",
-    autoClose: 4000,
-  });
-  Navigate("/Login");
-  localStorage.removeItem("user_token");
-  localStorage.removeItem("user_role_name");
-};
-
-// store
-const storeAirport = async () => {
-  setLoader(true);
-  await axios
-    .post(
-      `${baseUrl}airports`,
-      {
-        name: getValues("airportName"),
-      },
-      {
+// show Airlines
+const fetchAirlines = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}airlines`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      }
+      })
+      .then(function (response) {
+        setAirlines(response.data.data);
+      })
+      .catch(function (error) {   
+          console.log("Error deleting airport:", error);
+          handleUnauthenticated();
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+};
+
+// store airlines
+const storeAirport = async () => {
+setLoader(true);
+await axios
+    .post(
+    `${baseUrl}airlines`,
+    {
+        name: getValues("name"),
+    },
+    {
+        headers: {
+        Authorization: `Bearer ${userToken}`,
+        },
+    }
     )
     .then(() => {
-      toast.success("تم إنشاء المطار  بنجاح");
-      reset();
-      fetchAirports();
+    toast.success("تم إنشاء خط الطيران بنجاح  بنجاح");
+    reset();
+    fetchAirlines();
     })
     .catch((error) => {
-      if (error.response.data.message == "Already_exist") {
-        toast("هذا المطار موجود بالفعل ", { type: "error" });
-      }
-      if ( error.response.data.message === "The name has already been taken."  ) {
-        toast.error("المطار مسجل بالفعل");
-      }
+    if (error.response.data.message == "Already_exist") {
+        toast("هذا الخط موجود بالفعل ", { type: "error" });
+    }
+    if ( error.response.data.message === "The name has already been taken."  ) {
+        toast.error("خط الطيران مسجل بالفعل");
+    }
     })
     .finally(() => {
-      setLoader(false);
+    setLoader(false);
     });
 };
 
-// delete
-function deleteAirport(id) {
-  setLoader(true);
-  axios
-    .delete(`${baseUrl}airports/${id}`, {
-      headers: {
+// delete airlines
+function deleteAilines(id) {
+setLoader(true);
+axios
+    .delete(`${baseUrl}airlines/${id}`, {
+    headers: {
         Authorization: `Bearer ${userToken}`,
-      },
+    },
     })
     .then(function () {
-      toast.success("تم حذف المطار بنجاح");
-      fetchAirports();
+    toast.success("تم حذف خط  الطيران بنجاح");
+    fetchAirlines();
     })
     .catch(function (error) {
-      toast.warning("حدث خطأ غير متوقع");
-      console.error("Error deleting airport:", error);
-      if (
-        error.response &&
-        error.response.status === 401 &&
-        error.response.data.message === "Unauthenticated"
-      ) {
-        toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-          type: "error",
-        });
-      } else {
-        console.log("Error deleting airport:", error);
-      }
+    console.log("Error deleting airport:", error);
     })
     .finally(() => {
-      setLoader(false);
+    setLoader(false);
     });
 }
 
-// update
+// update airlines
 const updateAirport = () => {
-  setLoader(true);
-  axios
+setLoader(true);
+axios
     .post(
-      `${baseUrl}airports/${updateAirportID}`,
-      {
-        name: getValues("airportName"),
-        status: airportStatus ? "1" : "0",
-      },
-      {
+    `${baseUrl}airlines/${updateAirportID}`,
+    {
+        name: getValues("name"),
+        status: airlinestatus ? "1" : "0",
+    },
+    {
         headers: {
-          Authorization: `Bearer ${userToken}`,
+        Authorization: `Bearer ${userToken}`,
         },
-      }
+    }
     )
     .then(() => {
-      toast("تم تحديث المطار  بنجاح", { type: "success" });
-      fetchAirports();
+    toast("تم تحديث المطار  بنجاح", { type: "success" });
+    fetchAirlines();
     })
     .catch((response) => {
-      if (response.response.data.message == "The name has already been taken.") {
+    if (response.response.data.message == "The name has already been taken.") {
         toast("هذا المطار مسجل بالعفل ", { type: "error" });
-      }
+    }
     })
     .finally(() => {
-      setLoader(false);
-      setUpdateMode(false);
-      reset();
+    setLoader(false);
+    setUpdateMode(false);
+    reset();
     });
 };
 
 const handleSearch = (e) => {
-  e.preventDefault();
-  setLoader(true);
+e.preventDefault();
+setLoader(true);
 
-  if (!searchValue.trim()) {
-    fetchAirports();
+if (!searchValue.trim()) {
+    fetchAirlines();
     return;
-  }
-  let allAirports = [...airports];
-  let filteredAirports = [];
-  allAirports.forEach((cat) => {
+}
+let allairlines = [...airlines];
+let filteredairlines = [];
+allairlines.forEach((cat) => {
     if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
-      filteredAirports.push(cat);
+    filteredairlines.push(cat);
     }
-  });
-  setAirports(filteredAirports);
-  setLoader(false);
+});
+setAirlines(filteredairlines);
+setLoader(false);
 };
 
-// show airlines by selection
-const fetchAirlinesInSelection = () => {
-  axios
-    .get(`${baseUrl}airlines/selection/id-name`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then((response) => {
-      setAirlines(response.data.data);
-    })
-    .catch((error) => {
-      console.error("Error fetching branches:", error);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-}
-
-//  pagenation
+//  pagenation 
 const [currentPage, setCurrentPage] = useState(1);
 const [totalPages, setTotalPages] = useState(1);
+
 useEffect(() => {
-  fetchPagination();
-}, [currentPage]); // Fetch data whenever currentPage changes
+fetchPagination();
+}, [currentPage]); 
+
 const fetchPagination = () => {
-  setLoader(true);
-  axios
-    .get(`http://127.0.0.1:8000/api/airports?page=${currentPage}`, {
-      headers: {
+setLoader(true);
+axios
+    .get(`http://127.0.0.1:8000/api/airlines?page=${currentPage}`, {
+    headers: {
         Authorization: `Bearer ${userToken}`,
-      },
+    },
     })
     .then(function (response) {
-      setAirports(response.data.data);
-      setTotalPages(response.data.meta.pagination.last_page);
+    setAirlines(response.data.data);
+    setTotalPages(response.data.meta.pagination.last_page);
     })
     .catch(function (error) {
-      console.error("Error fetching branches:", error);
+    console.error("Error fetching branches:", error);
     });
 };
 const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);
+setCurrentPage(selectedPage.selected + 1);
 };
 
-  return (
-    <main className="branchTable">
-      {/* add airport form */}
+return (
+    <main>
+      {/* add airlines form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
           <form>
             <div className="mb-5">
               <input
                 type="text"
-                {...register("airportName")}
-                placeholder="اسم المطار"
+                {...register("name")}
+                placeholder="اسم خط الطيران"
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
               {errors && (
                 <span className="text-red-500 text-sm">
-                  {errors.airportName?.message}
+                  {errors.name?.message}
                 </span>
               )}
             </div>
-            <div className="flex-grow">
-                <select
-                  {...register("airlineSelection")}
-                  className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                >
-                  <option value="" disabled selected>
-                   اختر خط الطيران
-                  </option>
-                  {airlines.map((airline) => {
-                    const { id, name } = airline;
-                    return <option key={id} value={id} label={name} />;
-                  })}
-                </select>
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.airlineSelection?.message}
-                  </span>
-                )}
-              </div>
             <div className="mb-5 pt-3">
               <div className="-mx-3 flex flex-wrap">
                 {updateMode && (
                   <div className="w-full px-3 sm:w-1/2">
                     <label className="text-white">
-                      تفعيل المطار أو إلغاء تفعيل المطار ؟
+                      تفعيل خط الطيران أو إلغاء تفعيل خط الطيران ؟
                     </label>
                     <div className="mb-5">
                       <Switch
-                        checked={airportStatus}
+                        checked={airlinestatus}
                         onChange={(e) => {
-                          setAirportStatus(e.target.checked);
+                          setAirlinestatus(e.target.checked);
                         }}
                         color="success"
                       />
@@ -303,15 +255,15 @@ const handlePageClick = (selectedPage) => {
                   disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تحديث المطار
+                  تحديث خط الطيران
                 </button>
               ) : (
                 <button
                   disabled={isSubmitting}
                   onClick={handleSubmit(storeAirport)}
-                  className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
+                  className="text-center text-xl mb-3 p-3 w-55 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تسجيل مطار جديد
+                  تسجيل خط طيران جديد
                 </button>
               )}
             </div>
@@ -319,7 +271,6 @@ const handlePageClick = (selectedPage) => {
         </div>
       </div>
       <div className="divider"></div>
-
       {/* Search input form */}
       <div className="my-3">
         <form className="w-full">
@@ -334,7 +285,7 @@ const handlePageClick = (selectedPage) => {
               onChange={(e) => setSearchValue(e.target.value)}
               onKeyUp={(e) => handleSearch(e)}
               className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="البحث باسم المطار"
+              placeholder="البحث باسم خط الطيران"
               required
             />
             <button
@@ -366,14 +317,14 @@ const handlePageClick = (selectedPage) => {
               التاريخ/الوقت{" "}
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              التعديل
+              تعديل البيانات
             </th>
           </tr>
         </thead>
         <tbody>
-          {/* Mapping airports data to table rows */}
-          {airports.map((airport, index) => {
-            const { name, id, status, created_at } = airport;
+          {/* Mapping airlines data to table rows */}
+          {airlines.map((airlines, index) => {
+            const { name, id, status, created_at } = airlines;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
               <tr
@@ -411,15 +362,15 @@ const handlePageClick = (selectedPage) => {
                       ScrollUp();
                       setUpdateAirportID(id);
                       setUpdateMode(true);
-                      setValue("airportName", name);
-                      setAirportStatus(status === "مفعل" ? true : false);
+                      setValue("name", name);
+                      setAirlinestatus(status === "مفعل" ? true : false);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >
                     <DriveFileRenameOutlineIcon />
                   </button>
                   <button
-                    onClick={() => deleteAirport(id)}
+                    onClick={() => deleteAilines(id)}
                     className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
                   >
                     <DeleteForeverIcon />
@@ -481,4 +432,4 @@ const handlePageClick = (selectedPage) => {
   );
 }
 
-export default AirportPage;
+export default Airlines;

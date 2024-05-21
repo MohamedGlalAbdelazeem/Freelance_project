@@ -14,327 +14,327 @@ import ReactPaginate from "react-paginate";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 
 const ServiceBooking = () => {
-  const baseUrl = "http://127.0.0.1:8000/api/";
 
-  const [loader, setLoader] = useState(true);
-  const Naviagate = useNavigate();
-  const userToken = localStorage.getItem("user_token");
-  const userRoleName = localStorage.getItem("user_role_name");
-  const [services, setServices] = useState([]);
-  const [updateMode, setUpdateMode] = useState(false);
-  const [updateSrvID, setUpdateSrvID] = useState("");
-  const [searchValue, setSearchValue] = useState("");
-  const [showSrvName, setShowSrvName] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [singleSrv, setSingleSrv] = useState({});
-  const [bookingService, setBookingService] = useState([]);
-  const [clients, setClients] = useState([]);
-  const [payments, setPayments] = useState([]);
-  const [showCurrencies, setShowCurrencies] = useState([]);
 
-  const schema = z.object({
-    client_id: z.string().min(1, { message: "اختر اسم العميل" }),
-    cost: z.string().min(1, { message: "يجب تعيين تكلفة الخدمة" }),
-    currency_id: z.string().min(1, { message: "اختر العملة" }),
-    payment_id: z.string().min(1, { message: "اختر طريقة الدفع" }),
-    service_id: z.string().min(1, { message: "ادخل نوع الخدمة" }),
+const baseUrl = "http://127.0.0.1:8000/api/";
+const [loader, setLoader] = useState(true);
+const Naviagate = useNavigate();
+const userToken = localStorage.getItem("user_token");
+const userRoleName = localStorage.getItem("user_role_name");
+const [updateMode, setUpdateMode] = useState(false);
+const [updateSrvID, setUpdateSrvID] = useState("");
+const [searchValue, setSearchValue] = useState("");
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+const [services, setServices] = useState([]);
+const [singleSrv, setSingleSrv] = useState({});
+const [showSrvName, setShowSrvName] = useState([]);
+const [bookingService, setBookingService] = useState([]);
+const [clients, setClients] = useState([]);
+const [payments, setPayments] = useState([]);
+const [showCurrencies, setShowCurrencies] = useState([]);
+
+const schema = z.object({
+  client_id: z.string().min(1, { message: "اختر اسم العميل" }),
+  cost: z.string().min(1, { message: "يجب تعيين تكلفة الخدمة" }),
+  currency_id: z.string().min(1, { message: "اختر العملة" }),
+  payment_id: z.string().min(1, { message: "اختر طريقة الدفع" }),
+  service_id: z.string().min(1, { message: "ادخل نوع الخدمة" }),
+});
+
+const {
+  register,
+  handleSubmit,
+  setValue,
+  reset,
+  getValues,
+  formState: { errors, isSubmitting },
+} = useForm({ resolver: zodResolver(schema) });
+
+const handleUnauthenticated = () => {
+  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+    type: "error",
+    autoClose: 4000,
   });
+  Naviagate("/Login");
+  localStorage.removeItem("user_token");
+  localStorage.removeItem("user_role_name");
+};
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    getValues,
-    formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema) });
+useEffect(() => {
+  fetchData();
+  fetchPayments();
+  serviceName();
+  fetchCurrencies();
+  fetchClients();
+}, []);
 
-  useEffect(() => {
-    fetchPayments();
-    serviceName();
-    fetchCurrencies();
-    fetchClients();
-    fetchData();
-  }, []);
-
-  const fetchSingleBookingService = (id) => {
-    let single = services.filter((bt) => bt.id === id);
-    setBookingService(...single);
-  };
+const fetchSingleBookingService = (id) => {
+  let single = services.filter((bt) => bt.id === id);
+  setBookingService(...single);
+};
 
   //pagenation
-  useEffect(() => {
-    fetchPagination();
-  }, [currentPage]);
-  const fetchPagination = () => {
-    setLoader(true);
-    axios
-      .get(`http://127.0.0.1:8000/api/bookings?page=${currentPage}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setServices(response.data.data);
-        setTotalPages(response.data.meta.pagination.last_page);
-      })
-      .catch(function (error) {
-        if (error.response.data.message === "User does not have the right roles." ) {
-          return null;
-        }
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-  const handlePageClick = (selectedPage) => {
-    setCurrentPage(selectedPage.selected + 1);
-  };
-
-  // fetch service_id
-  function serviceName() {
-    setLoader(true);
-    axios.get(`${baseUrl}services/selection/id-name`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setShowSrvName(response.data.data);
-      })
-      .catch(function (error) {
-        if (error.response.data.message === "User does not have the right roles." ) {
-          return null;
-        }
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  }
-
-  // fetch payments method
-  const fetchPayments = () => {
-    setLoader(true);
-    axios.get(`${baseUrl}payments`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setPayments(response.data.data);
-      })
-      .catch(function (error) {
-        if(error.response.data.message === "User does not have the right roles."){
-          return null;
-        }
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-
-  // fetch currencies
-  function fetchCurrencies() {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}currencies/selection/id-name`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setShowCurrencies(response.data.data);
-      })
-      .catch(function (error) {
-        if (  error.response.data.message === "User does not have the right roles." ) {
-          return null;
-        }
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  }
-  // fetch clients
-  const fetchClients = () => {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}clients/selection/id-name`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setClients(response.data.data);
-      })
-      .catch(function (error) {
-        if(error.response.data.message === "User does not have the right roles."){
-          return null;
-        }
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-
-  // fetch booking trip
-  const fetchData = () => {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}bookings`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setServices(response.data.data);
-      })
-      .catch(function (error) {
-        if(error.response.data.message === "Unauthorized"){
-           handleUnauthenticated();
-        }
-        if(error.response.data.message === "User does not have the right roles."){
-          return null;
-        }
-      
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-
-  const handleUnauthenticated = () => {
-    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-      type: "error",
-      autoClose: 4000,
-    });
-    Naviagate("/Login");
-    localStorage.removeItem("user_token");
-    localStorage.removeItem("user_role_name");
-  };
-
-  // store Booktrip
-  const storeSrv = async () => {
-    setLoader(true);
-    await axios
-      .post(
-        `${baseUrl}bookings/service`,
-        {
-          client_id: getValues("client_id"),
-          cost: getValues("cost"),
-          currency_id: getValues("currency_id"),
-          payment_id: getValues("payment_id"),
-          service_id: getValues("service_id"),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
-      .then(() => {
-        toast("تم حجز الخدمة بنجاح", { type: "success" });
-        fetchData();
-        reset();
-        setValue("client_id", "");
-        setValue("cost", "");
-        setValue("currency_id", "");
-        setValue("payment_id", "");
-        setValue("service_id", "");
-      })
-      .catch((error) => {
-        if (error.response.data.message === "The name has already been taken." ) {
-          toast.error("الخدمة موجودة بالفعل");
-        }
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-
-  // delete trip
-  function deleteSrv(id) {
-    setLoader(true);
-    axios
-      .delete(`${baseUrl}bookings/${id}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function () {
-        toast.success("تم حذف الخدمة بنجاح");
-        fetchData();
-      })
-      .catch(function (error) {
-        setLoader(true);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  }
-
-  const updateTrips = async () => {
-    setLoader(true);
-    await axios
-      .post(
-        `${baseUrl}bookings/service/${updateSrvID}`,
-        {
-          client_id: getValues("client_id"),
-          cost: getValues("cost"),
-          currency_id: getValues("currency_id"),
-          payment_id: getValues("payment_id"),
-          service_id: getValues("service_id"),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
-      .then(() => {
-        toast("تم تحديث الخدمة  بنجاح", { type: "success" });
-        fetchData();
-      })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
-          toast("هذة الخدمة موجودة بالعفل ", { type: "error" });
-        }
-        console.log("Error updating branch:", response.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
-        setUpdateMode(false);
-        reset();
-        setValue("type", "");
-        setValue("tripTo", "");
-        setValue("service_id", "");
-        setValue("client_id", "");
-        setValue("currency_id", "");
-        setValue("payment_id", "");
-      });
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-    if (!searchValue.trim()) {
-      fetchData();
-      return;
-    }
-    let allServices = [...services];
-    let filteredServices = [];
-    allServices.forEach((booking) => {
-      if (
-        booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        filteredServices.push(booking);
+useEffect(() => {
+  fetchPagination();
+}, [currentPage]);
+const fetchPagination = () => {
+  setLoader(true);
+  axios
+    .get(`http://127.0.0.1:8000/api/bookings?page=${currentPage}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setServices(response.data.data);
+      setTotalPages(response.data.meta.pagination.last_page);
+    })
+    .catch(function (error) {
+      if (error.response.data.message === "User does not have the right roles." ) {
+        return null;
       }
+    })
+    .finally(() => {
+      setLoader(false);
     });
-    setServices(filteredServices);
-    setLoader(false);
-  };
+};
+const handlePageClick = (selectedPage) => {
+  setCurrentPage(selectedPage.selected + 1);
+};
 
-  return (
+// fetch service_id
+function serviceName() {
+  setLoader(true);
+  axios.get(`${baseUrl}services/selection/id-name`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setShowSrvName(response.data.data);
+    })
+    .catch(function (error) {
+      if (error.response.data.message === "User does not have the right roles." ) {
+        return null;
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+}
+
+// fetch payments method
+const fetchPayments = () => {
+  setLoader(true);
+  axios.get(`${baseUrl}payments`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setPayments(response.data.data);
+    })
+    .catch(function (error) {
+      if(error.response.data.message === "User does not have the right roles."){
+        return null;
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+
+// fetch currencies
+function fetchCurrencies() {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}currencies/selection/id-name`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setShowCurrencies(response.data.data);
+    })
+    .catch(function (error) {
+      if (  error.response.data.message === "User does not have the right roles." ) {
+        return null;
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+}
+// fetch clients
+const fetchClients = () => {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}clients/selection/id-name`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setClients(response.data.data);
+    })
+    .catch(function (error) {
+      if(error.response.data.message === "User does not have the right roles."){
+        return null;
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+
+// show bookservice data
+const fetchData = () => {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}bookings`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setServices(response.data.data);
+    })
+    .catch(function (error) {
+      if (error.response && error.response.status === 401) {
+        handleUnauthenticated();
+      }
+      if(error.response.data.message === "User does not have the right roles."){
+        return null;
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+// store bookservice
+const storeSrv = async () => {
+  setLoader(true);
+  await axios
+    .post(
+      `${baseUrl}bookings/service`,
+      {
+        client_id: getValues("client_id"),
+        cost: getValues("cost"),
+        currency_id: getValues("currency_id"),
+        payment_id: getValues("payment_id"),
+        service_id: getValues("service_id"),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    )
+    .then(() => {
+      toast("تم حجز الخدمة بنجاح", { type: "success" });
+      fetchData();
+      reset();
+      setValue("client_id", "");
+      setValue("cost", "");
+      setValue("currency_id", "");
+      setValue("payment_id", "");
+      setValue("service_id", "");
+    })
+    .catch((error) => {
+      if (error.response.data.message === "The name has already been taken." ) {
+        toast.error("الخدمة موجودة بالفعل");
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+// delete bookservice
+function deleteSrv(id) {
+  setLoader(true);
+  axios
+    .delete(`${baseUrl}bookings/${id}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function () {
+      toast.success("تم حذف الخدمة بنجاح");
+      fetchData();
+    })
+    .catch(function (error) {
+      setLoader(true);
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+}
+// update bookservice
+const updateTrips = async () => {
+  setLoader(true);
+  await axios
+    .post(
+      `${baseUrl}bookings/service/${updateSrvID}`,
+      {
+        client_id: getValues("client_id"),
+        cost: getValues("cost"),
+        currency_id: getValues("currency_id"),
+        payment_id: getValues("payment_id"),
+        service_id: getValues("service_id"),
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    )
+    .then(() => {
+      toast("تم تحديث الخدمة  بنجاح", { type: "success" });
+      fetchData();
+    })
+    .catch((response) => {
+      if (response.response.data.message == "Already_exist") {
+        toast("هذة الخدمة موجودة بالعفل ", { type: "error" });
+      }
+      console.log("Error updating branch:", response.response.data.message);
+    })
+    .finally(() => {
+      setLoader(false);
+      setUpdateMode(false);
+      reset();
+      setValue("type", "");
+      setValue("tripTo", "");
+      setValue("service_id", "");
+      setValue("client_id", "");
+      setValue("currency_id", "");
+      setValue("payment_id", "");
+    });
+};
+
+//search
+const handleSearch = (e) => {
+  e.preventDefault();
+  setLoader(true);
+  if (!searchValue.trim()) {
+    fetchData();
+    return;
+  }
+  let allServices = [...services];
+  let filteredServices = [];
+  allServices.forEach((booking) => {
+    if (
+      booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
+    ) {
+      filteredServices.push(booking);
+    }
+  });
+  setServices(filteredServices);
+  setLoader(false);
+};
+
+
+return (
     <div className="flex flex-col">
       <div className="w-full mb-5">
         <Link
@@ -349,8 +349,8 @@ const ServiceBooking = () => {
           صفحة حجز الخدمات
         </div>
       </div>
-
-      <main className="branchTable">
+       {/* start dialog */}
+    <main className="branchTable">
         <dialog id="my_modal_2" className="modal">
           <div className="modal-box max-w-4xl relative">
             <div className="modal-action absolute -top-4 left-2">
@@ -437,6 +437,18 @@ const ServiceBooking = () => {
                         بيانات الخدمة
                       </dt>
                     </div>
+                    <div className="">
+                        <div className="w-full">
+                        <img
+                          // src={`http://127.0.0.1:8000${singleClient?.imagePath}/${singleClient?.image}`}
+                          src="https://images.pexels.com/photos/35537/child-children-girl-happy.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                          alt="avatar"
+                          className="w-[160px] h-[110px] rounded-sm border-4 border-zinc-500 mx-auto mt-2 mb-4"/>
+                         <dt className="text-sm font-medium text-gray-500 mb-2">
+                              صورة الخدمة  
+                        </dt>
+                      </div>
+                    </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
                         اسم الخدمة :
@@ -470,7 +482,7 @@ const ServiceBooking = () => {
             <button>close</button>
           </form>
         </dialog>
-
+   {/* end dialog */}
         {userRoleName === "admin" ? (
           <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
             <div className="mx-auto w-full ">
@@ -558,7 +570,8 @@ const ServiceBooking = () => {
                     )}
                   </div>
                 </div>
-                <div className="gap-2">
+                <div className="flex gap-5">
+                <div className="w-[49%] flex-grow ">
                   <select
                     id="countries"
                     {...register("service_id")}
@@ -580,6 +593,18 @@ const ServiceBooking = () => {
                       {errors.service_id?.message}
                     </span>
                   )}
+                </div>
+                <div className="w-[49%] flex-grow ">
+                  <div className="flex items-center justify-center w-full">
+                     <input
+                      {...register("image")}
+                      accept="image/*"
+                      className="file-input file-input-bordered w-full"
+                      id="file_input"
+                      type="file"
+                    />
+                  </div>
+                </div>
                 </div>
                 <div>
                   {updateMode ? (

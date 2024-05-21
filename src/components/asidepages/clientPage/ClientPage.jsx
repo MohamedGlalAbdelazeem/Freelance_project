@@ -38,29 +38,29 @@ function ClientPage() {
     localStorage.removeItem("user_role_name");
   };
 
-  const schema = z.object({
-    name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
-    email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
-    phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
-    address: z.string().min(1, { message: "يجب ادخال العنوان" }),
-    countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
-    image: z.any(),
-    notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
-  });
+const schema = z.object({
+  name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
+  email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
+  phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
+  address: z.string().min(1, { message: "يجب ادخال العنوان" }),
+  countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
+  image: z.any(),
+  notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
+});
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    getValues,
-    formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema) });
+const {
+  register,
+  handleSubmit,
+  setValue,
+  reset,
+  getValues,
+  formState: { errors, isSubmitting },
+} = useForm({ resolver: zodResolver(schema) });
 
-  useEffect(() => {
-    fetchClients();
-    fetchCountries();
-  }, []);
+useEffect(() => {
+  fetchClients();
+  fetchCountries();
+}, []);
 
 // pagenation
 const [currentPage, setCurrentPage] = useState(1);
