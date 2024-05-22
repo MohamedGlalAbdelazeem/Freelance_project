@@ -454,7 +454,7 @@ const handleSearch = (e) => {
                           // src={`http://127.0.0.1:8000${singleClient?.imagePath}/${singleClient?.image}`}
                           src="https://images.pexels.com/photos/35537/child-children-girl-happy.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500"
                           alt="avatar"
-                          className="w-[180px] h-[160px]  border-4 border-zinc-500 mx-auto mt-5 mb-4"/>
+                          className="w-[160px] h-[160px]  border-4 border-zinc-500 mx-auto mt-5 mb-4"/>
                          <dt className="text-sm font-medium text-gray-500">
                               صورة الخدمة  
                         </dt>
