@@ -51,7 +51,6 @@ const onSubmit = () => {
     )
     .then((res) => {
       setData(res.data.data.info);
-      reset();
     })
     .catch((error) => {
       if (error.response.data.message === "The to must be a date after from.") {
@@ -228,13 +227,11 @@ const handleUnauthenticated = () => {
       }
     </table>
         {data.length === 0 && (
-          <p className="w-full p-3 text-lg bg-gray-200 rounded-lg text-center">
-            لايوجد بيانات للعرض
+           <p className="mx-auto w-full p-3 text-lg text-center my-7 bg-gray-600  text-white rounded-lg  ">
+           لايوجد بيانات للعرض وذلك لأنه لم يتم حجز أي رحلة أو خدمة خلال اليوم
           </p>
         )}
       </>
-
-
       {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
