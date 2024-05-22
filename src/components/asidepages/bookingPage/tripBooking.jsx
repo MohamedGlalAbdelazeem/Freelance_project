@@ -258,8 +258,7 @@ const storeTrips = async () => {
 // delete trip
 function deleteTrips(id) {
   setLoader(true);
-  axios
-    .delete(`${baseUrl}bookings/${id}`, {
+  axios.delete(`${baseUrl}bookings/${id}`, {
       headers: {
         Authorization: `Bearer ${userToken}`,
       },
@@ -572,7 +571,7 @@ const handleSearch = (e) => {
                 <div className=" flex flex-wrap gap-3">
                 <div className="w-[49%] flex-grow ">
                   <input
-                    type="number"
+                    type="text"
                     {...register("ticket_number")}
                     placeholder="رقم التذكرة"
                     dir="rtl"
@@ -871,20 +870,12 @@ const handleSearch = (e) => {
                             setUpdateTripsID(id);
                             setUpdateMode(true);
                             setValue("client_id", client?.id.toString());
-                            setValue(
-                              "cost",
-                              bookingTrip?.trip?.cost.toString()
-                            );
+                            setValue( "cost", bookingTrip?.trip?.cost.toString());
                             setValue("currency_id", currency?.id.toString());
                             setValue("payment_id", payment?.id.toString());
-                            setValue(
-                              "number_of_tickets",
-                              bookingTrip?.number_of_ticket.toString()
-                            );
-                            setValue(
-                              "trip_id",
-                              bookingTrip?.trip?.id.toString()
-                            );
+                            setValue("number_of_tickets", bookingTrip?.number_of_ticket.toString());
+                            setValue("ticket_number", bookingTrip?.ticket_number.toString());
+                            setValue("trip_id", bookingTrip?.trip?.id.toString() );
                             setValue(
                               "type",
                               (bookingTrip?.type === "ذهاب" ? 1 : 2).toString()

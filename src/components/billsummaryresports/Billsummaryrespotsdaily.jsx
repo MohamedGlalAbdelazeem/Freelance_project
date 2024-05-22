@@ -1,11 +1,10 @@
-import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
-import { useEffect, useState } from "react";
+import BallotIcon from '@mui/icons-material/Ballot';
+ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import PeopleOutlineIcon from '@mui/icons-material/PeopleOutline';
-import { zodResolver } from "@hookform/resolvers/zod";
+ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link , useNavigate } from "react-router-dom";
 function Billsummaryrespotsdaily() {
 const baseUrl = "http://127.0.0.1:8000/api/";
@@ -55,7 +54,6 @@ const dailyReport = () => {
       setDataBillSummar(response.data.data.billSummary);
       setDataAllInfoTrip(response.data.data.allInfoTrip);
       setLoader(false);
-      console.log(response.data.data.allInfoTrip);
     })
     .catch(function (error) {
       if (error.response.data.message === "Unauthenticated.") {
@@ -63,7 +61,6 @@ const dailyReport = () => {
       }
     })
     .finally(() => {
-      
       setLoader(false);
     });
 };
@@ -73,12 +70,11 @@ return (
   <div className="w-full mb-5">
     <Link
       className="bg-gray-500 text-white float-left p-2 rounded-lg hover:bg-gray-700 hover:shadow-lg transition duration-200"
-      to="/Mainpage/Clientsreport/Rangeclientreports"
-    >
+      to="/Mainpage/Billsummarypage/Rangebillsummresport">
        انتقل إلي تقارير كشف الحساب خلال مدة زمنية
     </Link>
     <div className="text-3xl font-bold text-gray-900 -mb-5 underline underline-offset-8 decoration-blue-500">
-      <PeopleOutlineIcon sx={{ fontSize: 50 }} />
+      <BallotIcon sx={{ fontSize: 50 }} />
       التقارير اليومية لكشف الحساب
     </div>
     
@@ -90,9 +86,9 @@ return (
       <thead>
           <tr>
             {["الترتيب",
-             "نوع العملة",
+             "اسم العملة",
              "طريقة الدفع",
-             "التكلفة", 
+             " التكلفة الكلية", 
                 ].map(
               (header, index) => (
                 <th key={index}
@@ -137,20 +133,19 @@ return (
     </table>
     
     {/* trip info */}
-
     <table className="border-collapse w-full mt-20 text-sm">
       <thead>
           <tr>
             {["الترتيب",
-             "اسم العملة",
-             "طريقة الدفع",
-             "التكلفة", 
-             "الجنسية",
-             "الفرع", 
-             "نوع العملة",
-             "طريقة الدفع",
+             " اسم  العميل",
+             " هاتف  العميل",
+             "الفرع الموجود به العميل",
+             "اسم الخدمة",
+             "تكلفة الخدمة", 
+             "حالة الخدمة",
              "نوع الحجز",
-              "التكلفة",
+             "وقت إنشاء الخدمة",
+             "نوع حجز الرحلة",
                 ].map(
               (header, index) => (
                 <th key={index}
@@ -161,8 +156,7 @@ return (
             )}
           </tr>
       </thead>
-      {
-        dataAllInfoTrip.map((data , index)=>{
+      { dataAllInfoTrip.map((data , index)=>{
           return (
             <tbody key={index}>
             <tr  className="bg-white text-center   lg:hover:bg-gray-200 flex lg:table-row flex-row lg:flex-row flex-wrap lg:flex-no-wrap mb-10 lg:mb-0">
@@ -171,49 +165,49 @@ return (
                  {index + 1}
                 </span>
               </td>
-              <td className="w-full lg:w-auto p-2 text-white bg-red-400  border border-b text-center block lg:table-cell relative lg:static">
+              <td className="w-full lg:w-auto p-2  border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded  text-sm font-bold">
-                  {data?.currency?.name}
+                 {data?.client?.name}
                 </span>
               </td>
-              <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
+              <td className="w-full lg:w-auto p-2 text-white bg-red-400  border border-b text-center block lg:table-cell relative lg:static">
+                <span className="rounded  text-sm font-bold">
+                 {data?.client?.phone_number}
+                </span>
+              </td>
+              <td className="w-full lg:w-auto p-2  border border-b text-center block lg:table-cell relative lg:static">
+                <span className="rounded  text-sm font-bold">
+                 {data?.client?.branch?.branch_name}
+                </span>
+              </td>
+              <td className="w-full lg:w-auto p-2 text-white bg-red-400  border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1 text-sm font-bold">
-                {data?.payment?.name}
+                {data?.bookingTrip === null ? data?.bookingService?.service?.name : data?.bookingTrip?.trip?.name}
                 </span>
               </td>
               <td className="w-full lg:w-auto p-2    border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1 px-3 text-sm font-bold">
-                {data?.total_cost}
-                </span>
-              </td>
-              <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
-                <span className="rounded py-1  text-sm font-bold">
-              
+                {data?.bookingTrip === null ? data?.bookingService?.service?.cost : data?.bookingTrip?.trip?.cost}
                 </span>
               </td>
               <td className="w-full lg:w-auto p-2 text-white bg-red-400  border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1  text-sm font-bold">
-             
+                {data?.bookingTrip === null ? data?.bookingService?.service?.status : data?.bookingTrip?.trip?.status}
                 </span>
               </td>
-              <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
+              <td className="w-full lg:w-auto p-2   border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1  text-sm font-bold">
-               
+                {data?.bookingTrip === null ? "حجز خدمة" :  "حجز خدمة"  || data?.bookingService === null ? "حجز رحلة" :  "حجز رحلة" }
                 </span>
               </td>
-              <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
-                <span className="rounded py-1 text-sm font-bold">
-              
-                </span>
-              </td>
-              <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
+              <td className="w-full lg:w-auto p-2 border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1  text-sm font-bold">
-                {/* {client?.bookingTrip === null ? "حجز خدمة" :  "حجز خدمة"  || client?.bookingService === null ? "حجز رحلة" :  "حجز رحلة" } */}
+                {data?.bookingTrip === null ? data?.bookingService?.service?.created_at : data?.bookingTrip?.trip?.created_at}
                 </span>
               </td>
-              <td className="w-full lg:w-auto p-2 text-white bg-red-400  border border-b text-center block lg:table-cell relative lg:static">
-                <span className="rounded py-1 px-3 text-sm font-bold">
-            
+              <td className="w-full lg:w-auto p-2 border border-b  text-white bg-red-400 text-center block lg:table-cell relative lg:static">
+                <span className="rounded py-1  text-sm font-bold">
+                {data?.bookingTrip === null ? "---" : data?.bookingTrip?.type}
                 </span>
               </td>
             </tr>
@@ -221,13 +215,13 @@ return (
           )
         })
       }
-    
     </table>
-
-
-
+    {dataAllInfoTrip.length === 0 && (
+                  <p className="mx-auto w-full p-3 text-lg text-center my-7 bg-gray-600  text-white rounded-lg  ">
+                    لايوجد بيانات للعرض وذلك لأنه لم يتم حجز أي رحلة أو خدمة خلال اليوم
+                   </p>
+           )}
   </>
-
   {loader && (
     <>
       <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>

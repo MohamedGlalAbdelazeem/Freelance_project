@@ -54,8 +54,6 @@ const dailyReport = () => {
     .then(function (response) {
       setData(response.data.data.info);
       setLoader(false);
- 
-      console.log(response.data.data.info);
     })
     .catch(function (error) {
       if (error.response.data.message === "Unauthenticated.") {
@@ -93,8 +91,8 @@ return (
              "العنوان", 
              "الجنسية",
              "الفرع", 
-             "نوع العملة",
-             "طريقة الدفع",
+             "وقت تسجيل العميل",
+             "الإيميل ",
              "نوع الحجز",
               "التكلفة",
                 ].map(
@@ -144,12 +142,12 @@ return (
               </td>
               <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1  text-sm font-bold">
-                {client?.currency?.name}
+                {client?.client?.created_at}
                 </span>
               </td>
               <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1 text-sm font-bold">
-                {client?.payment?.name}
+                {client?.client?.email}
                 </span>
               </td>
               <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
@@ -163,7 +161,7 @@ return (
                 </span>
               </td>
             </tr>
-      </tbody>
+             </tbody>
           )
         })
       }

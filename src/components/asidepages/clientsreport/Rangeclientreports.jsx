@@ -50,17 +50,20 @@ const onSubmit = () => {
       }
     )
     .then((res) => {
-      setData(response.data.data.info);
+      setData(res.data.data.info);
       reset();
     })
     .catch((error) => {
-      console.log(error);
+      if (error.response.data.message === "The to must be a date after from.") {
+        toast("من فضلك قيمة التاريخ المدخلة خطأ")
+      }
     })
     .finally(() => {
       setLoader(false);
     });
 };
 
+// show daily reports for clients
 const dailyReport = () => {
   setLoader(true);
   axios
@@ -72,7 +75,6 @@ const dailyReport = () => {
     .then(function (response) {
       setData(response.data.data.info);
       setLoader(false);
-      console.log(response.data.data.info);
     })
     .catch(function (error) {
       if (error.response.data.message === "Unauthenticated.") {
@@ -151,8 +153,8 @@ const handleUnauthenticated = () => {
              "العنوان", 
              "الجنسية",
              "الفرع", 
-             "نوع العملة",
-             "طريقة الدفع",
+             "وقت تسجيل العميل",
+             "الإيميل ",
              "نوع الحجز",
               "التكلفة",
                 ].map(
@@ -184,7 +186,7 @@ const handleUnauthenticated = () => {
                 {client?.client?.phone_number}
                 </span>
               </td>
-              <td className="w-full lg:w-auto p-2 border border-b text-center block lg:table-cell relative lg:static">
+              <td className="w-full lg:w-auto p-2    border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1 px-3 text-sm font-bold">
                 {client?.client?.address}
                 </span>
@@ -201,12 +203,12 @@ const handleUnauthenticated = () => {
               </td>
               <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1  text-sm font-bold">
-                {client?.currency?.name}
+                {client?.client?.created_at}
                 </span>
               </td>
-              <td className="w-full lg:w-auto p-2   border border-b text-center block lg:table-cell relative lg:static">
+              <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                 <span className="rounded py-1 text-sm font-bold">
-                {client?.payment?.name}
+                {client?.client?.email}
                 </span>
               </td>
               <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
@@ -220,7 +222,7 @@ const handleUnauthenticated = () => {
                 </span>
               </td>
             </tr>
-      </tbody>
+             </tbody>
           )
         })
       }

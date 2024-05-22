@@ -6,6 +6,7 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import { toast } from "react-toastify";
+import BadgeOutlinedIcon from '@mui/icons-material/BadgeOutlined';
 import CategoryIcon from "@mui/icons-material/Category";
 import LocalAirportIcon from "@mui/icons-material/LocalAirport";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
@@ -17,7 +18,7 @@ import CreditCardIcon from "@mui/icons-material/CreditCard";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import SensorOccupiedIcon from '@mui/icons-material/SensorOccupied';
-import SummarizeIcon from '@mui/icons-material/Summarize';
+import LibraryBooksOutlinedIcon from '@mui/icons-material/LibraryBooksOutlined';
 import BuildIcon from "@mui/icons-material/Build";
 import StickyNote2Icon from '@mui/icons-material/StickyNote2';
 
@@ -45,12 +46,12 @@ function Asidebar() {
       {
         text: "تقارير العملاء ",
         path:"/Mainpage/Clientsreport",
-        icon: <SummarizeIcon sx={{ fontSize: 35 }} />,
+        icon: <BadgeOutlinedIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "تقارير كشف حساب ",
         path:"/Mainpage/Billsummarypage",
-        icon: <StickyNote2Icon sx={{ fontSize: 35 }} />,
+        icon: <LibraryBooksOutlinedIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة العملاء",
@@ -101,6 +102,21 @@ function Asidebar() {
   } else if (userrolename === "super_admin") {
     asidebarItems = [
       {
+        text: "تقارير العملاء ",
+        path:"/Mainpage/Clientsreport",
+        icon: <BadgeOutlinedIcon sx={{ fontSize: 35 }} />,
+      },
+      {
+        text: "تقارير كشف حساب ",
+        path:"/Mainpage/Billsummarypage",
+        icon: <LibraryBooksOutlinedIcon sx={{ fontSize: 35 }} />,
+      },  
+      {
+        text: "إضافة سوبر أدمن جديد",
+        path: "/Mainpage/Addsupueradminpage",
+        icon: <SensorOccupiedIcon sx={{ fontSize: 35 }} />,
+      },
+      {
         text: "إدارة الفروع",
         path: "/Mainpage/Branchpage",
         icon: <AddHomeWorkOutlinedIcon sx={{ fontSize: 35 }} />,
@@ -130,15 +146,11 @@ function Asidebar() {
         path: "/Mainpage/Services",
         icon: <SettingsSuggestIcon sx={{ fontSize: 35 }} />,
       },
+      
       {
         text: "الإعدادات",
         path: "/Mainpage/Settings",
         icon: <BuildIcon sx={{ fontSize: 35 }} />,
-      },
-      {
-        text: "إضافة سوبر أدمن جديد",
-        path: "/Mainpage/Addsupueradminpage",
-        icon: <SensorOccupiedIcon sx={{ fontSize: 35 }} />,
       },
     ];
   }

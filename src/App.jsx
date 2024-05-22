@@ -28,7 +28,7 @@ import Billsummarypage from "./components/billsummaryresports/Billsummarypage";
 import Rangeclientreports from "./components/asidepages/clientsreport/Rangeclientreports";
 import Dailyclientsreports from "./components/asidepages/clientsreport/Dailyclientsreports";
 import Billsummaryrespotsdaily from "./components/billsummaryresports/Billsummaryrespotsdaily";
- 
+import Rangebillsummresport from "./components/billsummaryresports/Rangebillsummresport";
 function App() {
 
   return (
@@ -64,7 +64,9 @@ function App() {
 
           <Route path="Billsummarypage" element={<Billsummarypage />} />
           <Route path="Billsummarypage/Billsummaryrespotsdaily" element={<Billsummaryrespotsdaily />} />
- 
+          <Route path="Billsummarypage/Rangebillsummresport" element={<Rangebillsummresport />} />
+
+
           <Route path="Userpage" element={<Userpage />} />
           <Route path="clientpage" element={<ClientPage />} />
           <Route path="Branchpage" element={<Branchpage />} />

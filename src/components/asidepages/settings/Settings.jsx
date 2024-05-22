@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 function Settings() {
   const userToken = localStorage.getItem("user_token");
   const [value, setValue] = useState("");
-
+  const [updateDate, setUpdateDate] = useState("");
   useEffect(() => {
     fetchNumber();
   }, []);
@@ -49,8 +49,8 @@ function Settings() {
       )
       .then((res) => {
         if (res.data.message === "Update Successfully")
-          toast.success("تم التحديث بنجاح");
-        console.log(res.data);
+          toast("تم تعديل عدد الأيام  بنجاح");
+         setUpdateDate(res.data.data.updated_at);
       })
       .catch((err) => {
         console.log(err);
@@ -88,6 +88,10 @@ function Settings() {
             </div>
           </form>
         </div>
+        <div className="rounded-lg text-center mt-3 mx-auto p-5 text-white bg-slate-600 w-fit">
+           اخر تاريخ تم تحديث فيه عدد الأيام : {updateDate}
+        </div>
+       
       </div>
     </>
   );

@@ -9,84 +9,95 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function Reportpage() {
-  const [loader, setLoader] = useState(true);
-  const Naviagate = useNavigate();
-  const [data, setData] = useState([]);
+
   const baseUrl = "http://127.0.0.1:8000/api/";
-  const userToken = localStorage.getItem("user_token");
-  const userRoleName = localStorage.getItem("user_role_name");
-  const schema = z.object({
-    from: z.string().min(1, { message: "أدخل تاريخ البداية" }),
-    to: z.string().min(1, { message: "أدخل تاريخ النهاية" }),
+const [loader, setLoader] = useState(true);
+const Naviagate = useNavigate();
+const [data, setData] = useState([]);
+const userToken = localStorage.getItem("user_token");
+const userRoleName = localStorage.getItem("user_role_name");
+
+
+const schema = z.object({
+from: z.string().min(1, { message: "أدخل تاريخ البداية" }),
+to: z.string().min(1, { message: "أدخل تاريخ النهاية" }),
+});
+const {
+  register,
+  handleSubmit,
+  getValues,
+  reset,
+  formState: { errors, isSubmitting },
+} = useForm({ resolver: zodResolver(schema) });
+
+const handleUnauthenticated = () => {
+  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+    type: "error",
+    autoClose: 4000,
   });
-  const {
-    register,
-    handleSubmit,
-    getValues,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema) });
+  Naviagate("/Login");
+  localStorage.removeItem("user_token");
+  localStorage.removeItem("user_role_name");
+};
 
-  useEffect(() => {
-    dailyReport();
-  }, []);
-
-  const onSubmit = () => {
-    setLoader(true);
-    axios
-      .post(
-        `${baseUrl}report/between-days`,
-        {
-          from: getValues("from"),
-          to: getValues("to"),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
-      .then((res) => {
-        setData(res.data.data);
-        reset();
-      })
-      .catch((error) => {
-        console.log(error);
-        handleUnauthenticated();
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-  const dailyReport = () => {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}report/daily`, {
+useEffect(() => {
+  dailyReport();
+}, []);
+  
+const onSubmit = () => {
+  setLoader(true);
+  axios
+    .post(
+      `${baseUrl}report/between-days`,
+      {
+        from: getValues("from"),
+        to: getValues("to"),
+      },
+      {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      })
-      .then(function (response) {
-        setLoader(false);
-        setData(response.data.data);
-      })
-      .catch(function (error) {
-        console.error("Error fetching branches:", error);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-  const handleUnauthenticated = () => {
-    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-      type: "error",
-      autoClose: 4000,
+      }
+    )
+    .then((res) => {
+      setData(res.data.data);
+      reset();
+    })
+    .catch((error) => {
+      if (error.response.data.message === "The to must be a date after from.") {
+        toast("من فضلك قيمة التاريخ المدخلة خطأ")
+      }
+    })
+    .finally(() => {
+      setLoader(false);
     });
-    Naviagate("/Login");
-    localStorage.removeItem("user_token");
-    localStorage.removeItem("user_role_name");
-  };
-  return (
+};
+  
+const dailyReport = () => {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}report/daily`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setLoader(false);
+      setData(response.data.data);
+    })
+    .catch(function (error) {
+      if (error.response?.data?.message === "Unauthenticated.") {
+        handleUnauthenticated();
+      } else {
+        console.error(error,"errrrrro");
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+ 
+return (
     <div className="bg-gray-300 p-9 rounded-xl">
       <h1 className="text-center text-3xl font-bold text-gray-900 -mb-5 underline underline-offset-8 decoration-blue-500">
         <InventoryIcon sx={{ fontSize: 50 }}/>

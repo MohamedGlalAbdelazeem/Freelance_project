@@ -443,11 +443,12 @@ return (
                           // src={`http://127.0.0.1:8000${singleClient?.imagePath}/${singleClient?.image}`}
                           src="https://images.pexels.com/photos/35537/child-children-girl-happy.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500"
                           alt="avatar"
-                          className="w-[160px] h-[110px] rounded-sm border-4 border-zinc-500 mx-auto mt-2 mb-4"/>
-                         <dt className="text-sm font-medium text-gray-500 mb-2">
+                          className="w-[150px] h-[150px]  border-4 border-zinc-500 mx-auto mt-5 mb-4"/>
+                         <dt className="text-sm font-medium text-gray-500">
                               صورة الخدمة  
                         </dt>
                       </div>
+            
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
