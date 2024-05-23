@@ -165,7 +165,6 @@ return (
           )
         })
       }
-  
     </table>
     {data.length === 0 && (
            <p className="mx-auto w-full p-3 text-lg text-center my-7 bg-gray-600  text-white rounded-lg  ">
