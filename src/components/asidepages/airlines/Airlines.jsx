@@ -67,8 +67,9 @@ const fetchAirlines = () => {
         setAirlines(response.data.data);
       })
       .catch(function (error) {   
-          console.log("Error deleting airport:", error);
-          handleUnauthenticated();
+        if (error.response.data.message === "Unauthenticated.") {
+            handleUnauthenticated();
+        }
       })
       .finally(() => {
         setLoader(false);

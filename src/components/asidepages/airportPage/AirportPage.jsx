@@ -257,7 +257,7 @@ const handlePageClick = (selectedPage) => {
               )}
             </div>
             <div className="flex-grow">
-                <select
+                {/* <select
                   {...register("airlineSelection")}
                   className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 >
@@ -268,7 +268,23 @@ const handlePageClick = (selectedPage) => {
                     const { id, name } = airline;
                     return <option key={id} value={id} label={name} />;
                   })}
-                </select>
+                </select> */}
+
+                    {airlines.map((airline) => {
+                    const { id, name } = airline;
+                    return (
+                      <div class="w-fit space-y-2 p-10">
+                      <h2 class="text- font-medium text-gray-700">Select your titles</h2>
+                      <div class="relative flex w-56 items-center rounded bg-gray-50 py-3 px-4 pl-14 font-medium text-gray-700">
+                        <input class="peer hidden" type="checkbox" name="title4" id="title4" checked />
+                        <label class="absolute left-0 top-0 h-full w-full cursor-pointer rounded border peer-checked:border-blue-600 peer-checked:bg-blue-100" for="title4"> </label>
+                        <div class="absolute left-4 h-5 w-5 rounded border-2 border-gray-300 bg-gray-200 ring-blue-600 ring-offset-2 peer-checked:border-transparent peer-checked:bg-blue-600 peer-checked:ring-2"></div>
+                        <span class="pointer-events-none z-10">{name}</span>
+                      </div>
+                    </div>
+                    );
+                  })}
+                 
                 {errors && (
                   <span className="text-red-500 text-sm">
                     {errors.airlineSelection?.message}
