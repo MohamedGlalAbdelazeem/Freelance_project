@@ -81,7 +81,9 @@ function Services() {
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
-        if(error.response.data.message === "User does not have the right roles."){
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
           return null;
         }
       })
@@ -106,7 +108,9 @@ function Services() {
         setShowCategories(response.data.data);
       })
       .catch(function (error) {
-        if(error.response.data.message === "User does not have the right roles."){
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
           return null;
         }
       });
@@ -124,7 +128,9 @@ function Services() {
         setShowCurrency(response.data.data);
       })
       .catch(function (error) {
-        if(error.response.data.message === "User does not have the right roles."){
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
           return null;
         }
       });
@@ -141,10 +147,12 @@ function Services() {
         setServices(response.data.data);
       })
       .catch(function (error) {
-        if(error.response.data.message === "Unauthorized"){
+        if (error.response.data.message === "Unauthorized") {
           handleUnauthenticated();
-       }
-        if(error.response.data.message === "User does not have the right roles."){
+        }
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
           return null;
         }
       })
@@ -179,13 +187,18 @@ function Services() {
         setValue("currency_id", "");
       })
       .catch(function (error) {
-        if (error.response.data.message === "The name has already been taken." ) {
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
           toast.error("الخدمة موجودة بالفعل");
         }
-        if(error.response.data.message === "User does not have the right roles."){
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
           return null;
         }
-      }) .finally(() => {
+      })
+      .finally(() => {
         setLoader(false);
       });
   };
@@ -234,6 +247,9 @@ function Services() {
         toast.success("تم تحديث البيانات بنجاح");
         fetchServices();
         setUpdateMode(false);
+        reset();
+        setValue("category_id", "");
+        setValue("currency_id", "");
       })
       .catch(function (error) {
         toast.error(error.response.data.message);
@@ -438,7 +454,7 @@ function Services() {
                       rows={1}
                       type="text"
                       {...register("description")}
-                      placeholder="وصف الخدمة "
+                      placeholder="ملاحظات"
                       className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                     {errors && (
