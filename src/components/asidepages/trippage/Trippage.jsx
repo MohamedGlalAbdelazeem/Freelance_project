@@ -31,6 +31,8 @@ function Trippage() {
   const [singleTrip, setSingleTrip] = useState({});
   const [showAirports, setShowAirports] = useState([]);
   const [showCurrencies, setShowCurrencies] = useState([]);
+  const [showAirLines, setShowAirLines] = useState([]);
+  const [airportId, setAirportId] = useState("");
 
   const schema = z.object({
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
@@ -59,11 +61,16 @@ function Trippage() {
     fetchCategories();
     fetchAirports();
     fetchCurrencies();
+    // fetchAirLines();
   }, []);
 
   useEffect(() => {
     fetchPagenation();
   }, [currentPage]);
+
+  useEffect(() => {
+    fetchAirLines();
+  }, [airportId]);
 
   function fetchCountries() {
     setLoader(true);
@@ -145,6 +152,29 @@ function Trippage() {
     setLoader(true);
     axios
       .get(`${baseUrl}airports/selection/id-name`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setShowAirports(response.data.data);
+      })
+      .catch(function (error) {
+        if (
+          error.response.data.message === "User does not have the right roles."
+        ) {
+          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
+          console.error("هذا المستخدم ليس له صلاحية التعديل");
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }
+  function fetchAirLines() {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}airlines/show-air-line/${airportId}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -532,10 +562,11 @@ function Trippage() {
                   )}
                 </div>
               </div>
-              <div className="flex gap-4	">
+              <div className="flex gap-2	">
                 <div className="flex-grow w-full">
                   <select
                     {...register("airport_id")}
+                    onChange={(e) => setAirportId(e.target.value)}
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="" disabled selected>
@@ -554,6 +585,28 @@ function Trippage() {
                       {errors.airport_id?.message}
                     </span>
                   )}
+                </div>
+                <div className="flex-grow w-full">
+                  <select
+                    {...register("air_line_id")}
+                    className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                  >
+                    <option value="" disabled selected>
+                      اختر خط الطيران
+                    </option>
+                    {/* {showAirLines.map((line, index) => {
+                      return (
+                        <option key={index} value={line.id}>
+                          {line.name}
+                        </option>
+                      );
+                    })} */}
+                  </select>
+                  {/* {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.air_line_id?.message}
+                    </span>
+                  )} */}
                 </div>
                 <div className="flex-grow w-full">
                   <select
