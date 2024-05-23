@@ -28,131 +28,115 @@ function AirportPage() {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
 
-  const schema = z.object({
-    airportName: z.string().min(1, { message: "ادخل اسم المطار" }),
+const schema = z.object({
+  airportName: z.string().min(1, { message: "ادخل اسم المطار" }),
+});
+const {
+  register,
+  handleSubmit,
+  setValue,
+  reset,
+  getValues,
+  formState: { errors, isSubmitting },
+} = useForm({ resolver: zodResolver(schema) });
+useEffect(() => {
+  fetchAirports();
+  fetchPagination();
+  fetchAirlinesInSelection();
+}, []);
+
+const handleUnauthenticated = () => {
+  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+    type: "error",
+    autoClose: 4000,
   });
+  Navigate("/Login");
+  localStorage.removeItem("user_token");
+  localStorage.removeItem("user_role_name");
+};
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    getValues,
-    formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema) });
-
-  useEffect(() => {
-    fetchAirports();
-    fetchPagination();
-    fetchAirlinesInSelection();
-  }, []);
-
-  const fetchAirports = () => {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}airports`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setAirports(response.data.data);
-      })
-      .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+const fetchAirports = () => {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}airports`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setAirports(response.data.data);
+    })
+    .catch(function (error) {
+      if (error.response.data.message === "Unauthenticated.") {
         handleUnauthenticated();
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-
-  const handleUnauthenticated = () => {
-    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-      type: "error",
-      autoClose: 4000,
-    });
-    Navigate("/Login");
-    localStorage.removeItem("user_token");
-    localStorage.removeItem("user_role_name");
-  };
-
-  // store
-  const storeAirport = async () => {
-    setLoader(true);
-    if (selectedOptions.length === 0) {
-      toast.error("يجب اختيار خطوط الطيران", { type: "error" });
+      }
+    })
+    .finally(() => {
       setLoader(false);
-      return;
-    }
-    await axios
-      .post(
-        `${baseUrl}airports`,
-        {
-          name: getValues("airportName"),
-          airLines: selectedIds,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
-      .then(() => {
-        toast.success("تم إنشاء المطار  بنجاح");
-        reset();
-        setSelectedOptions([]);
-        fetchAirports();
-      })
-      .catch((error) => {
-        if (error.response.data.message == "Already_exist") {
-          toast("هذا المطار موجود بالفعل ", { type: "error" });
-        }
-        if (
-          error.response.data.message === "The name has already been taken."
-        ) {
-          toast.error("المطار مسجل بالفعل");
-        }
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
+    });
+};
 
-  // delete
-  function deleteAirport(id) {
-    setLoader(true);
-    axios
-      .delete(`${baseUrl}airports/${id}`, {
+const storeAirport = async () => {
+  setLoader(true);
+  if (selectedOptions.length === 0) {
+    toast.error("يجب اختيار خطوط الطيران", { type: "error" });
+    setLoader(false);
+    return;
+  }
+  await axios
+    .post(
+      `${baseUrl}airports`,
+      {
+        name: getValues("airportName"),
+        airLines: selectedIds,
+      },
+      {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      })
-      .then(function () {
-        toast.success("تم حذف المطار بنجاح");
-        fetchAirports();
-      })
-      .catch(function (error) {
-        toast.warning("حدث خطأ غير متوقع");
-        console.error("Error deleting airport:", error);
-        if (
-          error.response &&
-          error.response.status === 401 &&
-          error.response.data.message === "Unauthenticated"
-        ) {
-          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-            type: "error",
-          });
-        } else {
-          console.log("Error deleting airport:", error);
-        }
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  }
+      }
+    )
+    .then(() => {
+      toast.success("تم إنشاء المطار  بنجاح");
+      reset();
+      setSelectedOptions([]);
+      fetchAirports();
+    })
+    .catch((error) => {
+      if (error.response.data.message == "Already_exist") {
+        toast("هذا المطار موجود بالفعل ", { type: "error" });
+      }
+      if (
+        error.response.data.message === "The name has already been taken."
+      ) {
+        toast.error("المطار مسجل بالفعل");
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
 
-  // update
+function deleteAirport(id) {
+  setLoader(true);
+  axios
+    .delete(`${baseUrl}airports/${id}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function () {
+      toast.success("تم حذف المطار بنجاح");
+      fetchAirports();
+    })
+    .catch(function (error) {
+      return null
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+}
+
   const updateAirport = () => {
     setLoader(true);
     if (selectedOptions.length === 0) {
@@ -212,7 +196,7 @@ function AirportPage() {
     setLoader(false);
   };
 
-  // show airlines by selection
+ 
   const fetchAirlinesInSelection = () => {
     axios
       .get(`${baseUrl}airlines/selection/id-name`, {
@@ -241,12 +225,12 @@ function AirportPage() {
   const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
     fetchPagination();
-  }, [currentPage]); // Fetch data whenever currentPage changes
+  }, [currentPage]); 
 
   const fetchPagination = () => {
     setLoader(true);
     axios
-      .get(`http://127.0.0.1:8000/api/airports?page=${currentPage}`, {
+      .get(`${baseUrl}airports?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -308,7 +292,7 @@ function AirportPage() {
                 isMulti
                 options={options}
                 value={selectedOptions}
-                noOptionsMessage={"لا توجد خطوط طيران"}
+                noOptionsMessage={()=>"لا توجد خطوط طيران"  }
                 backspaceRemovesValue
                 hideSelectedOptions
                 className="flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"

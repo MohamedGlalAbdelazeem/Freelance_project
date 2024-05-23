@@ -36,11 +36,21 @@ function CurrencyPage() {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
+    });
+    Navigate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
+
   useEffect(() => {
     fetchCurrency();
   }, []);
 
-  // fetch data from api
+  
   const fetchCurrency = () => {
     setLoader(true);
     axios
@@ -53,23 +63,16 @@ function CurrencyPage() {
         setCurrency(response.data.data);
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-         handleUnauthenticated();
+        if (error.response.data.message === "Unauthenticated.") {
+          handleUnauthenticated();
+        }
       })
       .finally(() => {
         setLoader(false);
       });
   };
 
-  const handleUnauthenticated = () => {
-    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-      type: "error",
-      autoClose: 4000,
-    });
-    Navigate("/Login");
-    localStorage.removeItem("user_token");
-    localStorage.removeItem("user_role_name");
-  };
+ 
 
   const storeCurrency = async () => {
     setLoader(true);
@@ -118,19 +121,7 @@ function CurrencyPage() {
         fetchCurrency();
       })
       .catch(function (error) {
-        toast.warning("حدث خطأ غير متوقع");
-        console.error("Error deleting Currency:", error);
-        if (
-          error.response &&
-          error.response.status === 401 &&
-          error.response.data.message === "Unauthenticated"
-        ) {
-          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-            type: "error",
-          });
-        } else {
-          console.log("Error deleting Currency:", error);
-        }
+       return null
       })
       .finally(() => {
         setLoader(false);
@@ -187,18 +178,17 @@ function CurrencyPage() {
     setLoader(false);
   };
 
-  // fetch pagenation data///////////////////////
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   useEffect(() => {
     fetchPagination();
-  }, [currentPage]); // Fetch data whenever currentPage changes
+  }, [currentPage]);  
 
   const fetchPagination = () => {
     setLoader(true);
     axios
-      .get(`http://127.0.0.1:8000/api/currencies?page=${currentPage}`, {
+      .get(`${baseUrl}currencies?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },

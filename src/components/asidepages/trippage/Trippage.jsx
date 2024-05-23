@@ -61,16 +61,15 @@ function Trippage() {
     fetchCategories();
     fetchAirports();
     fetchCurrencies();
-    // fetchAirLines();
   }, []);
 
   useEffect(() => {
     fetchPagenation();
   }, [currentPage]);
 
-  // useEffect(() => {
-  //   fetchAirLines();
-  // }, [airportId]);
+  useEffect(() => {
+    fetchAirLines();
+  }, [airportId]);
 
   function fetchCountries() {
     setLoader(true);
@@ -87,9 +86,8 @@ function Trippage() {
         if (
           error.response.data.message === "User does not have the right roles."
         ) {
-          toast.error("هذا المستخدم ليس له صلاحية التعديل");
+          console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
         }
-        console.error("حدث خطأ الرجاء محاولة مرة أخري", error);
       })
       .finally(() => {
         setLoader(false);
@@ -104,7 +102,7 @@ function Trippage() {
   const fetchPagenation = () => {
     setLoader(true);
     axios
-      .get(`http://127.0.0.1:8000/api/trips?page=${currentPage}`, {
+      .get(`${baseUrl}trips?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -120,7 +118,6 @@ function Trippage() {
         setLoader(false);
       });
   };
-
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage.selected + 1);
   };
@@ -140,7 +137,6 @@ function Trippage() {
         if (
           error.response.data.message === "User does not have the right roles."
         ) {
-          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
           console.error("هذا المستخدم ليس له صلاحية التعديل");
         }
       })
@@ -148,6 +144,7 @@ function Trippage() {
         setLoader(false);
       });
   }
+
   function fetchAirports() {
     setLoader(true);
     axios
@@ -163,7 +160,6 @@ function Trippage() {
         if (
           error.response.data.message === "User does not have the right roles."
         ) {
-          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
           console.error("هذا المستخدم ليس له صلاحية التعديل");
         }
       })
@@ -171,10 +167,10 @@ function Trippage() {
         setLoader(false);
       });
   }
+
   function fetchAirLines() {
     setLoader(true);
-    axios
-      .get(`${baseUrl}airlines/show-air-line/${airportId}`, {
+    axios.get(`${baseUrl}airlines/show-air-line/${airportId}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -186,7 +182,6 @@ function Trippage() {
         if (
           error.response.data.message === "User does not have the right roles."
         ) {
-          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
           console.error("هذا المستخدم ليس له صلاحية التعديل");
         }
       })
@@ -209,7 +204,6 @@ function Trippage() {
         if (
           error.response.data.message === "User does not have the right roles."
         ) {
-          // toast.error("هذا المستخدم ليس له صلاحية التعديل");
           console.error("هذا المستخدم ليس له صلاحية التعديل");
         }
       })
@@ -218,7 +212,7 @@ function Trippage() {
       });
   }
 
-  // fetch data from api
+  
   const fetchData = () => {
     setLoader(true);
     axios
@@ -232,8 +226,9 @@ function Trippage() {
         setTrips(response.data.data);
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخ:", error);
-        handleUnauthenticated();
+        if (error.response.data.message === "Unauthenticated.") {
+          handleUnauthenticated();
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -250,7 +245,7 @@ function Trippage() {
     localStorage.removeItem("user_role_name");
   };
 
-  // store trip
+
   const storeTrips = async () => {
     setLoader(true);
     await axios
@@ -299,14 +294,13 @@ function Trippage() {
           toast.error("الرحلة موجود بالفعل");
         }
         console.log(error);
-        // toast.warning(response.response.data.message);
+        
       })
       .finally(() => {
         setLoader(false);
       });
   };
 
-  // delete trip
   function deleteTrips(id) {
     setLoader(true);
     axios
@@ -552,7 +546,7 @@ function Trippage() {
                   <textarea
                     rows="1"
                     {...register("tripDescription")}
-                    placeholder="وصف بسيط عن الرحلة"
+                    placeholder=" ملاحظات  "
                     className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   />
                   {errors && (
@@ -565,7 +559,11 @@ function Trippage() {
               <div className="flex gap-2	">
                 <div className="flex-grow w-full">
                   <select
-                    {...register("airport_id")}
+                    {...register('airport_id', {
+                      onChange: ( ) => {setAirportId(id)},
+  
+                    })}
+                   
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="" disabled selected>

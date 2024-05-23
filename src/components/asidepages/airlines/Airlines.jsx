@@ -123,7 +123,7 @@ axios
     fetchAirlines();
     })
     .catch(function (error) {
-    console.log("Error deleting airport:", error);
+      return null;
     })
     .finally(() => {
     setLoader(false);

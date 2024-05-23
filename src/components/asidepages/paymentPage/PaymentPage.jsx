@@ -36,11 +36,21 @@ function PaymentPage() {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
+    });
+    Navigate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
+
   useEffect(() => {
     fetchPayments();
   }, []);
 
-  // fetch data from api
+   
   const fetchPayments = () => {
     setLoader(true);
     axios
@@ -53,23 +63,16 @@ function PaymentPage() {
         setPayments(response.data.data);
       })
       .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-        handleUnauthenticated();
+        if (error.response.data.message === "Unauthenticated.") {
+          handleUnauthenticated();
+        }
       })
       .finally(() => {
         setLoader(false);
       });
   };
 
-  const handleUnauthenticated = () => {
-    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-      type: "error",
-      autoClose: 4000,
-    });
-    Navigate("/Login");
-    localStorage.removeItem("user_token");
-    localStorage.removeItem("user_role_name");
-  };
+
 
   const storePayment = async () => {
     setLoader(true);
@@ -119,19 +122,7 @@ function PaymentPage() {
         fetchPayments();
       })
       .catch(function (error) {
-        toast.warning("حدث خطأ غير متوقع");
-        console.error("Error deleting airport:", error);
-        if (
-          error.response &&
-          error.response.status === 401 &&
-          error.response.data.message === "Unauthenticated"
-        ) {
-          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-            type: "error",
-          });
-        } else {
-          console.log("Error deleting airport:", error);
-        }
+      return null
       })
       .finally(() => {
         setLoader(false);
@@ -161,7 +152,7 @@ function PaymentPage() {
         if (response.response.data.message == "Already_exist") {
           toast("هذا طريقة الدفع مسجل بالعفل ", { type: "error" });
         }
-        console.log("Error updating airport:", response.response.data.message);
+        
       })
       .finally(() => {
         setLoader(false);
@@ -189,14 +180,11 @@ function PaymentPage() {
     setLoader(false);
   };
 
-  // fetch pagenation data///////////////////////
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   useEffect(() => {
     fetchPagination();
-  }, [currentPage]); // Fetch data whenever currentPage changes
-
+  }, [currentPage]); 
   const fetchPagination = () => {
     setLoader(true);
     axios
@@ -318,7 +306,8 @@ function PaymentPage() {
               الترتيب
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              ال            </th>
+              الاسم           
+               </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               الحالة
             </th>

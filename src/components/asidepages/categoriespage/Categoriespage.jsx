@@ -24,194 +24,169 @@ function Categoriespage() {
   const [updateCategoryID, setUpdateCategoryID] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
-  const schema = z.object({
-    categoryName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
+const schema = z.object({
+  categoryName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
+});
+
+const {
+  register,
+  handleSubmit,
+  setValue,
+  reset,
+  getValues,
+  formState: { errors, isSubmitting },
+} = useForm({ resolver: zodResolver(schema) });
+
+const handleUnauthenticated = () => {
+  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+    type: "error",
+    autoClose: 4000,
   });
+  Naviagate("/Login");
+  localStorage.removeItem("user_token");
+  localStorage.removeItem("user_role_name");
+};
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    getValues,
-    formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema) });
+useEffect(() => {
+  fetchCategories();
+  fetchPagenation();
+}, []);
 
-  useEffect(() => {
-    fetchCategories();
-    fetchPagenation();
-  }, []);
-
-  // fetch data from api
-  const fetchCategories = () => {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}categories`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        } else {
-          setLoader(false);
-          setCategories(response.data.data);
-        }
-      })
-      .catch(function (error) {
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+const fetchCategories = () => {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}categories`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+         setLoader(false);
+         setCategories(response.data.data);
+    })
+    .catch(function (error) {
+      if (error.response.data.message === "Unauthenticated.") {
         handleUnauthenticated();
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-
-  const handleUnauthenticated = () => {
-    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-      type: "error",
-      autoClose: 4000,
+      }
+    })
+    .finally(() => {
+      setLoader(false);
     });
-    Naviagate("/Login");
-    localStorage.removeItem("user_token");
-    localStorage.removeItem("user_role_name");
-  };
+};
 
-  const storeCategory = async () => {
-    setLoader(true);
-    await axios
-      .post(
-        `${baseUrl}categories`,
-        {
-          name: getValues("categoryName"),
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
-      .then(() => {
-        toast.success("تم إنشاء الرحلة  بنجاح");
-        reset();
-        fetchCategories();
-      })
-      .catch((error) => {
-        if (error.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
-        }
-        if (
-          error.response.data.message ===
-          "The name has already been taken."
-        ) {
-          toast.error("تصنيف الرحلة موجود بالفعل");
-        }
-        console.log(error);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-
-  function deleteCategory(id) {
-    setLoader(true);
-    axios
-      .delete(`${baseUrl}categories/${id}`, {
+const storeCategory = async () => {
+  setLoader(true);
+  await axios
+    .post(
+      `${baseUrl}categories`,
+      {
+        name: getValues("categoryName"),
+      },
+      {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      })
-      .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        } else if (response.status === 204) {
-          toast.success("تم حذف الرحلة بنجاح");
-          fetchCategories();
-        } else {
-          console.error("Unexpected response status:", response.status);
-          toast.warning("حدث خطأ غير متوقع");
-        }
-      })
-      .catch(function (error) {
-        console.error("Error deleting category:", error);
-        setLoader(true);
-        if (
-          error.response &&
-          error.response.status === 401 &&
-          error.response.data.message === "Unauthenticated"
-        ) {
-          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-            type: "error",
-          });
-        } else {
-          console.log("Error deleting category:", error);
-        }
-      });
-    setLoader(false);
-  }
-
-  const updateCategory = () => {
-    setLoader(true);
-    axios
-      .post(
-        `${baseUrl}categories/${updateCategoryID}`,
-        {
-          name: getValues("categoryName"),
-          status: categoryStatus ? "1" : "0",
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
-      .then(() => {
-        toast("تم تحديث الرحلة  بنجاح", { type: "success" });
-        fetchCategories();
-      })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
-        }
-        console.log("Error updating category:", response.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
-        setUpdateMode(false);
-        reset();
-      });
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-
-    if (!searchValue.trim()) {
-      fetchCategories();
-      return;
-    }
-    let allCategories = [...categories];
-    let filteredCategories = [];
-    allCategories.forEach((cat) => {
-      if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredCategories.push(cat);
       }
+    )
+    .then(() => {
+      toast.success("تم إنشاء الرحلة  بنجاح");
+      reset();
+      fetchCategories();
+    })
+    .catch((error) => {
+      if (error.response.data.message == "Already_exist") {
+        toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
+      }
+      if (
+        error.response.data.message ===
+        "The name has already been taken."
+      ) {
+        toast.error("تصنيف الرحلة موجود بالفعل");
+      }
+      console.log(error);
+    })
+    .finally(() => {
+      setLoader(false);
     });
-    setCategories(filteredCategories);
-    setLoader(false);
-  };
+};
+
+function deleteCategory(id) {
+  setLoader(true);
+  axios
+    .delete(`${baseUrl}categories/${id}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+        toast.success("تم حذف الرحلة بنجاح");
+        fetchCategories();
+    })
+    .catch(function (error) {
+        return null;
+    });
+  setLoader(false);
+}
+
+const updateCategory = () => {
+  setLoader(true);
+  axios
+    .post(
+      `${baseUrl}categories/${updateCategoryID}`,
+      {
+        name: getValues("categoryName"),
+        status: categoryStatus ? "1" : "0",
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    )
+    .then(() => {
+      toast("تم تحديث الرحلة  بنجاح", { type: "success" });
+      fetchCategories();
+    })
+    .catch((response) => {
+      if (response.response.data.message == "Already_exist") {
+        toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
+      }
+      console.log("Error updating category:", response.response.data.message);
+    })
+    .finally(() => {
+      setLoader(false);
+      setUpdateMode(false);
+      reset();
+    });
+};
+
+const handleSearch = (e) => {
+  e.preventDefault();
+  setLoader(true);
+
+  if (!searchValue.trim()) {
+    fetchCategories();
+    return;
+  }
+  let allCategories = [...categories];
+  let filteredCategories = [];
+  allCategories.forEach((cat) => {
+    if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
+      filteredCategories.push(cat);
+    }
+  });
+  setCategories(filteredCategories);
+  setLoader(false);
+};
 
 
 
-// fetch pagenation data///////////////////////
+
 const [currentPage, setCurrentPage] = useState(1);
 const [totalPages, setTotalPages] = useState(1);
-
 useEffect(() => {
   fetchPagenation();
 }, [currentPage]); 
-
 const fetchPagenation = () => {
   setLoader(true);
   axios
@@ -228,15 +203,11 @@ const fetchPagenation = () => {
       console.error("Error fetching branches:", error);
     });
 };
-
 const handlePageClick = (selectedPage) => {
   setCurrentPage(selectedPage.selected + 1);
 };
 
-
-
-  
-  return (
+return (
     <main className="branchTable">
       {/* add category form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">

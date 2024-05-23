@@ -64,14 +64,14 @@ function Asidebar() {
         icon: <CategoryIcon sx={{ fontSize: 35 }} />,
       },
       {
-        text: "إدارة المطارات",
-        path: "/Mainpage/airports",
-        icon: <FlightTakeoffIcon sx={{ fontSize: 35 }} />,
-      },
-      {
         text: "إدارة خطوط الطيران",
         path: "/Mainpage/Airlines",
         icon: <ConnectingAirportsIcon sx={{ fontSize: 35 }} />,
+      },
+      {
+        text: "إدارة المطارات",
+        path: "/Mainpage/airports",
+        icon: <FlightTakeoffIcon sx={{ fontSize: 35 }} />,
       },
       {
         text: "إدارة العملات",

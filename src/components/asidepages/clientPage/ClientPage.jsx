@@ -14,6 +14,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import ReactPaginate from "react-paginate";
 
 function ClientPage() {
+
   const baseUrl = "http://127.0.0.1:8000/api/";
   const backBaseUrl = "http://127.0.0.1:8000";
   const [loader, setLoader] = useState(false);
@@ -29,220 +30,229 @@ function ClientPage() {
   const [singleClient, setSingleClient] = useState({});
   const Navigate = useNavigate();
 
-  const handleUnauthenticated = () => {
-    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-      type: "error",
-      autoClose: 4000,
-    });
-    Navigate("/Login");
-    localStorage.removeItem("user_token");
-    localStorage.removeItem("user_role_name");
-  };
-
-  const schema = z.object({
-    name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
-    email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
-    phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
-    address: z.string().min(1, { message: "يجب ادخال العنوان" }),
-    countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
-    image: z.any(),
-    notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
+const handleUnauthenticated = () => {
+  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+    type: "error",
+    autoClose: 4000,
   });
+  Navigate("/Login");
+  localStorage.removeItem("user_token");
+  localStorage.removeItem("user_role_name");
+};
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    reset,
-    getValues,
-    formState: { errors, isSubmitting },
-  } = useForm({ resolver: zodResolver(schema) });
+const schema = z.object({
+  name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
+  email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
+  phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
+  address: z.string().min(1, { message: "يجب ادخال العنوان" }),
+  countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
+  image: z.any(),
+  notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
+});
 
-  useEffect(() => {
-    fetchClients();
-    fetchCountries();
-  }, []);
+const {
+  register,
+  handleSubmit,
+  setValue,
+  reset,
+  getValues,
+  formState: { errors, isSubmitting },
+} = useForm({ resolver: zodResolver(schema) });
 
-  // pagenation
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  useEffect(() => {
-    fetchPagenation();
-  }, [currentPage]); // Fetch data whenever currentPage changes
-  const fetchPagenation = () => {
-    setLoader(true);
-    axios
-      .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setClients(response.data.data);
-        setTotalPages(response.data.meta.pagination.last_page);
-      })
-      .catch(function (error) {
-        console.error("Error fetching branches:", error);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-  const handlePageClick = (selectedPage) => {
-    setCurrentPage(selectedPage.selected + 1);
-  };
-  // pagenation
 
-  const fetchCountries = () => {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}countries`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setCountries(response.data.data);
-      })
-      .catch(function (error) {
-        console.error("Error fetching countries:", error);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-
-  const fetchClients = () => {
-    setLoader(true);
-    axios
-      .get(`${baseUrl}clients`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function (response) {
-        setClients(response.data.data);
-      })
-      .catch(function (error) {
-        console.error("Error:", error);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-
-  const storeClient = () => {
-    setLoader(true);
-    const clientData = {
-      name: getValues("name"),
-      email: getValues("email"),
-      phone_number: getValues("phone_number"),
-      address: getValues("address"),
-      branch_id: clients[0]?.branch?.branch_id,
-      countries_id: getValues("countries_id"),
-      notes: getValues("notes"),
-    };
-    if (getValues("image").length > 0) {
-      clientData.image = getValues("image")[0];
-    }
-    axios
-      .post(`${baseUrl}clients`, clientData, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-          "content-type": "multipart/form-data",
-        },
-      })
-      .then(function () {
-        toast.success("تم تسجيل العميل بنجاح");
-        fetchClients();
-        reset();
-        setValue("countries_id", "");
-      })
-      .catch(function (error) {
-        if (
-          error.response.data.message === "The email has already been taken."
-        ) {
-          toast.error("هذا البريد الإلكتروني موجود بالفعل");
-        }
-        console.log(error);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-  const deleteClient = (id) => {
-    setLoader(true);
-    axios
-      .delete(`${baseUrl}clients/${id}`, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      })
-      .then(function () {
-        fetchClients();
-        toast.success(`تم حذف العميل بنجاح`);
-      })
-      .catch(function (error) {
-        toast.error(error.response.data.message);
-      });
-  };
-  const handleClientUpdate = () => {
-    setLoader(true);
-    const updateClientData = {
-      name: getValues("name"),
-      email: getValues("email"),
-      phone_number: getValues("phone_number"),
-      address: getValues("address"),
-      branch_id: clients[0]?.branch?.branch_id,
-      countries_id: getValues("countries_id"),
-      notes: getValues("notes"),
-    };
-    if (getValues("image").length > 0) {
-      updateClientData.image = getValues("image")[0];
-    }
-    axios
-      .post(`${baseUrl}clients/${updateClientID}`, updateClientData, {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-          "content-type": "multipart/form-data",
-        },
-      })
-      .then(function () {
-        toast.success("تم تحديث العميل بنجاح");
-        fetchClients();
-        setUpdateMode(false);
-        reset();
-      })
-      .catch(function (error) {
-        toast.error(error.response.data.message);
-      })
-      .finally(() => {
-        setLoader(false);
-      });
-  };
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-
-    if (!searchValue.trim()) {
-      fetchClients();
-      return;
-    }
-    let allClients = [...clients];
-    let filteredClients = [];
-    allClients.forEach((client) => {
-      if (client.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredClients.push(client);
-      }
+// pagenation
+const [currentPage, setCurrentPage] = useState(1);
+const [totalPages, setTotalPages] = useState(1);
+useEffect(() => {
+  fetchPagenation();
+}, [currentPage]);  
+const fetchPagenation = () => {
+  setLoader(true);
+  axios
+    .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setClients(response.data.data);
+      setTotalPages(response.data.meta.pagination.last_page);
+    })
+    .catch(function (error) {
+      console.error("Error fetching branches:", error);
+    })
+    .finally(() => {
+      setLoader(false);
     });
-    setClients(filteredClients);
-    setLoader(false);
+};
+const handlePageClick = (selectedPage) => {
+  setCurrentPage(selectedPage.selected + 1);
+};
+
+
+useEffect(() => {
+  fetchClients();
+  fetchCountries();
+}, []);
+// countries
+const fetchCountries = () => {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}countries`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setCountries(response.data.data);
+    })
+    .catch(function (error) {
+      console.error("Error fetching countries:", error);
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+// get clients
+const fetchClients = () => {
+  setLoader(true);
+  axios
+    .get(`${baseUrl}clients`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function (response) {
+      setClients(response.data.data);
+    })
+    .catch(function (error) {
+      console.error("Error:", error);
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+//store
+const storeClient = () => {
+  setLoader(true);
+  const clientData = {
+    name: getValues("name"),
+    email: getValues("email"),
+    phone_number: getValues("phone_number"),
+    address: getValues("address"),
+    branch_id: clients[0]?.branch?.branch_id,
+    countries_id: getValues("countries_id"),
+    notes: getValues("notes"),
   };
-  const fetchClientById = (id) => {
-    let single = clients.filter((client) => client.id === id);
-    setSingleClient(...single);
+  if (getValues("image").length > 0) {
+    clientData.image = getValues("image")[0];
+  }
+  axios
+    .post(`${baseUrl}clients`, clientData, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        "content-type": "multipart/form-data",
+      },
+    })
+    .then(function () {
+      toast.success("تم تسجيل العميل بنجاح");
+      fetchClients();
+      reset();
+      setValue("countries_id", "");
+    })
+    .catch(function (error) {
+      if (error.response.data.message === "Unauthenticated.") {
+        handleUnauthenticated();
+      }
+      if (
+        error.response.data.message === "The email has already been taken."
+      ) {
+        toast.error("هذا البريد الإلكتروني موجود بالفعل");
+      }
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+//delete
+const deleteClient = (id) => {
+  setLoader(true);
+  axios
+    .delete(`${baseUrl}clients/${id}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    })
+    .then(function () {
+      fetchClients();
+      toast.success(`تم حذف العميل بنجاح`);
+    })
+    .catch(function (error) {
+      toast.error(error.response.data.message);
+    });
+};
+//update
+const handleClientUpdate = () => {
+  setLoader(true);
+  const updateClientData = {
+    name: getValues("name"),
+    email: getValues("email"),
+    phone_number: getValues("phone_number"),
+    address: getValues("address"),
+    branch_id: clients[0]?.branch?.branch_id,
+    countries_id: getValues("countries_id"),
+    notes: getValues("notes"),
   };
-  return (
+  if (getValues("image").length > 0) {
+    updateClientData.image = getValues("image")[0];
+  }
+  axios
+    .post(`${baseUrl}clients/${updateClientID}`, updateClientData, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+        "content-type": "multipart/form-data",
+      },
+    })
+    .then(function () {
+      toast.success("تم تحديث العميل بنجاح");
+      setUpdateMode(false);
+      fetchClients();
+      reset();
+      setValue("countries_id", "");
+    })
+    .catch(function (error) {
+      toast.error(error.response.data.message);
+    })
+    .finally(() => {
+      setLoader(false);
+    });
+};
+//search
+const handleSearch = (e) => {
+  e.preventDefault();
+  setLoader(true);
+
+  if (!searchValue.trim()) {
+    fetchClients();
+    return;
+  }
+  let allClients = [...clients];
+  let filteredClients = [];
+  allClients.forEach((client) => {
+    if (client.name.toLowerCase().includes(searchValue.toLowerCase())) {
+      filteredClients.push(client);
+    }
+  });
+  setClients(filteredClients);
+  setLoader(false);
+};
+// get client by id
+const fetchClientById = (id) => {
+  let single = clients.filter((client) => client.id === id);
+  setSingleClient(...single);
+};
+
+return (
     <div>
       <dialog id="my_modal_2" className="modal">
         <div className="modal-box relative">
@@ -257,7 +267,7 @@ function ClientPage() {
                 <img
                   src={`${backBaseUrl}${singleClient?.imagePath}/${singleClient?.image}`}
                   alt="avatar"
-                  className="w-[100px] h-[100px] rounded-full border-4 border-zinc-500 mx-auto mb-4"
+                  className="w-[150px] h-[150px]  border-zinc-500 mx-auto mb-4"
                 />
               </div>
             )}
@@ -286,6 +296,22 @@ function ClientPage() {
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {singleClient?.phone_number}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      اسم الفرع :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleClient?.branch?.branch_name }
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      الملاحظات:
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleClient?.notes}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
