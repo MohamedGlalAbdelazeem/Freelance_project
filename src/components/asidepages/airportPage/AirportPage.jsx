@@ -25,8 +25,8 @@ function AirportPage() {
   const [updateAirportID, setUpdateAirportID] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [options, setOptions] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
-  const [defaultValues, setDefaultValues] = useState([]);
 
   const schema = z.object({
     airportName: z.string().min(1, { message: "ادخل اسم المطار" }),
@@ -80,6 +80,11 @@ function AirportPage() {
   // store
   const storeAirport = async () => {
     setLoader(true);
+    if (selectedOptions.length === 0) {
+      toast.error("يجب اختيار خطوط الطيران", { type: "error" });
+      setLoader(false);
+      return;
+    }
     await axios
       .post(
         `${baseUrl}airports`,
@@ -96,9 +101,8 @@ function AirportPage() {
       .then(() => {
         toast.success("تم إنشاء المطار  بنجاح");
         reset();
+        setSelectedOptions([]);
         fetchAirports();
-        setSelectedIds([]);
-        setDefaultValues([]);
       })
       .catch((error) => {
         if (error.response.data.message == "Already_exist") {
@@ -109,7 +113,6 @@ function AirportPage() {
         ) {
           toast.error("المطار مسجل بالفعل");
         }
-        console.log(error);
       })
       .finally(() => {
         setLoader(false);
@@ -152,6 +155,11 @@ function AirportPage() {
   // update
   const updateAirport = () => {
     setLoader(true);
+    if (selectedOptions.length === 0) {
+      toast.error("يجب اختيار خطوط الطيران", { type: "error" });
+      setLoader(false);
+      return;
+    }
     axios
       .post(
         `${baseUrl}airports/${updateAirportID}`,
@@ -169,7 +177,9 @@ function AirportPage() {
       .then(() => {
         toast("تم تحديث المطار  بنجاح", { type: "success" });
         fetchAirports();
-        setDefaultValues([]);
+        reset();
+        setSelectedOptions([]);
+        setUpdateMode(false);
       })
       .catch((response) => {
         if (
@@ -180,8 +190,6 @@ function AirportPage() {
       })
       .finally(() => {
         setLoader(false);
-        setUpdateMode(false);
-        reset();
       });
   };
 
@@ -214,11 +222,11 @@ function AirportPage() {
       })
       .then((response) => {
         setAirlines(response.data.data);
-        const options = response.data.data.map((airline) => ({
+        const options2 = response.data.data.map((airline) => ({
           value: airline.id,
           label: airline.name,
         }));
-        setOptions(options);
+        setOptions(options2);
       })
       .catch((error) => {
         console.error("Error fetching branches:", error);
@@ -254,11 +262,10 @@ function AirportPage() {
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage.selected + 1);
   };
-  const handleSelect = (selectedOptions) => {
-    const ids = selectedOptions
-      ? selectedOptions.map((option) => option.value)
-      : [];
-    setSelectedIds(ids);
+  const handleSelect = (selected) => {
+    setSelectedOptions(selected);
+    const selectedIds = selected.map((item) => item.value);
+    setSelectedIds(selectedIds);
   };
   const defValues = [];
   const showAirPortById = (id) => {
@@ -271,7 +278,8 @@ function AirportPage() {
       .then((response) => {
         response.data.data.airLines.map((airline) => {
           defValues.push({ value: airline.id, label: airline.name });
-          setDefaultValues(defValues);
+          setSelectedOptions(defValues);
+          setSelectedIds(defValues.map((item) => item.value));
         });
       });
   };
@@ -299,11 +307,10 @@ function AirportPage() {
               <Select
                 isMulti
                 options={options}
+                value={selectedOptions}
                 noOptionsMessage={"لا توجد خطوط طيران"}
                 backspaceRemovesValue
-                
                 hideSelectedOptions
-                values={defaultValues.length > 0 && defaultValues }
                 className="flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 onChange={handleSelect}
               />
@@ -430,7 +437,7 @@ function AirportPage() {
                       key={index}
                       className="rounded bg-blue-200 px-2 py-1  w-fit my-1 mx-auto text-xs font-bold"
                     >
-                      {index + 1} - {airline.name}
+                      {index + 1}-{airline.name}
                     </p>
                   ))}
                 </td>
