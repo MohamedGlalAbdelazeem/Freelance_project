@@ -66,7 +66,7 @@ const TripBooking = () => {
     fetchClients();
     fetchData();
   }, []);
-
+   
   const fetchSingleBookingTrip = (id) => {
     let single = bookings.filter((bt) => bt.id === id);
     setBookingTrip(...single);
