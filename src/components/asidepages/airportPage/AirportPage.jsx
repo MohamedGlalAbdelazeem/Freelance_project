@@ -6,16 +6,17 @@ import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { set, z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { ScrollUp } from "../../ScrollUp";
+import Select from "react-select";
 
 function AirportPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [airports, setAirports] = useState([]);
-  const [airlines , setAirlines ] = useState([]);
+  const [airlines, setAirlines] = useState([]);
   const [loader, setLoader] = useState(true);
   const Navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
@@ -23,10 +24,12 @@ function AirportPage() {
   const [updateMode, setUpdateMode] = useState(false);
   const [updateAirportID, setUpdateAirportID] = useState("");
   const [searchValue, setSearchValue] = useState("");
+  const [options, setOptions] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [defaultValues, setDefaultValues] = useState([]);
 
   const schema = z.object({
     airportName: z.string().min(1, { message: "ادخل اسم المطار" }),
-    airlineSelection: z.string().min(1, { message: "اختر خط الطيران" }),
   });
 
   const {
@@ -38,204 +41,240 @@ function AirportPage() {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
-useEffect(() => {
-  fetchAirports();
-  fetchPagination();
-  fetchAirlinesInSelection();
-}, []);
-
-
-const fetchAirports = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}airports`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setAirports(response.data.data);
-    })
-    .catch(function (error) {
-      console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
-      handleUnauthenticated();
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-
-const handleUnauthenticated = () => {
-  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-    type: "error",
-    autoClose: 4000,
-  });
-  Navigate("/Login");
-  localStorage.removeItem("user_token");
-  localStorage.removeItem("user_role_name");
-};
-
-// store
-const storeAirport = async () => {
-  setLoader(true);
-  await axios
-    .post(
-      `${baseUrl}airports`,
-      {
-        name: getValues("airportName"),
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      }
-    )
-    .then(() => {
-      toast.success("تم إنشاء المطار  بنجاح");
-      reset();
-      fetchAirports();
-    })
-    .catch((error) => {
-      if (error.response.data.message == "Already_exist") {
-        toast("هذا المطار موجود بالفعل ", { type: "error" });
-      }
-      if ( error.response.data.message === "The name has already been taken."  ) {
-        toast.error("المطار مسجل بالفعل");
-      }
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-
-// delete
-function deleteAirport(id) {
-  setLoader(true);
-  axios
-    .delete(`${baseUrl}airports/${id}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function () {
-      toast.success("تم حذف المطار بنجاح");
-      fetchAirports();
-    })
-    .catch(function (error) {
-      toast.warning("حدث خطأ غير متوقع");
-      console.error("Error deleting airport:", error);
-      if (
-        error.response &&
-        error.response.status === 401 &&
-        error.response.data.message === "Unauthenticated"
-      ) {
-        toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-          type: "error",
-        });
-      } else {
-        console.log("Error deleting airport:", error);
-      }
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-}
-
-// update
-const updateAirport = () => {
-  setLoader(true);
-  axios
-    .post(
-      `${baseUrl}airports/${updateAirportID}`,
-      {
-        name: getValues("airportName"),
-        status: airportStatus ? "1" : "0",
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
-        },
-      }
-    )
-    .then(() => {
-      toast("تم تحديث المطار  بنجاح", { type: "success" });
-      fetchAirports();
-    })
-    .catch((response) => {
-      if (response.response.data.message == "The name has already been taken.") {
-        toast("هذا المطار مسجل بالعفل ", { type: "error" });
-      }
-    })
-    .finally(() => {
-      setLoader(false);
-      setUpdateMode(false);
-      reset();
-    });
-};
-
-const handleSearch = (e) => {
-  e.preventDefault();
-  setLoader(true);
-
-  if (!searchValue.trim()) {
+  useEffect(() => {
     fetchAirports();
-    return;
+    fetchPagination();
+    fetchAirlinesInSelection();
+  }, []);
+
+  const fetchAirports = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}airports`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setAirports(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", error);
+        handleUnauthenticated();
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
+    });
+    Navigate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
+
+  // store
+  const storeAirport = async () => {
+    setLoader(true);
+    await axios
+      .post(
+        `${baseUrl}airports`,
+        {
+          name: getValues("airportName"),
+          airLines: selectedIds,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success("تم إنشاء المطار  بنجاح");
+        reset();
+        fetchAirports();
+        setSelectedIds([]);
+        setDefaultValues([]);
+      })
+      .catch((error) => {
+        if (error.response.data.message == "Already_exist") {
+          toast("هذا المطار موجود بالفعل ", { type: "error" });
+        }
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
+          toast.error("المطار مسجل بالفعل");
+        }
+        console.log(error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+
+  // delete
+  function deleteAirport(id) {
+    setLoader(true);
+    axios
+      .delete(`${baseUrl}airports/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function () {
+        toast.success("تم حذف المطار بنجاح");
+        fetchAirports();
+      })
+      .catch(function (error) {
+        toast.warning("حدث خطأ غير متوقع");
+        console.error("Error deleting airport:", error);
+        if (
+          error.response &&
+          error.response.status === 401 &&
+          error.response.data.message === "Unauthenticated"
+        ) {
+          toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+            type: "error",
+          });
+        } else {
+          console.log("Error deleting airport:", error);
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
   }
-  let allAirports = [...airports];
-  let filteredAirports = [];
-  allAirports.forEach((cat) => {
-    if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
-      filteredAirports.push(cat);
+
+  // update
+  const updateAirport = () => {
+    setLoader(true);
+    axios
+      .post(
+        `${baseUrl}airports/${updateAirportID}`,
+        {
+          name: getValues("airportName"),
+          airLines: selectedIds,
+          status: airportStatus ? "1" : "0",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(() => {
+        toast("تم تحديث المطار  بنجاح", { type: "success" });
+        fetchAirports();
+        setDefaultValues([]);
+      })
+      .catch((response) => {
+        if (
+          response.response.data.message == "The name has already been taken."
+        ) {
+          toast("هذا المطار مسجل بالعفل ", { type: "error" });
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+        setUpdateMode(false);
+        reset();
+      });
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setLoader(true);
+
+    if (!searchValue.trim()) {
+      fetchAirports();
+      return;
     }
-  });
-  setAirports(filteredAirports);
-  setLoader(false);
-};
-
-// show airlines by selection
-const fetchAirlinesInSelection = () => {
-  axios
-    .get(`${baseUrl}airlines/selection/id-name`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then((response) => {
-      setAirlines(response.data.data);
-    })
-    .catch((error) => {
-      console.error("Error fetching branches:", error);
-    })
-    .finally(() => {
-      setLoader(false);
+    let allAirports = [...airports];
+    let filteredAirports = [];
+    allAirports.forEach((cat) => {
+      if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
+        filteredAirports.push(cat);
+      }
     });
-}
+    setAirports(filteredAirports);
+    setLoader(false);
+  };
 
-//  pagenation
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
-useEffect(() => {
-  fetchPagination();
-}, [currentPage]); // Fetch data whenever currentPage changes
-const fetchPagination = () => {
-  setLoader(true);
-  axios
-    .get(`http://127.0.0.1:8000/api/airports?page=${currentPage}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setAirports(response.data.data);
-      setTotalPages(response.data.meta.pagination.last_page);
-    })
-    .catch(function (error) {
-      console.error("Error fetching branches:", error);
-    });
-};
-const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);
-};
+  // show airlines by selection
+  const fetchAirlinesInSelection = () => {
+    axios
+      .get(`${baseUrl}airlines/selection/id-name`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then((response) => {
+        setAirlines(response.data.data);
+        const options = response.data.data.map((airline) => ({
+          value: airline.id,
+          label: airline.name,
+        }));
+        setOptions(options);
+      })
+      .catch((error) => {
+        console.error("Error fetching branches:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+
+  //  pagenation
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  useEffect(() => {
+    fetchPagination();
+  }, [currentPage]); // Fetch data whenever currentPage changes
+
+  const fetchPagination = () => {
+    setLoader(true);
+    axios
+      .get(`http://127.0.0.1:8000/api/airports?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setAirports(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      });
+  };
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
+  const handleSelect = (selectedOptions) => {
+    const ids = selectedOptions
+      ? selectedOptions.map((option) => option.value)
+      : [];
+    setSelectedIds(ids);
+  };
+  const defValues = [];
+  const showAirPortById = (id) => {
+    axios
+      .get(`${baseUrl}airports/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then((response) => {
+        response.data.data.airLines.map((airline) => {
+          defValues.push({ value: airline.id, label: airline.name });
+          setDefaultValues(defValues);
+        });
+      });
+  };
 
   return (
     <main className="branchTable">
@@ -257,24 +296,18 @@ const handlePageClick = (selectedPage) => {
               )}
             </div>
             <div className="flex-grow">
-                <select
-                  {...register("airlineSelection")}
-                  className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                >
-                  <option value="" disabled selected>
-                   اختر خط الطيران
-                  </option>
-                  {airlines.map((airline) => {
-                    const { id, name } = airline;
-                    return <option key={id} value={id} label={name} />;
-                  })}
-                </select>
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.airlineSelection?.message}
-                  </span>
-                )}
-              </div>
+              <Select
+                isMulti
+                options={options}
+                noOptionsMessage={"لا توجد خطوط طيران"}
+                backspaceRemovesValue
+                
+                hideSelectedOptions
+                values={defaultValues.length > 0 && defaultValues }
+                className="flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                onChange={handleSelect}
+              />
+            </div>
             <div className="mb-5 pt-3">
               <div className="-mx-3 flex flex-wrap">
                 {updateMode && (
@@ -356,7 +389,10 @@ const handlePageClick = (selectedPage) => {
               الترتيب
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الاسم
+              اسم المطار
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              خطوط الطيران
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               الحالة
@@ -373,7 +409,7 @@ const handlePageClick = (selectedPage) => {
         <tbody>
           {/* Mapping airports data to table rows */}
           {airports.map((airport, index) => {
-            const { name, id, status, created_at } = airport;
+            const { name, id, status, created_at, airLines } = airport;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
               <tr
@@ -387,6 +423,16 @@ const handlePageClick = (selectedPage) => {
                   <span className="rounded  px-2 text-xs font-bold">
                     {name}
                   </span>
+                </td>
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  {airLines.map((airline, index) => (
+                    <p
+                      key={index}
+                      className="rounded bg-blue-200 px-2 py-1  w-fit my-1 mx-auto text-xs font-bold"
+                    >
+                      {index + 1} - {airline.name}
+                    </p>
+                  ))}
                 </td>
                 <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                   {status === "مفعل" ? (
@@ -410,9 +456,10 @@ const handlePageClick = (selectedPage) => {
                     onClick={() => {
                       ScrollUp();
                       setUpdateAirportID(id);
-                      setUpdateMode(true);
                       setValue("airportName", name);
+                      setUpdateMode(true);
                       setAirportStatus(status === "مفعل" ? true : false);
+                      // showAirPortById(id);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >
@@ -431,28 +478,26 @@ const handlePageClick = (selectedPage) => {
         </tbody>
       </table>
       <div>
-          {/* Render pagination */}
-          <ReactPaginate
-            pageCount={totalPages}
-            pageRangeDisplayed={3}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageClick}
-            containerClassName={"flex justify-center mt-4 text-2xl"}
-            activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-            previousLabel={"السابق"}
-            nextLabel={"التالي"}
-            previousClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            nextClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            pageClassName={
-              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
-            }
-          />
-        </div>
-        {loader && (
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          pageClassName={"mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "}
+        />
+      </div>
+      {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
           <svg

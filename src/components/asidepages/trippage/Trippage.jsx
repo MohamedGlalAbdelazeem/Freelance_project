@@ -68,9 +68,9 @@ function Trippage() {
     fetchPagenation();
   }, [currentPage]);
 
-  useEffect(() => {
-    fetchAirLines();
-  }, [airportId]);
+  // useEffect(() => {
+  //   fetchAirLines();
+  // }, [airportId]);
 
   function fetchCountries() {
     setLoader(true);
@@ -566,7 +566,6 @@ function Trippage() {
                 <div className="flex-grow w-full">
                   <select
                     {...register("airport_id")}
-                    onChange={(e) => setAirportId(e.target.value)}
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="" disabled selected>
@@ -594,19 +593,19 @@ function Trippage() {
                     <option value="" disabled selected>
                       اختر خط الطيران
                     </option>
-                    {/* {showAirLines.map((line, index) => {
+                    {showAirports?.airLines?.map((line, index) => {
                       return (
                         <option key={index} value={line.id}>
                           {line.name}
                         </option>
                       );
-                    })} */}
+                    })}
                   </select>
-                  {/* {errors && (
+                  {errors && (
                     <span className="text-red-500 text-sm">
                       {errors.air_line_id?.message}
                     </span>
-                  )} */}
+                  )}
                 </div>
                 <div className="flex-grow w-full">
                   <select
