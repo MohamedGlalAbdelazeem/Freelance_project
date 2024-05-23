@@ -17,6 +17,7 @@ import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrow
 
 const TripBooking = () => {
   const baseUrl = "http://127.0.0.1:8000/api/";
+  const backBaseUrl = "http://127.0.0.1:8000";
 
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
@@ -45,6 +46,8 @@ const TripBooking = () => {
     number_of_tickets: z.string().min(1, { message: "ادخل عدد التذاكر" }),
     type: z.string().min(1, { message: "يجب تعيين نوع الرحلة" }),
     trip_id: z.string().min(1, { message: "اختر اسم الرحلة " }),
+    ticket_number: z.string().optional(),
+    // image: z.string().optional(),
   });
 
   const {
@@ -75,279 +78,295 @@ const TripBooking = () => {
   const month = fullDate.getMonth() + 1;
   const day = fullDate.getDate();
   const formattedDate = `${year}-${month}-${day}`;
-  
-const handleUnauthenticated = () => {
-  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-    type: "error",
-    autoClose: 4000,
-  });
-  Naviagate("/Login");
-  localStorage.removeItem("user_token");
-  localStorage.removeItem("user_role_name");
-};
 
-//pagenation
-useEffect(() => {
-  fetchPagenation();
-}, [currentPage]);
-const fetchPagenation = () => {
-  setLoader(true);
-  axios
-    .get(`http://127.0.0.1:8000/api/bookings?page=${currentPage}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setBookings(response.data.data);
-      setTotalPages(response.data.meta.pagination.last_page);
-    })
-    .catch(function (error) {
-      console.error("Error fetching branches:", error);
-    })
-    .finally(() => {
-      setLoader(false);
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
     });
-};
-const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);
-};
+    Naviagate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
 
-// fetch trip_id
-function fetchTrip() {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}trips/selection/id-name`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setshowTripName(response.data.data);
-    })
-    .catch(function (error) {
-      const errorMessage = error.response.data.message;
-      console.log("Error fetching trips:", errorMessage);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-}
-
-// fetch payments method
-const fetchPayments = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}payments`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setPayments(response.data.data);
-    })
-    .catch(function (error) {
-      const errorMessage = error.response.data.message;
-      console.error("حدث خطأ الرجاء محاولة مرة أخرى:", errorMessage);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-// fetch currencies
-function fetchCurrencies() {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}currencies/selection/id-name`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setShowCurrencies(response.data.data);
-    })
-    .catch(function (error) {
-      const errorMessage = error.response.data.message;
-      console.error("حدث خطأ الرجاء محاولة مرة أخرى:", errorMessage);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-}
-// fetch clients
-const fetchClients = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}clients/selection/id-name`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setClients(response.data.data);
-    })
-    .catch(function (error) {
-      console.error("Error:", error);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-// fetch booking trip
-const fetchData = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}bookings`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setBookings(response.data.data);
-    })
-    .catch(function (error) {
-      if (error.response && error.response.status === 401) {
-        handleUnauthenticated();
-      }
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-// store Booktrip
-const storeTrips = async () => {
-  setLoader(true);
-  await axios
-    .post(
-      `${baseUrl}bookings/trip`,
-      {
-        client_id: getValues("client_id"),
-        cost: getValues("cost"),
-        currency_id: getValues("currency_id"),
-        payment_id: getValues("payment_id"),
-        number_of_tickets: getValues("number_of_tickets"),
-        type: getValues("type"),
-        ticket_number: getValues("ticket_number"),
-        trip_id: getValues("trip_id"),
-      },
-      {
+  //pagenation
+  useEffect(() => {
+    fetchPagenation();
+  }, [currentPage]);
+  const fetchPagenation = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}bookings?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      }
-    )
-    .then(() => {
-      toast("تم حجز الرحلة  بنجاح", { type: "success" });
-      fetchData();
-      reset();
-      setValue("type", "");
-      setValue("tripTo", "");
-      setValue("trip_id", "");
-      setValue("client_id", "");
-      setValue("currency_id", "");
-      setValue("payment_id", "");
-    })
-    .catch((error) => {
-      const errorMessage = error.response.data.message;
-      console.log(errorMessage);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-// delete trip
-function deleteTrips(id) {
-  setLoader(true);
-  axios.delete(`${baseUrl}bookings/${id}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function () {
-      toast.success("تم حذف الرحلة بنجاح");
-      fetchData();
-    })
-    .catch(function (error) {
-      console.error("Error deleting branch:", error);
-      setLoader(true);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-}
-//update
-const updateTrips = async () => {
-  setLoader(true);
-  console.log("updateTripsID", updateTripsID);
-  await axios
-    .post(
-      `${baseUrl}bookings/trip/${updateTripsID}`,
-      {
-        client_id: getValues("client_id"),
-        cost: getValues("cost"),
-        currency_id: getValues("currency_id"),
-        payment_id: getValues("payment_id"),
-        trip_id: getValues("trip_id"),
-        number_of_tickets: getValues("number_of_tickets"),
-        type: getValues("type"),
-      },
-      {
+      })
+      .then(function (response) {
+        setBookings(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
+
+  // fetch trip_id
+  function fetchTrip() {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}trips/selection/id-name`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      }
-    )
-    .then(() => {
-      toast("تم تحديث الرحلة  بنجاح", { type: "success" });
-      fetchData();
-      setUpdateMode(false);
-      reset();
-      setValue("type", "");
-      setValue("tripTo", "");
-      setValue("trip_id", "");
-      setValue("client_id", "");
-      setValue("currency_id", "");
-      setValue("payment_id", "");
-    })
-    .catch((response) => {
-      if (response.response.data.message == "Already_exist") {
-        toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
-      } else {
-        console.log("Error updating branch:", response);
-      }
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-//search
-const handleSearch = (e) => {
-  e.preventDefault();
-  setLoader(true);
-
-  if (!searchValue.trim()) {
-    fetchData();
-    return;
+      })
+      .then(function (response) {
+        setshowTripName(response.data.data);
+      })
+      .catch(function (error) {
+        const errorMessage = error.response.data.message;
+        console.log("Error fetching trips:", errorMessage);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
   }
-  let allBookings = [...bookings];
-  let filteredBookings = [];
-  allBookings.forEach((booking) => {
-    if (
-      booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
-    ) {
-      filteredBookings.push(booking);
+
+  // fetch payments method
+  const fetchPayments = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}payments`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setPayments(response.data.data);
+      })
+      .catch(function (error) {
+        const errorMessage = error.response.data.message;
+        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", errorMessage);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  // fetch currencies
+  function fetchCurrencies() {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}currencies/selection/id-name`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setShowCurrencies(response.data.data);
+      })
+      .catch(function (error) {
+        const errorMessage = error.response.data.message;
+        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", errorMessage);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }
+  // fetch clients
+  const fetchClients = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}clients/selection/id-name`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setClients(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("Error:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  // fetch booking trip
+  const fetchData = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}bookings`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setBookings(response.data.data);
+      })
+      .catch(function (error) {
+        if (error.response && error.response.status === 401) {
+          handleUnauthenticated();
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  // store Booktrip
+  const storeTrips = async () => {
+    setLoader(true);
+    let tripData = {
+      client_id: getValues("client_id"),
+      cost: getValues("cost"),
+      currency_id: getValues("currency_id"),
+      payment_id: getValues("payment_id"),
+      number_of_tickets: getValues("number_of_tickets"),
+      type: getValues("type"),
+      trip_id: getValues("trip_id"),
+    };
+
+    if (!getValues("ticket_number") && getValues("image").length > 0) {
+      tripData.image = getValues("image[0]");
+    } else if (getValues("image").length == 0 && getValues("ticket_number")) {
+      tripData.ticket_number = getValues("ticket_number");
+    } else if (getValues("ticket_number") && getValues("image").length > 0) {
+      tripData.image = getValues("image[0]");
+      tripData.ticket_number = getValues("ticket_number");
     }
-  });
-  setBookings(filteredBookings);
-  setLoader(false);
-};
+
+    await axios
+      .post(`${baseUrl}bookings/trip`, tripData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(() => {
+        toast("تم حجز الرحلة  بنجاح", { type: "success" });
+        fetchData();
+        reset();
+        setValue("type", "");
+        setValue("tripTo", "");
+        setValue("trip_id", "");
+        setValue("client_id", "");
+        setValue("currency_id", "");
+        setValue("payment_id", "");
+      })
+      .catch((error) => {
+        const errorMessage = error.response.data.message;
+        console.log(errorMessage);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  // delete trip
+  function deleteTrips(id) {
+    setLoader(true);
+    axios
+      .delete(`${baseUrl}bookings/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function () {
+        toast.success("تم حذف الرحلة بنجاح");
+        fetchData();
+      })
+      .catch(function (error) {
+        console.error("Error deleting branch:", error);
+        setLoader(true);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }
+  //update
+  const updateTrips = async () => {
+    setLoader(true);
+    let tripData = {
+      client_id: getValues("client_id"),
+      cost: getValues("cost"),
+      currency_id: getValues("currency_id"),
+      payment_id: getValues("payment_id"),
+      number_of_tickets: getValues("number_of_tickets"),
+      type: getValues("type"),
+      trip_id: getValues("trip_id"),
+    };
+
+    if (!getValues("ticket_number") && getValues("image").length > 0) {
+      tripData.image = getValues("image[0]");
+    } else if (getValues("image").length == 0 && getValues("ticket_number")) {
+      tripData.ticket_number = getValues("ticket_number");
+    } else if (getValues("ticket_number") && getValues("image").length > 0) {
+      tripData.image = getValues("image[0]");
+      tripData.ticket_number = getValues("ticket_number");
+    }
+
+    await axios
+      .post(`${baseUrl}bookings/trip/${updateTripsID}`, tripData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(() => {
+        toast("تم تحديث الرحلة  بنجاح", { type: "success" });
+        fetchData();
+        setUpdateMode(false);
+        reset();
+        setValue("type", "");
+        setValue("tripTo", "");
+        setValue("trip_id", "");
+        setValue("client_id", "");
+        setValue("currency_id", "");
+        setValue("payment_id", "");
+      })
+      .catch((response) => {
+        if (response.response.data.message == "Already_exist") {
+          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
+        } else {
+          console.log("Error updating branch:", response);
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  //search
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setLoader(true);
+
+    if (!searchValue.trim()) {
+      fetchData();
+      return;
+    }
+    let allBookings = [...bookings];
+    let filteredBookings = [];
+    allBookings.forEach((booking) => {
+      if (
+        booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
+      ) {
+        filteredBookings.push(booking);
+      }
+    });
+    setBookings(filteredBookings);
+    setLoader(false);
+  };
 
   return (
     <div className="flex flex-col">
       <div className="w-full mb-5">
         <Link
           className="bg-gray-500 text-white  float-left p-2 rounded-lg hover:bg-gray-700 hover:shadow-lg transition duration-200"
-          to="/Mainpage/booking/service" >
+          to="/Mainpage/booking/service"
+        >
           انتقل إلى حجز خدمة أخري
           <KeyboardDoubleArrowLeftIcon />
         </Link>
@@ -360,7 +379,9 @@ const handleSearch = (e) => {
           <div className="modal-box max-w-4xl relative">
             <div className="modal-action absolute -top-4 left-2">
               <form method="dialog">
-                <button className="btn rounded-full w-12 h-10 bg-red-600 text-white">X</button>
+                <button className="btn rounded-full w-12 h-10 bg-red-600 text-white">
+                  X
+                </button>
               </form>
             </div>
             <div className="text-center flex justify-center">
@@ -406,7 +427,7 @@ const handleSearch = (e) => {
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
-                           عنوان  العميل :
+                        عنوان العميل :
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                         {bookingTrip?.client?.address}
@@ -448,19 +469,21 @@ const handleSearch = (e) => {
                         بيانات الرحلة
                       </dt>
                     </div>
-                    <div className="">
+
+                    {bookingTrip?.documentPath && bookingTrip?.document && (
+                      <div className="">
                         <div className="w-full">
-                        <img
-                          // src={`http://127.0.0.1:8000${singleClient?.imagePath}/${singleClient?.image}`}
-                          src="https://images.pexels.com/photos/35537/child-children-girl-happy.jpg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-                          alt="avatar"
-                          className="w-[160px] h-[160px]  border-4 border-zinc-500 mx-auto mt-5 mb-4"/>
-                         <dt className="text-sm font-medium text-gray-500">
-                              صورة الخدمة  
-                        </dt>
+                          <img
+                            src={`${backBaseUrl}${bookingTrip?.documentPath}/${bookingTrip?.document}`}
+                            alt="avatar"
+                            className="w-[160px] h-[160px]  border-4 border-zinc-500 mx-auto mt-5 mb-4"
+                          />
+                          <dt className="text-sm font-medium text-gray-500">
+                            صورة الخدمة
+                          </dt>
+                        </div>
                       </div>
-            
-                    </div>
+                    )}
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                       <dt className="text-sm font-medium text-gray-500">
                         اسم الرحلة :
@@ -506,7 +529,7 @@ const handleSearch = (e) => {
                         رقم التذكرة:
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {bookingTrip?.bookingTrip?.ticket_number}
+                        {bookingTrip?.bookingTrip?.ticket_number || "لا يوجد"}
                       </dd>
                     </div>
                     <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -582,27 +605,27 @@ const handleSearch = (e) => {
                   </div>
                 </div>
                 <div className=" flex flex-wrap gap-3">
-                <div className="w-[49%] flex-grow ">
-                  <input
-                    type="text"
-                    {...register("ticket_number")}
-                    placeholder="رقم التذكرة"
-                    dir="rtl"
-                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                  />
-                </div>
-                <div className="w-[49%] flex-grow ">
-                  <div className="flex items-center justify-center w-full">
-                     <input
-                      {...register("image")}
-                      accept="image/*"
-                      className="file-input file-input-bordered w-full"
-                      id="file_input"
-                      type="file"
+                  <div className="w-[49%] flex-grow ">
+                    <input
+                      type="text"
+                      {...register("ticket_number")}
+                      placeholder="رقم التذكرة"
+                      dir="rtl"
+                      className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                     />
                   </div>
+                  <div className="w-[49%] flex-grow ">
+                    <div className="flex items-center justify-center w-full">
+                      <input
+                        {...register("image")}
+                        accept="image/*"
+                        className="file-input file-input-bordered w-full"
+                        id="file_input"
+                        type="file"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
                 <div className="flex gap-4	">
                   <div className="flex-grow w-full">
                     <select
@@ -876,19 +899,30 @@ const handleSearch = (e) => {
                   {userRoleName === "admin" ? (
                     <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                       <div className="flex gap-2 justify-center items-center">
-                        
                         <button
                           onClick={() => {
                             ScrollUp();
                             setUpdateTripsID(id);
                             setUpdateMode(true);
                             setValue("client_id", client?.id.toString());
-                            setValue( "cost", bookingTrip?.trip?.cost.toString());
+                            setValue(
+                              "cost",
+                              bookingTrip?.trip?.cost.toString()
+                            );
                             setValue("currency_id", currency?.id.toString());
                             setValue("payment_id", payment?.id.toString());
-                            setValue("number_of_tickets", bookingTrip?.number_of_ticket.toString());
-                            setValue("ticket_number", bookingTrip?.ticket_number.toString());
-                            setValue("trip_id", bookingTrip?.trip?.id.toString() );
+                            setValue(
+                              "number_of_tickets",
+                              bookingTrip?.number_of_ticket.toString()
+                            );
+                            setValue(
+                              "ticket_number",
+                              bookingTrip?.ticket_number
+                            );
+                            setValue(
+                              "trip_id",
+                              bookingTrip?.trip?.id.toString()
+                            );
                             setValue(
                               "type",
                               (bookingTrip?.type === "ذهاب" ? 1 : 2).toString()

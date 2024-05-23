@@ -15,6 +15,7 @@ import ReactPaginate from "react-paginate";
 
 function ClientPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
+  const backBaseUrl = "http://127.0.0.1:8000";
   const [loader, setLoader] = useState(false);
   const [countries, setCountries] = useState([]);
 
@@ -38,60 +39,59 @@ function ClientPage() {
     localStorage.removeItem("user_role_name");
   };
 
-const schema = z.object({
-  name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
-  email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
-  phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
-  address: z.string().min(1, { message: "يجب ادخال العنوان" }),
-  countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
-  image: z.any(),
-  notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
-});
+  const schema = z.object({
+    name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
+    email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
+    phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
+    address: z.string().min(1, { message: "يجب ادخال العنوان" }),
+    countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
+    image: z.any(),
+    notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
+  });
 
-const {
-  register,
-  handleSubmit,
-  setValue,
-  reset,
-  getValues,
-  formState: { errors, isSubmitting },
-} = useForm({ resolver: zodResolver(schema) });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
 
-useEffect(() => {
-  fetchClients();
-  fetchCountries();
-}, []);
+  useEffect(() => {
+    fetchClients();
+    fetchCountries();
+  }, []);
 
-// pagenation
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
-useEffect(() => {
-  fetchPagenation();
-}, [currentPage]); // Fetch data whenever currentPage changes
-const fetchPagenation = () => {
-  setLoader(true);
-  axios
-    .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setClients(response.data.data);
-      setTotalPages(response.data.meta.pagination.last_page);
-    })
-    .catch(function (error) {
-      console.error("Error fetching branches:", error);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);
-};
-// pagenation
-
+  // pagenation
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  useEffect(() => {
+    fetchPagenation();
+  }, [currentPage]); // Fetch data whenever currentPage changes
+  const fetchPagenation = () => {
+    setLoader(true);
+    axios
+      .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setClients(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
+  // pagenation
 
   const fetchCountries = () => {
     setLoader(true);
@@ -122,7 +122,6 @@ const handlePageClick = (selectedPage) => {
       })
       .then(function (response) {
         setClients(response.data.data);
-       
       })
       .catch(function (error) {
         console.error("Error:", error);
@@ -141,9 +140,11 @@ const handlePageClick = (selectedPage) => {
       address: getValues("address"),
       branch_id: clients[0]?.branch?.branch_id,
       countries_id: getValues("countries_id"),
-      image: getValues("image[0]"),
       notes: getValues("notes"),
     };
+    if (getValues("image").length > 0) {
+      clientData.image = getValues("image")[0];
+    }
     axios
       .post(`${baseUrl}clients`, clientData, {
         headers: {
@@ -158,8 +159,9 @@ const handlePageClick = (selectedPage) => {
         setValue("countries_id", "");
       })
       .catch(function (error) {
-        if (error.response.data.message === "The email has already been taken.") {
-          
+        if (
+          error.response.data.message === "The email has already been taken."
+        ) {
           toast.error("هذا البريد الإلكتروني موجود بالفعل");
         }
         console.log(error);
@@ -186,33 +188,23 @@ const handlePageClick = (selectedPage) => {
   };
   const handleClientUpdate = () => {
     setLoader(true);
-    let updateClientData;
-    if (!getValues("image[0]")) {
-      updateClientData = {
-        name: getValues("name"),
-        email: getValues("email"),
-        phone_number: getValues("phone_number"),
-        address: getValues("address"),
-        countries_id: getValues("countries_id"),
-        branch_id: clients[0]?.branch?.branch_id,
-        notes: getValues("notes"),
-      };
-    } else {
-      updateClientData = {
-        name: getValues("name"),
-        email: getValues("email"),
-        phone_number: getValues("phone_number"),
-        address: getValues("address"),
-        countries_id: getValues("countries_id"),
-        branch_id: clients[0]?.branch?.branch_id,
-        // image: getValues("image[0]"),
-        notes: getValues("notes"),
-      };
+    const updateClientData = {
+      name: getValues("name"),
+      email: getValues("email"),
+      phone_number: getValues("phone_number"),
+      address: getValues("address"),
+      branch_id: clients[0]?.branch?.branch_id,
+      countries_id: getValues("countries_id"),
+      notes: getValues("notes"),
+    };
+    if (getValues("image").length > 0) {
+      updateClientData.image = getValues("image")[0];
     }
     axios
       .post(`${baseUrl}clients/${updateClientID}`, updateClientData, {
         headers: {
           Authorization: `Bearer ${userToken}`,
+          "content-type": "multipart/form-data",
         },
       })
       .then(function () {
@@ -260,13 +252,15 @@ const handlePageClick = (selectedPage) => {
             </form>
           </div>
           <div className="text-center flex flex-col justify-center">
-            <div>
-              <img
-                src={`http://127.0.0.1:8000${singleClient?.imagePath}/${singleClient?.image}`}
-                alt="avatar"
-                className="w-[100px] h-[100px] rounded-full border-4 border-zinc-500 mx-auto mb-4"
-              />
-            </div>
+            {singleClient?.imagePath && singleClient?.image && (
+              <div>
+                <img
+                  src={`${backBaseUrl}${singleClient?.imagePath}/${singleClient?.image}`}
+                  alt="avatar"
+                  className="w-[100px] h-[100px] rounded-full border-4 border-zinc-500 mx-auto mb-4"
+                />
+              </div>
+            )}
             <div className="bg-white overflow-hidden shadow rounded-lg border">
               <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
                 <dl className="sm:divide-y sm:divide-gray-200">
@@ -415,7 +409,7 @@ const handlePageClick = (selectedPage) => {
                 </div>
                 <div className="w-[49%] flex-grow ">
                   <div className="flex items-center justify-center w-full">
-                     <input
+                    <input
                       {...register("image")}
                       accept="image/*"
                       className="file-input file-input-bordered w-full"
