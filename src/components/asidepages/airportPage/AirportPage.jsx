@@ -459,7 +459,7 @@ function AirportPage() {
                       setValue("airportName", name);
                       setUpdateMode(true);
                       setAirportStatus(status === "مفعل" ? true : false);
-                      // showAirPortById(id);
+                      showAirPortById(id);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >
