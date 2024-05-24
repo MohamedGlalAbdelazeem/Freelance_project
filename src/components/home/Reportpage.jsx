@@ -10,12 +10,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 function Reportpage() {
 
-  const baseUrl = "http://127.0.0.1:8000/api/";
-const [loader, setLoader] = useState(true);
-const Naviagate = useNavigate();
-const [data, setData] = useState([]);
-const userToken = localStorage.getItem("user_token");
-const userRoleName = localStorage.getItem("user_role_name");
+  const baseUrl = import.meta.env.VITE_SOME_KEY
+  const [loader, setLoader] = useState(true);
+  const Naviagate = useNavigate();
+  const [data, setData] = useState([]);
+  const userToken = localStorage.getItem("user_token");
+  const userRoleName = localStorage.getItem("user_role_name");
 
 
 const schema = z.object({

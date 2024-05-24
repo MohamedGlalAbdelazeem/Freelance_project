@@ -12,7 +12,7 @@ import { z } from "zod";
 import { ScrollUp } from "../../ScrollUp";
 function Addsupueradminpage() {
 
-  const baseUrl = "http://127.0.0.1:8000/api/";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
   const navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
   const [updateMode, setUpdateMode] = useState(false);

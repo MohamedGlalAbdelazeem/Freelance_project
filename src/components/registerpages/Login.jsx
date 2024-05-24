@@ -6,6 +6,8 @@ import { toast } from "react-toastify";
 import LockOpenIcon from '@mui/icons-material/LockOpen'; 
 import LoginIcon from '@mui/icons-material/Login';
 function Login() {
+
+  const baseUrl = import.meta.env.VITE_SOME_KEY
   const Navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +26,7 @@ function Login() {
     }
     setLoader(true);
     try {
-      const res = await axios.post(`http://127.0.0.1:8000/api/login`, {
+      const res = await axios.post(`${baseUrl}login`, {
         email: email,
         password: password,
       });
@@ -93,8 +95,7 @@ function Login() {
                 className="w-6 h-6 mx-3 text-gray-300 dark:text-gray-500"
                 fill="none"
                 viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+                stroke="currentColor">
                 <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
             </span>

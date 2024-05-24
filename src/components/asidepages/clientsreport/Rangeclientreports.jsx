@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
 function Rangeclientreports() {
   
-const baseUrl = "http://127.0.0.1:8000/api/";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
 const [loader, setLoader] = useState(true);
 const Naviagate = useNavigate();
 const [data, setData] = useState([]);

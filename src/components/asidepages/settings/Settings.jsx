@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 
 function Settings() {
+  const baseUrl = import.meta.env.VITE_SOME_KEY
   const userToken = localStorage.getItem("user_token");
   const [value, setValue] = useState("");
   const [updateDate, setUpdateDate] = useState("");
@@ -12,7 +13,7 @@ function Settings() {
 
   const fetchNumber = () => {
     axios
-      .get("http://127.0.0.1:8000/api/settings/allow_updated", {
+      .get(`${baseUrl}settings/allow_updated`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -37,7 +38,7 @@ function Settings() {
     }
     axios
       .post(
-        "http://127.0.0.1:8000/api/settings/allow_updated",
+        `${baseUrl}settings/allow_updated`,
         {
           days: value,
         },

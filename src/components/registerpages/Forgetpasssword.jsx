@@ -5,6 +5,7 @@ import axios from "axios";
 import Resetpassword from "./Resetpassword";
 import VpnKeyIcon from '@mui/icons-material/VpnKey';
 function Forgetpasssword() {
+   const baseUrl = import.meta.env.VITE_SOME_KEY
     const [email, setEmail] = useState("");
     const [loader , setLoader ] = useState(false);
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ function Forgetpasssword() {
       }
     try {
        setLoader(true); 
-       const res = await axios.post(`http://127.0.0.1:8000/api/forget-password`, {
+       const res = await axios.post(`${baseUrl}forget-password`, {
        email: email,
       });
 
@@ -29,12 +30,12 @@ function Forgetpasssword() {
       toast("يجب كتابة البريد الإلكتروني الخاص بك  ", { type: "error"});
     }
     finally {
-        setLoader(false); // Hide loader whether request was successful or failed
+        setLoader(false);  
     }};
 
 
 
-  return (
+return (
     <>
   <section className="bg-white dark:bg-gray-900">
     <div className="container flex flex-col items-center justify-center min-h-screen px-6 mx-auto">

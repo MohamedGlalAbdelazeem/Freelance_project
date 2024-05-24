@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PersonPinIcon from "@mui/icons-material/PersonPin";
 function UserProfilePage() {
-  
+  const baseUrl = "http://127.0.0.1:8000/api/"
+
   const navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
   const [isError, setIsError] = useState(false);
@@ -33,7 +34,7 @@ function UserProfilePage() {
   const refreshUser = async () => {
     setLoader(true);
     await axios
-      .get("http://127.0.0.1:8000/api/refresh", {
+      .get(`${baseUrl}refresh`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -63,8 +64,7 @@ function UserProfilePage() {
     }
     setLoader(true);
     axios
-      .post(
-        `http://127.0.0.1:8000/api/update`,
+      .post(`${baseUrl}update`,
         {
           name: name,
           phone_number: phoneNumber,
@@ -87,7 +87,6 @@ function UserProfilePage() {
         setLoader(false);
       });
   };
-
   const changePassword = async (e) => {
     setLoader(true);
     e.preventDefault();
@@ -111,8 +110,7 @@ function UserProfilePage() {
       return;
     }
     await axios
-      .post(
-        "http://127.0.0.1:8000/api/change-password",
+      .post(`${baseUrl}change-password`,
         {
           current_password: oldPassword,
           password: newPassword,
@@ -123,14 +121,12 @@ function UserProfilePage() {
             Authorization: `Bearer ${userToken}`,
           },
         }
-      )
-      .then((res) => {
+      ).then((res) => {
         if (res.status === 200) {
           toast("تم تغيير كلمة السر بنجاح", { type: "success" });
           setOldPassword("");
           setConfirmNewPassword("");
           setNewPassword("");
-
         }
       })
       .catch((error) => {

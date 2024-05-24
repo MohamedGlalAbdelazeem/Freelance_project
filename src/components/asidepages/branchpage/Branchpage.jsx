@@ -15,7 +15,7 @@ import { ScrollUp } from "../../ScrollUp";
 import ReactPaginate from "react-paginate";
 
 function Branchpage() {
-  const baseUrl = "http://127.0.0.1:8000/api/";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
 
   const [branches, setBranches] = useState([]);
   const [loader, setLoader] = useState(true);

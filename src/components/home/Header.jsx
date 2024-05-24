@@ -50,26 +50,6 @@ function Header() {
         </div>
 
         <div className="flex-none gap-2">
-          {/* <div className="dropdown dropdown-end ">
-            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-              <div className="w-10 rounded-full bg-white">
-               <AccountCircleOutlinedIcon sx={{fontSize: 40}}/>
-              </div>
-            </div>
-            <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 text-xl rounded-box w-52">
-            <Link to="/Mainpage/Userprofilepage" className='p-3 text-sm  hover:text-success  '>
-              <li>
-                  الصفحة الشخصية
-              </li>
-            </Link>
-             
-              <li>
-                  <a onClick={handelLogout} className='bg-red-500 p-3 text-white cursor-pointer hover:text-black text-sm'>
-                      تسجيل الخروج
-                  </a>
-              </li>
-              </ul>
-          </div> */}
           <a
             onClick={handelLogout}
             className="bg-red-500 hover:bg-red-800 transition  p-3 text-white cursor-pointer text-sm rounded-xl ml-2"

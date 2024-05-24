@@ -14,7 +14,7 @@ import ReactPaginate from "react-paginate";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 
 const ServiceBooking = () => {
-  const baseUrl = "http://127.0.0.1:8000/api/";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
   const backBaseUrl = "http://127.0.0.1:8000";
 
   const [loader, setLoader] = useState(true);

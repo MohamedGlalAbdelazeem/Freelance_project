@@ -13,7 +13,7 @@ import ReactPaginate from "react-paginate";
 import { ScrollUp } from "../../ScrollUp";
 
 function CurrencyPage() {
-  const baseUrl = "http://127.0.0.1:8000/api/";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
   const [currency, setCurrency] = useState([]);
   const [loader, setLoader] = useState(true);
   const Navigate = useNavigate();
