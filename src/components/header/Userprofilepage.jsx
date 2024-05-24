@@ -18,141 +18,131 @@ function UserProfilePage() {
   const [branchID, setBranchID] = useState("");
 
 
-
-useEffect(() => {
-  setLoader(true);
-  const userToken = localStorage.getItem("user_token");
-  if (!userToken) {
-    handleUnauthenticated();
-    return;
-  }
-  refreshUser();
-}, []);
-
-const refreshUser = async () => {
-  setLoader(true);
-  await axios
-    .get("http://127.0.0.1:8000/api/refresh", {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setLoader(false);
-      setUserprofile(response.data.Admin);
-      setName(response.data.Admin.name);
-      setPhoneNumber(response.data.Admin.phone_number);
-      setBranchID(response.data.Admin.branch.name);
-    })
-    .catch(function (error) {
-        console.error("Error refreshing token:", error);
-    })
-    .finally(() => {
-      setLoader(false);
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
     });
-};
- 
-
-const handleUpdate = (e) => {
-  e.preventDefault();
-  if (!name || !phoneNumber) {
-    toast.error("الرجاء ملء جميع الحقول");
-    return;
-  }
-  setLoader(true);
-  axios
-    .post(
-      `http://127.0.0.1:8000/api/update`,
-      {
-        name: name,
-        phone_number: phoneNumber,
-      },
-      {
+    navigate("/Login");  
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
+  useEffect(() => {
+   refreshUser();
+  }, []);
+  const refreshUser = async () => {
+    setLoader(true);
+    await axios
+      .get("http://127.0.0.1:8000/api/refresh", {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      }
-    )
-    .then(function () {
-      toast.success("تم تحديث البيانات بنجاح");
-      refreshUser();
-    })
-    .catch(function (error) {
-      toast.error("لم يتم تعديل البيانات");
-      console.log(error);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-
-
-const changePassword = async (e) => {
-  setLoader(true);
-  e.preventDefault();
-  if (
-    newPassword.trim() === "" &&
-    confirmNewPassword.trim() === "" &&
-    oldPassword.trim() === ""
-  ) {
-    setIsError(true);
-    setLoader(false);
-    return;
-  }
-  if (newPassword.trim() !== confirmNewPassword.trim()) {
-    toast("كلمة المرور غير متطابقة", { type: "error" });
-    setLoader(false);
-    return;
-  }
-  if (newPassword.trim().length < 6 && confirmNewPassword.trim().length < 6) {
-    setLoader(false);
-    setIsError(true);
-    return;
-  }
-  await axios
-    .post(
-      "http://127.0.0.1:8000/api/change-password",
-      {
-        current_password: oldPassword,
-        password: newPassword,
-        password_confirmation: confirmNewPassword,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${userToken}`,
+      })
+      .then(function (response) {
+        setLoader(false);
+        setUserprofile(response.data.Admin);
+        setName(response.data.Admin.name);
+        setPhoneNumber(response.data.Admin.phone_number);
+        setBranchID(response.data.Admin.branch.name);
+      })
+      .catch(function (error) {
+        if (error.response?.data?.message === "Unauthenticated.") {
+          handleUnauthenticated();
+          console.error(error);
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    if (!name || !phoneNumber) {
+      toast.error("الرجاء ملء جميع الحقول");
+      return;
+    }
+    setLoader(true);
+    axios
+      .post(
+        `http://127.0.0.1:8000/api/update`,
+        {
+          name: name,
+          phone_number: phoneNumber,
         },
-      }
-    )
-    .then((res) => {
-      if (res.status === 200) {
-        toast("تم تغيير كلمة السر بنجاح", { type: "success" });
-        setOldPassword("");
-        setConfirmNewPassword("");
-        setNewPassword("");
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(function () {
+        toast.success("تم تحديث البيانات بنجاح");
+        refreshUser();
+      })
+      .catch(function (error) {
+        toast.error("لم يتم تعديل البيانات");
+        console.log(error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
-      }
-    })
-    .catch((error) => {
-      if (error.response.data.message === "The password is incorrect.") {
-        toast("كلمة المررو القديمة غير صحيحة", { type: "error" });
-      }
-      toast("لم يتم تغيير كلمة السر", { type: "error" });
-    })
-    .finally(() => {
+  const changePassword = async (e) => {
+    setLoader(true);
+    e.preventDefault();
+    if (
+      newPassword.trim() === "" &&
+      confirmNewPassword.trim() === "" &&
+      oldPassword.trim() === ""
+    ) {
+      setIsError(true);
       setLoader(false);
-    });
-};
+      return;
+    }
+    if (newPassword.trim() !== confirmNewPassword.trim()) {
+      toast("كلمة المرور غير متطابقة", { type: "error" });
+      setLoader(false);
+      return;
+    }
+    if (newPassword.trim().length < 6 && confirmNewPassword.trim().length < 6) {
+      setLoader(false);
+      setIsError(true);
+      return;
+    }
+    await axios
+      .post(
+        "http://127.0.0.1:8000/api/change-password",
+        {
+          current_password: oldPassword,
+          password: newPassword,
+          password_confirmation: confirmNewPassword,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          toast("تم تغيير كلمة السر بنجاح", { type: "success" });
+          setOldPassword("");
+          setConfirmNewPassword("");
+          setNewPassword("");
 
-
-const handleUnauthenticated = () => {
-  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-    type: "error",
-    autoClose: 4000,
-  });
-  navigate("/Login"); // Changed Naviagate to navigate
-  localStorage.removeItem("user_token");
-  localStorage.removeItem("user_role_name");
-};
+        }
+      })
+      .catch((error) => {
+        if (error.response.data.message === "The password is incorrect.") {
+          toast("كلمة المررو القديمة غير صحيحة", { type: "error" });
+        }
+        toast("لم يتم تغيير كلمة السر", { type: "error" });
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
 return (
     <div className="items-center justify-center">

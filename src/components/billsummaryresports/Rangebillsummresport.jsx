@@ -89,7 +89,6 @@ const dailyReport = () => {
     .catch(function (error) {
       if (error.response?.data?.message === "Unauthenticated.") {
         handleUnauthenticated();
-      } else {
         console.error(error);
       }
     })
