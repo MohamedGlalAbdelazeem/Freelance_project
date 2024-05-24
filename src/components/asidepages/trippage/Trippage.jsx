@@ -32,7 +32,7 @@ function Trippage() {
   const [showAirports, setShowAirports] = useState([]);
   const [showCurrencies, setShowCurrencies] = useState([]);
   const [showAirLines, setShowAirLines] = useState([]);
-  const [airportId, setAirportId] = useState("");
+  const [airportId, setAirportId] = useState([]);
 
   const schema = z.object({
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
@@ -70,7 +70,6 @@ function Trippage() {
   useEffect(() => {
     fetchAirLines();
   }, [airportId]);
-
   function fetchCountries() {
     setLoader(true);
     axios
@@ -560,8 +559,7 @@ function Trippage() {
                 <div className="flex-grow w-full">
                   <select
                     {...register('airport_id', {
-                      onChange: ( ) => {setAirportId(id)},
-  
+                      onChange: () => {setAirportId([getValues("airport_id")])},
                     })}
                    
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"

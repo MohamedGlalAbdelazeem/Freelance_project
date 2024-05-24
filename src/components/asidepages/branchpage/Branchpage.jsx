@@ -74,7 +74,6 @@ function Branchpage() {
       });
   };
 
-// fetch branch clients data
   const fetchBranchClients = (id) => {
     setLoader(true);
     axios
@@ -125,7 +124,6 @@ function Branchpage() {
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage.selected + 1);
   };
-  // fetch pagenation data///////////////////////
 
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
@@ -189,15 +187,8 @@ function Branchpage() {
         },
       })
       .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        } else if (response.status === 204) {
           toast.success("تم حذف الفرع بنجاح");
           fetchBranches();
-        } else {
-          console.error("Unexpected response status:", response.status);
-          toast.warning("حدث خطأ غير متوقع");
-        }
       })
       .catch(function (error) {
         console.error("Error deleting branch:", error);
