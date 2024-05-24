@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 import axios from "axios";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
@@ -14,7 +14,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import ReactPaginate from "react-paginate";
 
 function Trippage() {
-  const baseUrl = import.meta.env.VITE_SOME_KEY
+  const baseUrl = import.meta.env.VITE_SOME_KEY;
   const [trips, setTrips] = useState([]);
   const [filteredTrips, setFilteredTrips] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -150,7 +150,7 @@ function Trippage() {
   function fetchAirports() {
     setLoader(true);
     axios
-      .get(`${baseUrl}airports/selection/id-name`, {
+      .get(`${baseUrl}airports`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
