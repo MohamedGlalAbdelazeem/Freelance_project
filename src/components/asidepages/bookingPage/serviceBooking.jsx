@@ -14,11 +14,11 @@ import ReactPaginate from "react-paginate";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 
 const ServiceBooking = () => {
-  const baseUrl = import.meta.env.VITE_SOME_KEY
-  const backBaseUrl = import.meta.env.VITE_IMAGE_KEY; 
+  const baseUrl = import.meta.env.VITE_SOME_KEY;
+  const backBaseUrl = import.meta.env.VITE_IMAGE_KEY;
 
   const [loader, setLoader] = useState(true);
-  const Naviagate = useNavigate();
+  const Navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
   const userRoleName = localStorage.getItem("user_role_name");
   const [updateMode, setUpdateMode] = useState(false);
@@ -27,6 +27,7 @@ const ServiceBooking = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [services, setServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState([]);
   const [singleSrv, setSingleSrv] = useState({});
   const [showSrvName, setShowSrvName] = useState([]);
   const [bookingService, setBookingService] = useState([]);
@@ -56,7 +57,7 @@ const ServiceBooking = () => {
       type: "error",
       autoClose: 4000,
     });
-    Naviagate("/Login");
+    Navigate("/Login");
     localStorage.removeItem("user_token");
     localStorage.removeItem("user_role_name");
   };
@@ -88,6 +89,7 @@ const ServiceBooking = () => {
       })
       .then(function (response) {
         setServices(response.data.data);
+        setFilteredServices(response.data.data);
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
@@ -211,6 +213,7 @@ const ServiceBooking = () => {
       })
       .then(function (response) {
         setServices(response.data.data);
+        setFilteredServices(response.data.data);
       })
       .catch(function (error) {
         if (error.response && error.response.status === 401) {
@@ -318,7 +321,7 @@ const ServiceBooking = () => {
         if (response.response.data.message == "Already_exist") {
           toast("هذة الخدمة موجودة بالعفل ", { type: "error" });
         }
-        return null
+        return null;
       })
       .finally(() => {
         setLoader(false);
@@ -334,25 +337,17 @@ const ServiceBooking = () => {
   };
 
   //search
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-    if (!searchValue.trim()) {
-      fetchData();
-      return;
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredServices(services);
+    } else {
+      setFilteredServices(
+        services.filter((item) =>
+          item?.client?.name?.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     }
-    let allServices = [...services];
-    let filteredServices = [];
-    allServices.forEach((booking) => {
-      if (
-        booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        filteredServices.push(booking);
-      }
-    });
-    setServices(filteredServices);
-    setLoader(false);
-  };
+  }, [searchValue, services]);
 
   return (
     <div className="flex flex-col">
@@ -660,34 +655,22 @@ const ServiceBooking = () => {
 
         {/* Search input form */}
         <div className="my-3">
-          <form className="w-full">
-            <div className="relative">
-              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                <SearchIcon className="text-white" />
-              </div>
-              <input
-                type="search"
-                id="default-search"
-                value={searchValue}
-                onChange={(e) => {
-                  setSearchValue(e.target.value);
-                }}
-                onKeyUp={(e) => {
-                  handleSearch(e);
-                }}
-                className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="بحث باسم العميل"
-                required
-              />
-              <button
-                type="submit"
-                onClick={handleSearch}
-                className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                بحث{" "}
-              </button>
+          <div className="w-full relative">
+            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <SearchIcon className="text-white" />
             </div>
-          </form>
+            <input
+              type="search"
+              id="default-search"
+              value={searchValue}
+              onChange={(e) => {
+                setSearchValue(e.target.value);
+              }}
+              className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="بحث باسم العميل"
+              required
+            />
+          </div>
         </div>
 
         {/* Table to display branch data */}
@@ -743,7 +726,7 @@ const ServiceBooking = () => {
             </thead>
           )}
           <tbody>
-            {services.map((booking, index) => {
+            {filteredServices.map((booking, index) => {
               const {
                 id,
                 employee,

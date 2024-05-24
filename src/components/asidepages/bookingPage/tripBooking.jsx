@@ -15,14 +15,15 @@ import ReactPaginate from "react-paginate";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 
 const TripBooking = () => {
-  const baseUrl = import.meta.env.VITE_SOME_KEY
-  const backBaseUrl = import.meta.env.VITE_IMAGE_KEY; 
+  const baseUrl = import.meta.env.VITE_SOME_KEY;
+  const backBaseUrl = import.meta.env.VITE_IMAGE_KEY;
 
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem("user_token");
   const userRoleName = localStorage.getItem("user_role_name");
   const [bookings, setBookings] = useState([]);
+  const [filteredBookings, setFilteredBookings] = useState([]);
   const [updateMode, setUpdateMode] = useState(false);
   const [updateTripsID, setUpdateTripsID] = useState("");
   const [searchValue, setSearchValue] = useState("");
@@ -46,7 +47,6 @@ const TripBooking = () => {
     type: z.string().min(1, { message: "يجب تعيين نوع الرحلة" }),
     trip_id: z.string().min(1, { message: "اختر اسم الرحلة " }),
     ticket_number: z.string().optional(),
-    // image: z.string().optional(),
   });
 
   const {
@@ -65,7 +65,7 @@ const TripBooking = () => {
     fetchClients();
     fetchData();
   }, []);
-   
+
   const fetchSingleBookingTrip = (id) => {
     let single = bookings.filter((bt) => bt.id === id);
     setBookingTrip(...single);
@@ -102,10 +102,11 @@ const TripBooking = () => {
       })
       .then(function (response) {
         setBookings(response.data.data);
+        setFilteredBookings(response.data.data);
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
-        return null
+        return null;
       })
       .finally(() => {
         setLoader(false);
@@ -128,7 +129,7 @@ const TripBooking = () => {
         setshowTripName(response.data.data);
       })
       .catch(function (error) {
-        return null
+        return null;
       })
       .finally(() => {
         setLoader(false);
@@ -148,7 +149,7 @@ const TripBooking = () => {
         setPayments(response.data.data);
       })
       .catch(function (error) {
-        return null
+        return null;
       })
       .finally(() => {
         setLoader(false);
@@ -167,7 +168,7 @@ const TripBooking = () => {
         setShowCurrencies(response.data.data);
       })
       .catch(function (error) {
-        return null
+        return null;
       })
       .finally(() => {
         setLoader(false);
@@ -186,7 +187,7 @@ const TripBooking = () => {
         setClients(response.data.data);
       })
       .catch(function (error) {
-        return null
+        return null;
       })
       .finally(() => {
         setLoader(false);
@@ -203,6 +204,7 @@ const TripBooking = () => {
       })
       .then(function (response) {
         setBookings(response.data.data);
+        setFilteredBookings(response.data.data);
       })
       .catch(function (error) {
         if (error.response && error.response.status === 401) {
@@ -254,7 +256,7 @@ const TripBooking = () => {
         setValue("payment_id", "");
       })
       .catch((error) => {
-        return null
+        return null;
       })
       .finally(() => {
         setLoader(false);
@@ -326,34 +328,26 @@ const TripBooking = () => {
         if (response.response.data.message == "Already_exist") {
           toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
         } else {
-          return null
+          return null;
         }
       })
       .finally(() => {
         setLoader(false);
       });
   };
-  //search
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
 
-    if (!searchValue.trim()) {
-      fetchData();
-      return;
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredBookings(bookings);
+    } else {
+      setFilteredBookings(
+        bookings.filter((item) =>
+          item?.client?.name?.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     }
-    let allBookings = [...bookings];
-    let filteredBookings = [];
-    allBookings.forEach((booking) => {
-      if (
-        booking?.client?.name.toLowerCase().includes(searchValue.toLowerCase())
-      ) {
-        filteredBookings.push(booking);
-      }
-    });
-    setBookings(filteredBookings);
-    setLoader(false);
-  };
+  }, [searchValue, bookings]);
 
   return (
     <div className="flex flex-col">
@@ -741,33 +735,21 @@ const TripBooking = () => {
         )}
         {/* Search input form */}
         <div className="my-3">
-          <form className="w-full">
-            <div className="relative">
-              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                <SearchIcon className="text-white" />
-              </div>
-              <input
-                type="search"
-                id="default-search"
-                value={searchValue}
-                onChange={(e) => {
-                  setSearchValue(e.target.value);
-                }}
-                onKeyUp={(e) => {
-                  handleSearch(e);
-                }}
-                className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="بحث باسم العميل"
-                required
-              />
-              <button
-                type="submit"
-                onClick={handleSearch}
-                className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                بحث{" "}
-              </button>
+          <form className="w-full relative">
+            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <SearchIcon className="text-white" />
             </div>
+            <input
+              type="search"
+              id="default-search"
+              value={searchValue}
+              onChange={(e) => {
+                setSearchValue(e.target.value);
+              }}
+              className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="بحث باسم العميل"
+              required
+            />
           </form>
         </div>
 
@@ -836,7 +818,7 @@ const TripBooking = () => {
             </thead>
           )}
           <tbody>
-            {bookings.map((booking, index) => {
+            {filteredBookings.map((booking, index) => {
               const {
                 id,
                 employee,
