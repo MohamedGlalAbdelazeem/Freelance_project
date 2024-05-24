@@ -106,16 +106,13 @@ const fetchEmployees = () => {
       },
     })
     .then(function (response) {
-      if (response.status === 401) {
-        handleUnauthenticated();
-      } else {
         setLoader(false);
         setEmployees(response.data.data);
-      }
     })
     .catch(function (error) {
-      console.error("Error fetching branches:", error);
-      handleUnauthenticated();
+      if (error.response.data.message === "Unauthenticated.") {
+        handleUnauthenticated();
+      }
     })
     .finally(() => {
       setLoader(false);
@@ -158,7 +155,7 @@ const storeEmployee = () => {
         "Content-Type": "multipart/form-data",
       },
     })
-    .then(function () {
+    .then(function (res) {
       toast.success("تم تسجيل الموظف بنجاح");
       fetchEmployees();
       reset();
@@ -186,30 +183,12 @@ const deleteEmp = (id) => {
       },
     })
     .then(function (response) {
-      if (response.status === 401) {
-        handleUnauthenticated();
-      } else if (response.status === 204) {
         toast.success("تم حذف الموظف بنجاح");
         fetchEmployees();
-      } else {
-        console.error("Unexpected response status:", response.status);
-        toast.warning("حدث خطأ غير متوقع");
-      }
     })
     .catch(function (error) {
-      console.error("Error deleting branch:", error);
-      setLoader(true);
-      if (
-        error.response &&
-        error.response.status === 401 &&
-        error.response.data.message === "Unauthenticated"
-      ) {
-        toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-          type: "error",
-        });
-      } else {
-        console.log("Error deleting branch:", error);
-      }
+      return null;
+     
     })
     .finally(() => {
       setLoader(false);
@@ -424,7 +403,7 @@ const deleteEmp = (id) => {
               "الاسم",
               "البريد",
               "رقم الهاتف",
-              "الفرع",
+              // "الفرع",
               "الدور",
               "تاريخ الانشاء",
               "التعديل",
@@ -475,12 +454,12 @@ const deleteEmp = (id) => {
                     {phone_number}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                {/* <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {branches.find((branch) => branch.id === branch_id)?.name}
                     
                   </span>
-                </td>
+                </td> */}
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {role_name}

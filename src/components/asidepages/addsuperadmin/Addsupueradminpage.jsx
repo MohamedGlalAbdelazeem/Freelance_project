@@ -55,15 +55,7 @@ const handleUnauthenticated = () => {
   localStorage.removeItem("user_role_name");
 };
 
-// useEffect(() => {
-//   setLoader(true);
-//   const userToken = localStorage.getItem("user_token");
-//   if (!userToken) {
-//     handleUnauthenticated();
-//     return;
-//   }
-// }, []);
-
+ 
 
 
 useEffect(() => {

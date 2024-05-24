@@ -106,7 +106,7 @@ const TripBooking = () => {
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
-        console.error("Error fetching branches:", error);
+        return null
       })
       .finally(() => {
         setLoader(false);
@@ -129,8 +129,7 @@ const TripBooking = () => {
         setshowTripName(response.data.data);
       })
       .catch(function (error) {
-        const errorMessage = error.response.data.message;
-        console.log("Error fetching trips:", errorMessage);
+        return null
       })
       .finally(() => {
         setLoader(false);
@@ -150,8 +149,7 @@ const TripBooking = () => {
         setPayments(response.data.data);
       })
       .catch(function (error) {
-        const errorMessage = error.response.data.message;
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", errorMessage);
+        return null
       })
       .finally(() => {
         setLoader(false);
@@ -170,8 +168,7 @@ const TripBooking = () => {
         setShowCurrencies(response.data.data);
       })
       .catch(function (error) {
-        const errorMessage = error.response.data.message;
-        console.error("حدث خطأ الرجاء محاولة مرة أخرى:", errorMessage);
+        return null
       })
       .finally(() => {
         setLoader(false);
@@ -190,7 +187,7 @@ const TripBooking = () => {
         setClients(response.data.data);
       })
       .catch(function (error) {
-        console.error("Error:", error);
+        return null
       })
       .finally(() => {
         setLoader(false);
@@ -258,8 +255,7 @@ const TripBooking = () => {
         setValue("payment_id", "");
       })
       .catch((error) => {
-        const errorMessage = error.response.data.message;
-        console.log(errorMessage);
+        return null
       })
       .finally(() => {
         setLoader(false);
@@ -331,7 +327,7 @@ const TripBooking = () => {
         if (response.response.data.message == "Already_exist") {
           toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
         } else {
-          console.log("Error updating branch:", response);
+          return null
         }
       })
       .finally(() => {
