@@ -14,7 +14,7 @@ import { ScrollUp } from "../../ScrollUp";
 import ReactPaginate from "react-paginate";
 
 function Services() {
-  const baseUrl = "http://127.0.0.1:8000/api/";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
   const [loader, setLoader] = useState(true);
   const userRoleName = localStorage.getItem("user_role_name");
   const [updateMode, setUpdateMode] = useState(false);
@@ -61,18 +61,17 @@ function Services() {
     fetchCategories();
     fetchCurrency();
   }, []);
-  // fetch pagenation data///////////////////////
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchPagenation();
-  }, [currentPage]); // Fetch data whenever currentPage changes
-
+  }, [currentPage]);  
   const fetchPagenation = () => {
     setLoader(true);
     axios
-      .get(`http://127.0.0.1:8000/api/services?page=${currentPage}`, {
+      .get(`${baseUrl}services?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },

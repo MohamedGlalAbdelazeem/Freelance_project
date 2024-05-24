@@ -14,8 +14,8 @@ import ReactPaginate from "react-paginate";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 
 const ServiceBooking = () => {
-  const baseUrl = "http://127.0.0.1:8000/api/";
-  const backBaseUrl = "http://127.0.0.1:8000";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
+  const backBaseUrl = import.meta.env.VITE_IMAGE_KEY; 
 
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();

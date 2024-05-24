@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import LoginIcon from '@mui/icons-material/Login';
 import axios from "axios";
 function Resetpassword() {
+    const baseUrl = import.meta.env.VITE_SOME_KEY
     const [loader , setLoader ] = useState(false);
     const [password1, setPassword1] = useState("");
     const [password2, setPassword2] = useState("");
@@ -21,7 +22,7 @@ function Resetpassword() {
           }try {
            setLoader(true); 
            const res = await axios.post(
-            `http://127.0.0.1:8000/api/reset-password`,
+            `${baseUrl}reset-password`,
             {
               password: password1,
               password_confirmation: password2,
@@ -45,7 +46,7 @@ function Resetpassword() {
           console.log(error);
         }
         finally {
-            setLoader(false); // Hide loader whether request was successful or failed
+            setLoader(false);  
           }
     
       };

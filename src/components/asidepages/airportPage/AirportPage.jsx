@@ -14,7 +14,7 @@ import { ScrollUp } from "../../ScrollUp";
 import Select from "react-select";
 
 function AirportPage() {
-  const baseUrl = "http://127.0.0.1:8000/api/";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
   const [airports, setAirports] = useState([]);
   const [filteredAirports, setFilteredAirports] = useState([]);
   const [loader, setLoader] = useState(true);

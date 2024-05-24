@@ -13,7 +13,7 @@ import { ScrollUp } from "../../ScrollUp";
 import ReactPaginate from 'react-paginate';
 
 function Userpage() {
-  const baseUrl = "http://127.0.0.1:8000/api/";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
   const [loader, setLoader] = useState(true);
 
   const [updateMode, setUpdateMode] = useState(false);
@@ -117,7 +117,6 @@ const fetchEmployees = () => {
     .finally(() => {
       setLoader(false);
     });
-
 };
 
 const fetchBranchesInSelection = () => {
@@ -162,10 +161,8 @@ const storeEmployee = () => {
       setValue("branch_id","");
     })
     .catch(function (error) {
-      if (
-        error.response.data.message === "The email has already been taken."
-      ) {
-        toast.error("الموظف موجود بالفعل");
+      if ( error.response.data.message === "The email has already been taken." ) {
+        toast.error("هذا البريد  الإلكتروني موجود بالفعل ");
       }
       console.error("Error fetching", error.response.data.message);
     })
@@ -187,7 +184,7 @@ const deleteEmp = (id) => {
         fetchEmployees();
     })
     .catch(function (error) {
-      return null;
+      console.error("Error fetching", error.response.data.message);
      
     })
     .finally(() => {
@@ -216,11 +213,12 @@ const deleteEmp = (id) => {
       )
       .then(function () {
         toast.success("تم تحديث البيانات بنجاح");
+        reset();
         fetchEmployees();
         setUpdateMode(false);
       })
       .catch(function (error) {
-        toast.error(error.response.data.message);
+        console.error("Error fetching", error.response.data.message);
       })
       .finally(() => {
         setLoader(false);
@@ -246,7 +244,7 @@ const deleteEmp = (id) => {
     setLoader(false);
   };
 
-  return (
+return (
     <div>
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         {/* register & update users */}
@@ -403,7 +401,7 @@ const deleteEmp = (id) => {
               "الاسم",
               "البريد",
               "رقم الهاتف",
-              // "الفرع",
+              "الفرع",
               "الدور",
               "تاريخ الانشاء",
               "التعديل",
@@ -426,6 +424,7 @@ const deleteEmp = (id) => {
               email,
               phone_number,
               branch_id,
+              branch,
               role_name,
               created_at,
             } = emp;
@@ -454,12 +453,12 @@ const deleteEmp = (id) => {
                     {phone_number}
                   </span>
                 </td>
-                {/* <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
-                    {branches.find((branch) => branch.id === branch_id)?.name}
+                    {branch?.name}
                     
                   </span>
-                </td> */}
+                </td>
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {role_name}
