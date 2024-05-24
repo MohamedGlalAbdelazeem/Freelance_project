@@ -16,7 +16,7 @@ import ReactPaginate from "react-paginate";
 function ClientPage() {
 
   const baseUrl = import.meta.env.VITE_SOME_KEY
-  const backBaseUrl = "http://127.0.0.1:8000";//////////////////////////////////
+  const backBaseUrl = import.meta.env.VITE_IMAGE_KEY; 
   const [loader, setLoader] = useState(false);
   const [countries, setCountries] = useState([]);
 

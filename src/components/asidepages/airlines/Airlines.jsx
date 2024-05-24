@@ -12,10 +12,9 @@ import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { ScrollUp } from "../../ScrollUp";
 
-
 function Airlines() {
 
-  const baseUrl = import.meta.env.VITE_SOME_KEY
+const baseUrl = import.meta.env.VITE_SOME_KEY
 const [airlines, setAirlines] = useState([]);
 const [loader, setLoader] = useState(true);
 const Navigate = useNavigate();
