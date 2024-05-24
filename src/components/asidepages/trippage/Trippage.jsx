@@ -32,7 +32,7 @@ function Trippage() {
   const [showAirports, setShowAirports] = useState([]);
   const [showCurrencies, setShowCurrencies] = useState([]);
   const [showAirLines, setShowAirLines] = useState([]);
-  const [airportId, setAirportId] = useState([]);
+  const [airportId, setAirportId] = useState("");
 
   const schema = z.object({
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),

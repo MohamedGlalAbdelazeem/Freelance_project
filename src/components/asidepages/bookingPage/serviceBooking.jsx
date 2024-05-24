@@ -318,7 +318,7 @@ const ServiceBooking = () => {
         if (response.response.data.message == "Already_exist") {
           toast("هذة الخدمة موجودة بالعفل ", { type: "error" });
         }
-        console.log("Error updating branch:", response.response.data.message);
+        return null
       })
       .finally(() => {
         setLoader(false);
