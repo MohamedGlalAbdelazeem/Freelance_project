@@ -15,6 +15,7 @@ import { ScrollUp } from "../../ScrollUp";
 function PaymentPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [payments, setPayments] = useState([]);
+  const [filteredPayments, setFilteredPayments] = useState([]);
   const [loader, setLoader] = useState(true);
   const Navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
@@ -50,7 +51,6 @@ function PaymentPage() {
     fetchPayments();
   }, []);
 
-   
   const fetchPayments = () => {
     setLoader(true);
     axios
@@ -61,6 +61,7 @@ function PaymentPage() {
       })
       .then(function (response) {
         setPayments(response.data.data);
+        setFilteredPayments(response.data.data);
       })
       .catch(function (error) {
         if (error.response.data.message === "Unauthenticated.") {
@@ -71,8 +72,6 @@ function PaymentPage() {
         setLoader(false);
       });
   };
-
-
 
   const storePayment = async () => {
     setLoader(true);
@@ -121,8 +120,8 @@ function PaymentPage() {
         toast.success("تم حذف طريقة الدفع بنجاح");
         fetchPayments();
       })
-      .catch(function (error) {
-      return null
+      .catch(function () {
+        return null;
       })
       .finally(() => {
         setLoader(false);
@@ -152,7 +151,6 @@ function PaymentPage() {
         if (response.response.data.message == "Already_exist") {
           toast("هذا طريقة الدفع مسجل بالعفل ", { type: "error" });
         }
-        
       })
       .finally(() => {
         setLoader(false);
@@ -161,40 +159,36 @@ function PaymentPage() {
       });
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-
-    if (!searchValue.trim()) {
-      fetchPayments();
-      return;
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredPayments(payments);
+    } else {
+      setFilteredPayments(
+        payments.filter((item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     }
-    let allpayments = [...payments];
-    let filteredpayments = [];
-    allpayments.forEach((cat) => {
-      if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredpayments.push(cat);
-      }
-    });
-    setPayments(filteredpayments);
-    setLoader(false);
-  };
+  }, [searchValue, payments]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
     fetchPagination();
-  }, [currentPage]); 
+  }, [currentPage]);
   const fetchPagination = () => {
     setLoader(true);
     axios
-      .get(`http://127.0.0.1:8000/api/payments?page=${currentPage}`, {
+      .get(`${baseUrl}payments?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       })
       .then(function (response) {
         setPayments(response.data.data);
+        setFilteredPayments(response.data.data);
+
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
@@ -272,29 +266,19 @@ function PaymentPage() {
 
       {/* Search input form */}
       <div className="my-3">
-        <form className="w-full">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <SearchIcon className="text-white" />
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyUp={(e) => handleSearch(e)}
-              className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="البحث بطريقة الدفع"
-              required
-            />
-            <button
-              type="submit"
-              onClick={handleSearch}
-              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              بحث{" "}
-            </button>
+        <form className="w-full relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <SearchIcon className="text-white" />
           </div>
+          <input
+            type="search"
+            id="default-search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="البحث بطريقة الدفع"
+            required
+          />
         </form>
       </div>
 
@@ -306,8 +290,8 @@ function PaymentPage() {
               الترتيب
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الاسم           
-               </th>
+              الاسم
+            </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               الحالة
             </th>
@@ -322,7 +306,7 @@ function PaymentPage() {
         </thead>
         <tbody>
           {/* Mapping payments data to table rows */}
-          {payments.map((airport, index) => {
+          {filteredPayments.map((airport, index) => {
             const { name, id, status, created_at } = airport;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (

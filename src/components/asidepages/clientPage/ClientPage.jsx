@@ -14,7 +14,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import ReactPaginate from "react-paginate";
 
 function ClientPage() {
-
   const baseUrl = "http://127.0.0.1:8000/api/";
   const backBaseUrl = "http://127.0.0.1:8000";
   const [loader, setLoader] = useState(false);
@@ -24,235 +23,231 @@ function ClientPage() {
   const userRoleName = localStorage.getItem("user_role_name");
 
   const [clients, setClients] = useState([]);
+  const [filteredClients, setFilteredClients] = useState([]);
   const [searchValue, setSearchValue] = useState("");
   const [updateMode, setUpdateMode] = useState(false);
   const [updateClientID, setUpdateClientID] = useState("");
   const [singleClient, setSingleClient] = useState({});
   const Navigate = useNavigate();
 
-const handleUnauthenticated = () => {
-  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-    type: "error",
-    autoClose: 4000,
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
+    });
+    Navigate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
+
+  const schema = z.object({
+    name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
+    email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
+    phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
+    address: z.string().min(1, { message: "يجب ادخال العنوان" }),
+    countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
+    image: z.any(),
+    notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
   });
-  Navigate("/Login");
-  localStorage.removeItem("user_token");
-  localStorage.removeItem("user_role_name");
-};
 
-const schema = z.object({
-  name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
-  email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
-  phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
-  address: z.string().min(1, { message: "يجب ادخال العنوان" }),
-  countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
-  image: z.any(),
-  notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
-});
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
 
-const {
-  register,
-  handleSubmit,
-  setValue,
-  reset,
-  getValues,
-  formState: { errors, isSubmitting },
-} = useForm({ resolver: zodResolver(schema) });
-
-
-// pagenation
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
-useEffect(() => {
-  fetchPagenation();
-}, [currentPage]);  
-const fetchPagenation = () => {
-  setLoader(true);
-  axios
-    .get(`http://127.0.0.1:8000/api/clients?page=${currentPage}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setClients(response.data.data);
-      setTotalPages(response.data.meta.pagination.last_page);
-    })
-    .catch(function (error) {
-      console.error("Error fetching branches:", error);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);
-};
-
-
-useEffect(() => {
-  fetchClients();
-  fetchCountries();
-}, []);
-// countries
-const fetchCountries = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}countries`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setCountries(response.data.data);
-    })
-    .catch(function (error) {
-      console.error("Error fetching countries:", error);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-// get clients
-const fetchClients = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}clients`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setClients(response.data.data);
-    })
-    .catch(function (error) {
-      console.error("Error:", error);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-//store
-const storeClient = () => {
-  setLoader(true);
-  const clientData = {
-    name: getValues("name"),
-    email: getValues("email"),
-    phone_number: getValues("phone_number"),
-    address: getValues("address"),
-    branch_id: clients[0]?.branch?.branch_id,
-    countries_id: getValues("countries_id"),
-    notes: getValues("notes"),
+  // pagenation
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  useEffect(() => {
+    fetchPagenation();
+  }, [currentPage]);
+  const fetchPagenation = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}clients?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setClients(response.data.data);
+        setFilteredClients(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
   };
-  if (getValues("image").length > 0) {
-    clientData.image = getValues("image")[0];
-  }
-  axios
-    .post(`${baseUrl}clients`, clientData, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-        "content-type": "multipart/form-data",
-      },
-    })
-    .then(function () {
-      toast.success("تم تسجيل العميل بنجاح");
-      fetchClients();
-      reset();
-      setValue("countries_id", "");
-    })
-    .catch(function (error) {
-      if (error.response.data.message === "Unauthenticated.") {
-        handleUnauthenticated();
-      }
-      if (
-        error.response.data.message === "The email has already been taken."
-      ) {
-        toast.error("هذا البريد الإلكتروني موجود بالفعل");
-      }
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-//delete
-const deleteClient = (id) => {
-  setLoader(true);
-  axios
-    .delete(`${baseUrl}clients/${id}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function () {
-      fetchClients();
-      toast.success(`تم حذف العميل بنجاح`);
-    })
-    .catch(function (error) {
-      toast.error(error.response.data.message);
-    });
-};
-//update
-const handleClientUpdate = () => {
-  setLoader(true);
-  const updateClientData = {
-    name: getValues("name"),
-    email: getValues("email"),
-    phone_number: getValues("phone_number"),
-    address: getValues("address"),
-    branch_id: clients[0]?.branch?.branch_id,
-    countries_id: getValues("countries_id"),
-    notes: getValues("notes"),
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
   };
-  if (getValues("image").length > 0) {
-    updateClientData.image = getValues("image")[0];
-  }
-  axios
-    .post(`${baseUrl}clients/${updateClientID}`, updateClientData, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-        "content-type": "multipart/form-data",
-      },
-    })
-    .then(function () {
-      toast.success("تم تحديث العميل بنجاح");
-      setUpdateMode(false);
-      fetchClients();
-      reset();
-      setValue("countries_id", "");
-    })
-    .catch(function (error) {
-      toast.error(error.response.data.message);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-//search
-const handleSearch = (e) => {
-  e.preventDefault();
-  setLoader(true);
 
-  if (!searchValue.trim()) {
+  useEffect(() => {
     fetchClients();
-    return;
-  }
-  let allClients = [...clients];
-  let filteredClients = [];
-  allClients.forEach((client) => {
-    if (client.name.toLowerCase().includes(searchValue.toLowerCase())) {
-      filteredClients.push(client);
+    fetchCountries();
+  }, []);
+  // countries
+  const fetchCountries = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}countries`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setCountries(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("Error fetching countries:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  // get clients
+  const fetchClients = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}clients`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setClients(response.data.data);
+        setFilteredClients(response.data.data);
+      })
+      .catch(function (error) {
+        console.error("Error:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  //store
+  const storeClient = () => {
+    setLoader(true);
+    const clientData = {
+      name: getValues("name"),
+      email: getValues("email"),
+      phone_number: getValues("phone_number"),
+      address: getValues("address"),
+      branch_id: clients[0]?.branch?.branch_id,
+      countries_id: getValues("countries_id"),
+      notes: getValues("notes"),
+    };
+    if (getValues("image").length > 0) {
+      clientData.image = getValues("image")[0];
     }
-  });
-  setClients(filteredClients);
-  setLoader(false);
-};
-// get client by id
-const fetchClientById = (id) => {
-  let single = clients.filter((client) => client.id === id);
-  setSingleClient(...single);
-};
+    axios
+      .post(`${baseUrl}clients`, clientData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "content-type": "multipart/form-data",
+        },
+      })
+      .then(function () {
+        toast.success("تم تسجيل العميل بنجاح");
+        fetchClients();
+        reset();
+        setValue("countries_id", "");
+      })
+      .catch(function (error) {
+        if (error.response.data.message === "Unauthenticated.") {
+          handleUnauthenticated();
+        }
+        if (
+          error.response.data.message === "The email has already been taken."
+        ) {
+          toast.error("هذا البريد الإلكتروني موجود بالفعل");
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  //delete
+  const deleteClient = (id) => {
+    setLoader(true);
+    axios
+      .delete(`${baseUrl}clients/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function () {
+        fetchClients();
+        toast.success(`تم حذف العميل بنجاح`);
+      })
+      .catch(function (error) {
+        toast.error(error.response.data.message);
+      });
+  };
+  //update
+  const handleClientUpdate = () => {
+    setLoader(true);
+    const updateClientData = {
+      name: getValues("name"),
+      email: getValues("email"),
+      phone_number: getValues("phone_number"),
+      address: getValues("address"),
+      branch_id: clients[0]?.branch?.branch_id,
+      countries_id: getValues("countries_id"),
+      notes: getValues("notes"),
+    };
+    if (getValues("image").length > 0) {
+      updateClientData.image = getValues("image")[0];
+    }
+    axios
+      .post(`${baseUrl}clients/${updateClientID}`, updateClientData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "content-type": "multipart/form-data",
+        },
+      })
+      .then(function () {
+        toast.success("تم تحديث العميل بنجاح");
+        setUpdateMode(false);
+        fetchClients();
+        reset();
+        setValue("countries_id", "");
+      })
+      .catch(function (error) {
+        toast.error(error.response.data.message);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
-return (
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredClients(clients);
+    } else {
+      setFilteredClients(
+        clients.filter((item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
+    }
+  }, [searchValue, clients]);
+
+  // get client by id
+  const fetchClientById = (id) => {
+    let single = clients.filter((client) => client.id === id);
+    setSingleClient(...single);
+  };
+
+  return (
     <div>
       <dialog id="my_modal_2" className="modal">
         <div className="modal-box relative">
@@ -267,7 +262,7 @@ return (
                 <img
                   src={`${backBaseUrl}${singleClient?.imagePath}/${singleClient?.image}`}
                   alt="avatar"
-                  className="w-[150px] h-[150px]  border-zinc-500 mx-auto mb-4"
+                  className="w-[130px] h-[130px] rounded-lg border-zinc-500 mx-auto mb-4"
                 />
               </div>
             )}
@@ -303,7 +298,7 @@ return (
                       اسم الفرع :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient?.branch?.branch_name }
+                      {singleClient?.branch?.branch_name}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -487,31 +482,22 @@ return (
 
       {/* Search input form */}
       <div className="my-3">
-        <form className="w-full">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <SearchIcon className="text-white" />
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder={`ابحث عن عميل بالاسم`}
-              required
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyUp={(e) => handleSearch(e)}
-            />
-            <button
-              onClick={(e) => handleSearch(e)}
-              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              بحث
-            </button>
+        <div className="w-full relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <SearchIcon className="text-white" />
           </div>
-        </form>
+          <input
+            type="search"
+            id="default-search"
+            className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder={`ابحث عن عميل بالاسم`}
+            required
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+        </div>
       </div>
-      {/* Table to display branch data */}
+      {/* Table to display branch clients */}
       <table className="border-collapse w-full">
         <thead>
           {userRoleName === "admin" ? (
@@ -541,7 +527,7 @@ return (
           )}
         </thead>
         <tbody>
-          {clients.map((client, index) => {
+          {filteredClients.map((client, index) => {
             const {
               id,
               name,

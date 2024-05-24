@@ -24,6 +24,7 @@ function Services() {
   const [searchValue, setSearchValue] = useState("");
   const userToken = localStorage.getItem("user_token");
   const [services, setServices] = useState([]);
+  const [filteredServices, setFilteredServices] = useState([]);
   const [singleSrv, setSingleSrv] = useState({});
   const [showSrv, setShowSrv] = useState(false);
   const Naviagate = useNavigate();
@@ -78,6 +79,7 @@ function Services() {
       })
       .then(function (response) {
         setServices(response.data.data);
+        setFilteredServices(response.data.data);
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
@@ -145,6 +147,7 @@ function Services() {
       })
       .then(function (response) {
         setServices(response.data.data);
+        setFilteredServices(response.data.data);
       })
       .catch(function (error) {
         if (error.response.data.message === "Unauthorized") {
@@ -258,26 +261,18 @@ function Services() {
         setLoader(false);
       });
   };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-
-    if (!searchValue.trim()) {
-      fetchServices();
-      return;
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredServices(services);
+    } else {
+      setFilteredServices(
+        services.filter((item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     }
-    let allSrv = [...services];
-    let filteredSrv = [];
-    allSrv.forEach((srv) => {
-      if (srv.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredSrv.push(srv);
-      }
-    });
-    setServices(filteredSrv);
-    setLoader(false);
-  };
-
+  }, [searchValue, services]);
   const fetchSrvById = (id) => {
     let single = services.filter((client) => client.id === id);
     setSingleSrv(...single);
@@ -508,29 +503,20 @@ function Services() {
 
       {/* Search input form */}
       <div className="my-3">
-        <form className="w-full">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <SearchIcon className="text-white" />
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder={`ابحث عن خدمة بالاسم`}
-              required
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyUp={(e) => handleSearch(e)}
-            />
-            <button
-              onClick={(e) => handleSearch(e)}
-              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              بحث
-            </button>
+        <div className="w-full relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <SearchIcon className="text-white" />
           </div>
-        </form>
+          <input
+            type="search"
+            id="default-search"
+            className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder={`ابحث عن خدمة بالاسم`}
+            required
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+        </div>
       </div>
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
@@ -574,7 +560,7 @@ function Services() {
         </thead>
         <tbody>
           {/* Mapping branches data to table rows */}
-          {services.map((service, index) => {
+          {filteredServices.map((service, index) => {
             const {
               id,
               name,

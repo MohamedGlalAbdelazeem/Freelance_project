@@ -16,8 +16,9 @@ import ReactPaginate from "react-paginate";
 function Trippage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [trips, setTrips] = useState([]);
+  const [filteredTrips, setFilteredTrips] = useState([]);
   const [loader, setLoader] = useState(true);
-  const Naviagate = useNavigate();
+  const Navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
   const userRoleName = localStorage.getItem("user_role_name");
   const [branchStatus, setBranchStatus] = useState(false);
@@ -64,7 +65,7 @@ function Trippage() {
   }, []);
 
   useEffect(() => {
-    fetchPagenation();
+    fetchPagination();
   }, [currentPage]);
 
   useEffect(() => {
@@ -99,7 +100,7 @@ function Trippage() {
     setSingleTrip(...single);
   };
 
-  const fetchPagenation = () => {
+  const fetchPagination = () => {
     setLoader(true);
     axios
       .get(`${baseUrl}trips?page=${currentPage}`, {
@@ -109,6 +110,7 @@ function Trippage() {
       })
       .then(function (response) {
         setTrips(response.data.data);
+        setFilteredTrips(response.data.data);
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
@@ -185,7 +187,7 @@ function Trippage() {
         ) {
           console.error("هذا المستخدم ليس له صلاحية التعديل");
         }
-      })
+      });
   }
   function fetchCurrencies() {
     setLoader(true);
@@ -221,6 +223,7 @@ function Trippage() {
       .then(function (response) {
         setLoader(false);
         setTrips(response.data.data);
+        setFilteredTrips(response.data.data);
       })
       .catch(function (error) {
         if (error.response.data.message === "Unauthenticated.") {
@@ -237,7 +240,7 @@ function Trippage() {
       type: "error",
       autoClose: 4000,
     });
-    Naviagate("/Login");
+    Navigate("/Login");
     localStorage.removeItem("user_token");
     localStorage.removeItem("user_role_name");
   };
@@ -367,24 +370,18 @@ function Trippage() {
       });
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-
-    if (!searchValue.trim()) {
-      fetchData();
-      return;
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredTrips(trips);
+    } else {
+      setFilteredTrips(
+        trips.filter((item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     }
-    let allTrips = [...trips];
-    let filteredTrips = [];
-    allTrips.forEach((trip) => {
-      if (trip.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredTrips.push(trip);
-      }
-    });
-    setTrips(filteredTrips);
-    setLoader(false);
-  };
+  }, [searchValue, trips]);
 
   return (
     <main className="branchTable">
@@ -578,10 +575,7 @@ function Trippage() {
                     </option>
                     {showAirports.map((airport, index) => {
                       return (
-                        <option
-                          key={index}
-                          value={airport.id}
-                        >
+                        <option key={index} value={airport.id}>
                           {airport.name}
                         </option>
                       );
@@ -603,7 +597,7 @@ function Trippage() {
                     </option>
                     {showAirLines[0]?.airLines?.map((line, index) => {
                       return (
-                        <option key={index} value={line.id} >
+                        <option key={index} value={line.id}>
                           {line.name}
                         </option>
                       );
@@ -721,7 +715,6 @@ function Trippage() {
                         <Switch
                           checked={branchStatus}
                           onChange={(e) => {
-                            console.log(branchStatus);
                             setBranchStatus(e.target.checked);
                           }}
                           color="success"
@@ -763,34 +756,22 @@ function Trippage() {
 
       {/* Search input form */}
       <div className="my-3">
-        <form className="w-full">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <SearchIcon className="text-white" />
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              value={searchValue}
-              onChange={(e) => {
-                setSearchValue(e.target.value);
-              }}
-              onKeyUp={(e) => {
-                handleSearch(e);
-              }}
-              className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="بحث باسم الرحلة"
-              required
-            />
-            <button
-              type="submit"
-              onClick={handleSearch}
-              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              بحث{" "}
-            </button>
+        <div className="w-full relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <SearchIcon className="text-white" />
           </div>
-        </form>
+          <input
+            type="search"
+            id="default-search"
+            value={searchValue}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+            }}
+            className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="بحث باسم الرحلة"
+            required
+          />
+        </div>
       </div>
 
       {/* Table to display branch data */}
@@ -852,7 +833,7 @@ function Trippage() {
           </thead>
         )}
         <tbody>
-          {trips.map((trip, index) => {
+          {filteredTrips.map((trip, index) => {
             const {
               name,
               id,

@@ -12,50 +12,47 @@ import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
 import { ScrollUp } from "../../ScrollUp";
 
-
 function Airlines() {
+  const baseUrl = "http://127.0.0.1:8000/api/";
+  const [airlines, setAirlines] = useState([]);
+  const [filteredAirlines, setFilteredAirlines] = useState([]);
+  const [loader, setLoader] = useState(true);
+  const Navigate = useNavigate();
+  const userToken = localStorage.getItem("user_token");
+  const [airlineStatus, setAirlineStatus] = useState(false);
+  const [updateMode, setUpdateMode] = useState(false);
+  const [updateAirportID, setUpdateAirportID] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
-const baseUrl = "http://127.0.0.1:8000/api/";
-const [airlines, setAirlines] = useState([]);
-const [loader, setLoader] = useState(true);
-const Navigate = useNavigate();
-const userToken = localStorage.getItem("user_token");
-const [airlinestatus, setAirlinestatus] = useState(false);
-const [updateMode, setUpdateMode] = useState(false);
-const [updateAirportID, setUpdateAirportID] = useState("");
-const [searchValue, setSearchValue] = useState("");
+  const schema = z.object({
+    name: z.string().min(1, { message: "ادخل اسم خط الطيران" }),
+  });
 
-const schema = z.object({
-name: z.string().min(1, { message: "ادخل اسم خط الطيران" }),
-});
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
 
-const {
-register,
-handleSubmit,
-setValue,
-reset,
-getValues,
-formState: { errors, isSubmitting },
-} = useForm({ resolver: zodResolver(schema) });
-
-
-const handleUnauthenticated = () => {
+  const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-        type: "error",
-        autoClose: 4000,
+      type: "error",
+      autoClose: 4000,
     });
     Navigate("/Login");
     localStorage.removeItem("user_token");
     localStorage.removeItem("user_role_name");
-};
+  };
 
-useEffect(() => {
-  fetchAirlines();
-}, []);
+  useEffect(() => {
+    fetchAirlines();
+  }, []);
 
-
-// show Airlines
-const fetchAirlines = () => {
+  // show Airlines
+  const fetchAirlines = () => {
     setLoader(true);
     axios
       .get(`${baseUrl}airlines`, {
@@ -65,151 +62,151 @@ const fetchAirlines = () => {
       })
       .then(function (response) {
         setAirlines(response.data.data);
+        setFilteredAirlines(response.data.data);
       })
-      .catch(function (error) {   
+      .catch(function (error) {
         if (error.response.data.message === "Unauthenticated.") {
-            handleUnauthenticated();
+          handleUnauthenticated();
         }
       })
       .finally(() => {
         setLoader(false);
       });
-};
+  };
 
-// store airlines
-const storeAirport = async () => {
-setLoader(true);
-await axios
-    .post(
-    `${baseUrl}airlines`,
-    {
-        name: getValues("name"),
-    },
-    {
-        headers: {
-        Authorization: `Bearer ${userToken}`,
+  // store airlines
+  const storeAirport = async () => {
+    setLoader(true);
+    await axios
+      .post(
+        `${baseUrl}airlines`,
+        {
+          name: getValues("name"),
         },
-    }
-    )
-    .then(() => {
-    toast.success("تم إنشاء خط الطيران بنجاح  بنجاح");
-    reset();
-    fetchAirlines();
-    })
-    .catch((error) => {
-    if (error.response.data.message == "Already_exist") {
-        toast("هذا الخط موجود بالفعل ", { type: "error" });
-    }
-    if ( error.response.data.message === "The name has already been taken."  ) {
-        toast.error("خط الطيران مسجل بالفعل");
-    }
-    })
-    .finally(() => {
-    setLoader(false);
-    });
-};
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success("تم إنشاء خط الطيران بنجاح  بنجاح");
+        reset();
+        fetchAirlines();
+      })
+      .catch((error) => {
+        if (error.response.data.message == "Already_exist") {
+          toast("هذا الخط موجود بالفعل ", { type: "error" });
+        }
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
+          toast.error("خط الطيران مسجل بالفعل");
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
-// delete airlines
-function deleteAilines(id) {
-setLoader(true);
-axios
-    .delete(`${baseUrl}airlines/${id}`, {
-    headers: {
-        Authorization: `Bearer ${userToken}`,
-    },
-    })
-    .then(function () {
-    toast.success("تم حذف خط  الطيران بنجاح");
-    fetchAirlines();
-    })
-    .catch(function (error) {
-      return null;
-    })
-    .finally(() => {
-    setLoader(false);
-    });
-}
-
-// update airlines
-const updateAirport = () => {
-setLoader(true);
-axios
-    .post(
-    `${baseUrl}airlines/${updateAirportID}`,
-    {
-        name: getValues("name"),
-        status: airlinestatus ? "1" : "0",
-    },
-    {
+  // delete airlines
+  function deleteAirline(id) {
+    setLoader(true);
+    axios
+      .delete(`${baseUrl}airlines/${id}`, {
         headers: {
-        Authorization: `Bearer ${userToken}`,
+          Authorization: `Bearer ${userToken}`,
         },
+      })
+      .then(function () {
+        toast.success("تم حذف خط  الطيران بنجاح");
+        fetchAirlines();
+      })
+      .catch(function (error) {
+        return null;
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }
+
+  // update airlines
+  const updateAirport = () => {
+    setLoader(true);
+    axios
+      .post(
+        `${baseUrl}airlines/${updateAirportID}`,
+        {
+          name: getValues("name"),
+          status: airlineStatus ? "1" : "0",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(() => {
+        toast("تم تحديث المطار  بنجاح", { type: "success" });
+        fetchAirlines();
+      })
+      .catch((response) => {
+        if (
+          response.response.data.message == "The name has already been taken."
+        ) {
+          toast("هذا المطار مسجل بالعفل ", { type: "error" });
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+        setUpdateMode(false);
+        reset();
+      });
+  };
+
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredAirlines(airlines);
+    } else {
+      setFilteredAirlines(
+        airlines.filter((item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     }
-    )
-    .then(() => {
-    toast("تم تحديث المطار  بنجاح", { type: "success" });
-    fetchAirlines();
-    })
-    .catch((response) => {
-    if (response.response.data.message == "The name has already been taken.") {
-        toast("هذا المطار مسجل بالعفل ", { type: "error" });
-    }
-    })
-    .finally(() => {
-    setLoader(false);
-    setUpdateMode(false);
-    reset();
-    });
-};
+  }, [searchValue, airlines]);
 
-const handleSearch = (e) => {
-e.preventDefault();
-setLoader(true);
+  //  pagenation
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-if (!searchValue.trim()) {
-    fetchAirlines();
-    return;
-}
-let allairlines = [...airlines];
-let filteredairlines = [];
-allairlines.forEach((cat) => {
-    if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
-    filteredairlines.push(cat);
-    }
-});
-setAirlines(filteredairlines);
-setLoader(false);
-};
+  useEffect(() => {
+    fetchPagination();
+  }, [currentPage]);
 
-//  pagenation 
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
+  const fetchPagination = () => {
+    setLoader(true);
+    axios
+      .get(`http://127.0.0.1:8000/api/airlines?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setAirlines(response.data.data);
+        setFilteredAirlines(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      });
+  };
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
 
-useEffect(() => {
-fetchPagination();
-}, [currentPage]); 
-
-const fetchPagination = () => {
-setLoader(true);
-axios
-    .get(`http://127.0.0.1:8000/api/airlines?page=${currentPage}`, {
-    headers: {
-        Authorization: `Bearer ${userToken}`,
-    },
-    })
-    .then(function (response) {
-    setAirlines(response.data.data);
-    setTotalPages(response.data.meta.pagination.last_page);
-    })
-    .catch(function (error) {
-    console.error("Error fetching branches:", error);
-    });
-};
-const handlePageClick = (selectedPage) => {
-setCurrentPage(selectedPage.selected + 1);
-};
-
-return (
+  return (
     <main>
       {/* add airlines form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
@@ -237,9 +234,9 @@ return (
                     </label>
                     <div className="mb-5">
                       <Switch
-                        checked={airlinestatus}
+                        checked={airlineStatus}
                         onChange={(e) => {
-                          setAirlinestatus(e.target.checked);
+                          setAirlineStatus(e.target.checked);
                         }}
                         color="success"
                       />
@@ -274,30 +271,20 @@ return (
       <div className="divider"></div>
       {/* Search input form */}
       <div className="my-3">
-        <form className="w-full">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <SearchIcon className="text-white" />
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyUp={(e) => handleSearch(e)}
-              className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="البحث باسم خط الطيران"
-              required
-            />
-            <button
-              type="submit"
-              onClick={handleSearch}
-              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              بحث{" "}
-            </button>
+        <div className="w-full relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <SearchIcon className="text-white" />
           </div>
-        </form>
+          <input
+            type="search"
+            id="default-search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="البحث باسم خط الطيران"
+            required
+          />
+        </div>
       </div>
 
       {/* Table to display airport data */}
@@ -324,7 +311,7 @@ return (
         </thead>
         <tbody>
           {/* Mapping airlines data to table rows */}
-          {airlines.map((airlines, index) => {
+          {filteredAirlines.map((airlines, index) => {
             const { name, id, status, created_at } = airlines;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
@@ -364,14 +351,14 @@ return (
                       setUpdateAirportID(id);
                       setUpdateMode(true);
                       setValue("name", name);
-                      setAirlinestatus(status === "مفعل" ? true : false);
+                      setAirlineStatus(status === "مفعل" ? true : false);
                     }}
                     className="bg-green-700 text-white p-2 rounded hover:bg-green-500"
                   >
                     <DriveFileRenameOutlineIcon />
                   </button>
                   <button
-                    onClick={() => deleteAilines(id)}
+                    onClick={() => deleteAirline(id)}
                     className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
                   >
                     <DeleteForeverIcon />
@@ -383,28 +370,26 @@ return (
         </tbody>
       </table>
       <div>
-          {/* Render pagination */}
-          <ReactPaginate
-            pageCount={totalPages}
-            pageRangeDisplayed={3}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageClick}
-            containerClassName={"flex justify-center mt-4 text-2xl"}
-            activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-            previousLabel={"السابق"}
-            nextLabel={"التالي"}
-            previousClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            nextClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            pageClassName={
-              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
-            }
-          />
-        </div>
-        {loader && (
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          pageClassName={"mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "}
+        />
+      </div>
+      {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
           <svg

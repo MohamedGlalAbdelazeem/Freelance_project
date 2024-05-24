@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 import axios from "axios";
 import { useForm } from "react-hook-form";
-import { set, z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
 import ReactPaginate from "react-paginate";
@@ -16,7 +16,7 @@ import Select from "react-select";
 function AirportPage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [airports, setAirports] = useState([]);
-  const [airlines, setAirlines] = useState([]);
+  const [filteredAirports, setFilteredAirports] = useState([]);
   const [loader, setLoader] = useState(true);
   const Navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
@@ -28,114 +28,115 @@ function AirportPage() {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [selectedIds, setSelectedIds] = useState([]);
 
-const schema = z.object({
-  airportName: z.string().min(1, { message: "ادخل اسم المطار" }),
-});
-const {
-  register,
-  handleSubmit,
-  setValue,
-  reset,
-  getValues,
-  formState: { errors, isSubmitting },
-} = useForm({ resolver: zodResolver(schema) });
-useEffect(() => {
-  fetchAirports();
-  fetchPagination();
-  fetchAirlinesInSelection();
-}, []);
-
-const handleUnauthenticated = () => {
-  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-    type: "error",
-    autoClose: 4000,
+  const schema = z.object({
+    airportName: z.string().min(1, { message: "ادخل اسم المطار" }),
   });
-  Navigate("/Login");
-  localStorage.removeItem("user_token");
-  localStorage.removeItem("user_role_name");
-};
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
+  useEffect(() => {
+    fetchAirports();
+    fetchPagination();
+    fetchAirlinesInSelection();
+  }, []);
 
-const fetchAirports = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}airports`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setAirports(response.data.data);
-    })
-    .catch(function (error) {
-      if (error.response.data.message === "Unauthenticated.") {
-        handleUnauthenticated();
-      }
-    })
-    .finally(() => {
-      setLoader(false);
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
     });
-};
+    Navigate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
 
-const storeAirport = async () => {
-  setLoader(true);
-  if (selectedOptions.length === 0) {
-    toast.error("يجب اختيار خطوط الطيران", { type: "error" });
-    setLoader(false);
-    return;
-  }
-  await axios
-    .post(
-      `${baseUrl}airports`,
-      {
-        name: getValues("airportName"),
-        airLines: selectedIds,
-      },
-      {
+  const fetchAirports = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}airports`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      }
-    )
-    .then(() => {
-      toast.success("تم إنشاء المطار  بنجاح");
-      reset();
-      setSelectedOptions([]);
-      fetchAirports();
-    })
-    .catch((error) => {
-      if (error.response.data.message == "Already_exist") {
-        toast("هذا المطار موجود بالفعل ", { type: "error" });
-      }
-      if (
-        error.response.data.message === "The name has already been taken."
-      ) {
-        toast.error("المطار مسجل بالفعل");
-      }
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
+      })
+      .then(function (response) {
+        setAirports(response.data.data);
+        setFilteredAirports(response.data.data);
+      })
+      .catch(function (error) {
+        if (error.response.data.message === "Unauthenticated.") {
+          handleUnauthenticated();
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
-function deleteAirport(id) {
-  setLoader(true);
-  axios
-    .delete(`${baseUrl}airports/${id}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function () {
-      toast.success("تم حذف المطار بنجاح");
-      fetchAirports();
-    })
-    .catch(function (error) {
-      return null
-    })
-    .finally(() => {
+  const storeAirport = async () => {
+    setLoader(true);
+    if (selectedOptions.length === 0) {
+      toast.error("يجب اختيار خطوط الطيران", { type: "error" });
       setLoader(false);
-    });
-}
+      return;
+    }
+    await axios
+      .post(
+        `${baseUrl}airports`,
+        {
+          name: getValues("airportName"),
+          airLines: selectedIds,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success("تم إنشاء المطار  بنجاح");
+        reset();
+        setSelectedOptions([]);
+        fetchAirports();
+      })
+      .catch((error) => {
+        if (error.response.data.message == "Already_exist") {
+          toast("هذا المطار موجود بالفعل ", { type: "error" });
+        }
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
+          toast.error("المطار مسجل بالفعل");
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+
+  function deleteAirport(id) {
+    setLoader(true);
+    axios
+      .delete(`${baseUrl}airports/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function () {
+        toast.success("تم حذف المطار بنجاح");
+        fetchAirports();
+      })
+      .catch(function () {
+        return null;
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  }
 
   const updateAirport = () => {
     setLoader(true);
@@ -177,26 +178,19 @@ function deleteAirport(id) {
       });
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-
-    if (!searchValue.trim()) {
-      fetchAirports();
-      return;
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredAirports(airports);
+    } else {
+      setFilteredAirports(
+        airports.filter((item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     }
-    let allAirports = [...airports];
-    let filteredAirports = [];
-    allAirports.forEach((cat) => {
-      if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredAirports.push(cat);
-      }
-    });
-    setAirports(filteredAirports);
-    setLoader(false);
-  };
+  }, [searchValue, airports]);
 
- 
   const fetchAirlinesInSelection = () => {
     axios
       .get(`${baseUrl}airlines/selection/id-name`, {
@@ -205,7 +199,6 @@ function deleteAirport(id) {
         },
       })
       .then((response) => {
-        setAirlines(response.data.data);
         const options2 = response.data.data.map((airline) => ({
           value: airline.id,
           label: airline.name,
@@ -225,7 +218,7 @@ function deleteAirport(id) {
   const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
     fetchPagination();
-  }, [currentPage]); 
+  }, [currentPage]);
 
   const fetchPagination = () => {
     setLoader(true);
@@ -237,6 +230,7 @@ function deleteAirport(id) {
       })
       .then(function (response) {
         setAirports(response.data.data);
+        setFilteredAirports(response.data.data);
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
@@ -292,7 +286,7 @@ function deleteAirport(id) {
                 isMulti
                 options={options}
                 value={selectedOptions}
-                noOptionsMessage={()=>"لا توجد خطوط طيران"  }
+                noOptionsMessage={() => "لا توجد خطوط طيران"}
                 backspaceRemovesValue
                 hideSelectedOptions
                 className="flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
@@ -346,30 +340,20 @@ function deleteAirport(id) {
 
       {/* Search input form */}
       <div className="my-3">
-        <form className="w-full">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <SearchIcon className="text-white" />
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyUp={(e) => handleSearch(e)}
-              className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="البحث باسم المطار"
-              required
-            />
-            <button
-              type="submit"
-              onClick={handleSearch}
-              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              بحث{" "}
-            </button>
+        <div className="w-full relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <SearchIcon className="text-white" />
           </div>
-        </form>
+          <input
+            type="search"
+            id="default-search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="البحث باسم المطار"
+            required
+          />
+        </div>
       </div>
 
       {/* Table to display airport data */}
@@ -399,7 +383,7 @@ function deleteAirport(id) {
         </thead>
         <tbody>
           {/* Mapping airports data to table rows */}
-          {airports.map((airport, index) => {
+          {filteredAirports.map((airport, index) => {
             const { name, id, status, created_at, airLines } = airport;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (

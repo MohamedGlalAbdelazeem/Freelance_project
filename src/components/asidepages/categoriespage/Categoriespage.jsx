@@ -16,6 +16,7 @@ import { ScrollUp } from "../../ScrollUp";
 function Categoriespage() {
   const baseUrl = "http://127.0.0.1:8000/api/";
   const [categories, setCategories] = useState([]);
+  const [filteredCategories, setFilteredCategories] = useState([]);
   const [loader, setLoader] = useState(true);
   const Naviagate = useNavigate();
   const userToken = localStorage.getItem("user_token");
@@ -24,190 +25,182 @@ function Categoriespage() {
   const [updateCategoryID, setUpdateCategoryID] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
-const schema = z.object({
-  categoryName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
-});
-
-const {
-  register,
-  handleSubmit,
-  setValue,
-  reset,
-  getValues,
-  formState: { errors, isSubmitting },
-} = useForm({ resolver: zodResolver(schema) });
-
-const handleUnauthenticated = () => {
-  toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
-    type: "error",
-    autoClose: 4000,
+  const schema = z.object({
+    categoryName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
   });
-  Naviagate("/Login");
-  localStorage.removeItem("user_token");
-  localStorage.removeItem("user_role_name");
-};
 
-useEffect(() => {
-  fetchCategories();
-  fetchPagenation();
-}, []);
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    reset,
+    getValues,
+    formState: { errors, isSubmitting },
+  } = useForm({ resolver: zodResolver(schema) });
 
-const fetchCategories = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}categories`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-         setLoader(false);
-         setCategories(response.data.data);
-    })
-    .catch(function (error) {
-      if (error.response.data.message === "Unauthenticated.") {
-        handleUnauthenticated();
-      }
-    })
-    .finally(() => {
-      setLoader(false);
+  const handleUnauthenticated = () => {
+    toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
+      type: "error",
+      autoClose: 4000,
     });
-};
+    Naviagate("/Login");
+    localStorage.removeItem("user_token");
+    localStorage.removeItem("user_role_name");
+  };
 
-const storeCategory = async () => {
-  setLoader(true);
-  await axios
-    .post(
-      `${baseUrl}categories`,
-      {
-        name: getValues("categoryName"),
-      },
-      {
+  useEffect(() => {
+    fetchCategories();
+    fetchPagenation();
+  }, []);
+
+  const fetchCategories = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}categories`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      }
-    )
-    .then(() => {
-      toast.success("تم إنشاء الرحلة  بنجاح");
-      reset();
-      fetchCategories();
-    })
-    .catch((error) => {
-      if (error.response.data.message == "Already_exist") {
-        toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
-      }
-      if (
-        error.response.data.message ===
-        "The name has already been taken."
-      ) {
-        toast.error("تصنيف الرحلة موجود بالفعل");
-      }
-      console.log(error);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
+      })
+      .then(function (response) {
+        setLoader(false);
+        setCategories(response.data.data);
+        setFilteredCategories(response.data.data);
+      })
+      .catch(function (error) {
+        if (error.response.data.message === "Unauthenticated.") {
+          handleUnauthenticated();
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
-function deleteCategory(id) {
-  setLoader(true);
-  axios
-    .delete(`${baseUrl}categories/${id}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
+  const storeCategory = async () => {
+    setLoader(true);
+    await axios
+      .post(
+        `${baseUrl}categories`,
+        {
+          name: getValues("categoryName"),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(() => {
+        toast.success("تم إنشاء الرحلة  بنجاح");
+        reset();
+        fetchCategories();
+      })
+      .catch((error) => {
+        if (error.response.data.message == "Already_exist") {
+          toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
+        }
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
+          toast.error("تصنيف الرحلة موجود بالفعل");
+        }
+        console.log(error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+
+  function deleteCategory(id) {
+    setLoader(true);
+    axios
+      .delete(`${baseUrl}categories/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
         toast.success("تم حذف الرحلة بنجاح");
         fetchCategories();
-    })
-    .catch(function (error) {
+      })
+      .catch(function (error) {
         return null;
-    });
-  setLoader(false);
-}
+      });
+    setLoader(false);
+  }
 
-const updateCategory = () => {
-  setLoader(true);
-  axios
-    .post(
-      `${baseUrl}categories/${updateCategoryID}`,
-      {
-        name: getValues("categoryName"),
-        status: categoryStatus ? "1" : "0",
-      },
-      {
+  const updateCategory = () => {
+    setLoader(true);
+    axios
+      .post(
+        `${baseUrl}categories/${updateCategoryID}`,
+        {
+          name: getValues("categoryName"),
+          status: categoryStatus ? "1" : "0",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
+        }
+      )
+      .then(() => {
+        toast("تم تحديث الرحلة  بنجاح", { type: "success" });
+        fetchCategories();
+      })
+      .catch((response) => {
+        if (response.response.data.message == "Already_exist") {
+          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
+        }
+        console.log("Error updating category:", response.response.data.message);
+      })
+      .finally(() => {
+        setLoader(false);
+        setUpdateMode(false);
+        reset();
+      });
+  };
+
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredCategories(categories);
+    } else {
+      setFilteredCategories(
+        categories.filter((item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
+    }
+  }, [searchValue, categories]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  useEffect(() => {
+    fetchPagenation();
+  }, [currentPage]);
+  const fetchPagenation = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}categories?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
-      }
-    )
-    .then(() => {
-      toast("تم تحديث الرحلة  بنجاح", { type: "success" });
-      fetchCategories();
-    })
-    .catch((response) => {
-      if (response.response.data.message == "Already_exist") {
-        toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
-      }
-      console.log("Error updating category:", response.response.data.message);
-    })
-    .finally(() => {
-      setLoader(false);
-      setUpdateMode(false);
-      reset();
-    });
-};
+      })
+      .then(function (response) {
+        setCategories(response.data.data);
+        setFilteredCategories(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      });
+  };
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
 
-const handleSearch = (e) => {
-  e.preventDefault();
-  setLoader(true);
-
-  if (!searchValue.trim()) {
-    fetchCategories();
-    return;
-  }
-  let allCategories = [...categories];
-  let filteredCategories = [];
-  allCategories.forEach((cat) => {
-    if (cat.name.toLowerCase().includes(searchValue.toLowerCase())) {
-      filteredCategories.push(cat);
-    }
-  });
-  setCategories(filteredCategories);
-  setLoader(false);
-};
-
-
-
-
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
-useEffect(() => {
-  fetchPagenation();
-}, [currentPage]); 
-const fetchPagenation = () => {
-  setLoader(true);
-  axios
-    .get(`http://127.0.0.1:8000/api/categories?page=${currentPage}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setCategories(response.data.data);
-      setTotalPages(response.data.meta.pagination.last_page);
-    })
-    .catch(function (error) {
-      console.error("Error fetching branches:", error);
-    });
-};
-const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);
-};
-
-return (
+  return (
     <main className="branchTable">
       {/* add category form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
@@ -273,30 +266,20 @@ return (
 
       {/* Search input form */}
       <div className="my-3">
-        <form className="w-full">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <SearchIcon className="text-white" />
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyUp={(e) => handleSearch(e)}
-              className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="البحث باسم الرحلة"
-              required
-            />
-            <button
-              type="submit"
-              onClick={handleSearch}
-              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              بحث{" "}
-            </button>
+        <div className="w-full relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <SearchIcon className="text-white" />
           </div>
-        </form>
+          <input
+            type="search"
+            id="default-search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="البحث باسم الرحلة"
+            required
+          />
+        </div>
       </div>
 
       {/* Table to display category data */}
@@ -323,7 +306,7 @@ return (
         </thead>
         <tbody>
           {/* Mapping categories data to table rows */}
-          {categories.map((cat, index) => {
+          {filteredCategories.map((cat, index) => {
             const { name, id, status, created_at } = cat;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
@@ -383,28 +366,26 @@ return (
       </table>
       {/* loader */}
       <div>
-          {/* Render pagination */}
-          <ReactPaginate
-            pageCount={totalPages}
-            pageRangeDisplayed={3}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageClick}
-            containerClassName={"flex justify-center mt-4 text-2xl"}
-            activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-            previousLabel={"السابق"}
-            nextLabel={"التالي"}
-            previousClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            nextClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            pageClassName={
-              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
-            }
-          />
-        </div>
-        {loader && (
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          pageClassName={"mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "}
+        />
+      </div>
+      {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
           <svg
