@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Switch } from "@mui/material";
 import axios from "axios";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
@@ -70,6 +70,7 @@ function Trippage() {
   useEffect(() => {
     fetchAirLines();
   }, [airportId]);
+
   function fetchCountries() {
     setLoader(true);
     axios
@@ -168,14 +169,15 @@ function Trippage() {
   }
 
   function fetchAirLines() {
-    setLoader(true);
-    axios.get(`${baseUrl}airlines/show-air-line/${airportId}`, {
+    let url = `${baseUrl}airlines/show-air-line/${airportId}`;
+    axios
+      .get(url, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       })
       .then(function (response) {
-        setShowAirports(response.data.data);
+        setShowAirLines([response.data.data]);
       })
       .catch(function (error) {
         if (
@@ -184,9 +186,6 @@ function Trippage() {
           console.error("هذا المستخدم ليس له صلاحية التعديل");
         }
       })
-      .finally(() => {
-        setLoader(false);
-      });
   }
   function fetchCurrencies() {
     setLoader(true);
@@ -211,7 +210,6 @@ function Trippage() {
       });
   }
 
-  
   const fetchData = () => {
     setLoader(true);
     axios
@@ -244,7 +242,6 @@ function Trippage() {
     localStorage.removeItem("user_role_name");
   };
 
-
   const storeTrips = async () => {
     setLoader(true);
     await axios
@@ -260,6 +257,7 @@ function Trippage() {
           category_id: getValues("category_id"),
           airport_id: getValues("airport_id"),
           currency_id: getValues("currency_id"),
+          air_line_id: getValues("air_line_id"),
         },
         {
           headers: {
@@ -276,6 +274,7 @@ function Trippage() {
         setValue("category_id", "");
         setValue("airport_id", "");
         setValue("currency_id", "");
+        setValue("air_line_id", "");
       })
       .catch((error) => {
         if (error.response.data.message == "Already_exist") {
@@ -293,7 +292,6 @@ function Trippage() {
           toast.error("الرحلة موجود بالفعل");
         }
         console.log(error);
-        
       })
       .finally(() => {
         setLoader(false);
@@ -335,6 +333,7 @@ function Trippage() {
           description: getValues("tripDescription"),
           category_id: getValues("category_id"),
           airport_id: getValues("airport_id"),
+          air_line_id: getValues("air_line_id"),
           currency_id: getValues("currency_id"),
           status: branchStatus,
         },
@@ -352,6 +351,7 @@ function Trippage() {
         setValue("tripTo", "");
         setValue("category_id", "");
         setValue("airport_id", "");
+        setValue("air_line_id", "");
         setValue("currency_id", "");
         setUpdateMode(false);
       })
@@ -447,10 +447,18 @@ function Trippage() {
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
-                      المطار:
+                      المطار :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {singleTrip?.airport?.name}
+                    </dd>
+                  </div>
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium text-gray-500">
+                      خط الطيران :
+                    </dt>
+                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                      {singleTrip?.airLine?.name}
                     </dd>
                   </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -558,10 +566,11 @@ function Trippage() {
               <div className="flex gap-2	">
                 <div className="flex-grow w-full">
                   <select
-                    {...register('airport_id', {
-                      onChange: () => {setAirportId([getValues("airport_id")])},
+                    {...register("airport_id", {
+                      onChange: () => {
+                        setAirportId([getValues("airport_id")]);
+                      },
                     })}
-                   
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
                     <option value="" disabled selected>
@@ -569,7 +578,10 @@ function Trippage() {
                     </option>
                     {showAirports.map((airport, index) => {
                       return (
-                        <option key={index} value={airport.id}>
+                        <option
+                          key={index}
+                          value={airport.id}
+                        >
                           {airport.name}
                         </option>
                       );
@@ -589,9 +601,9 @@ function Trippage() {
                     <option value="" disabled selected>
                       اختر خط الطيران
                     </option>
-                    {showAirports?.airLines?.map((line, index) => {
+                    {showAirLines[0]?.airLines?.map((line, index) => {
                       return (
-                        <option key={index} value={line.id}>
+                        <option key={index} value={line.id} >
                           {line.name}
                         </option>
                       );
@@ -852,7 +864,7 @@ function Trippage() {
               description,
               category,
               airport,
-              currency,
+              airLine,
             } = trip;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
@@ -905,6 +917,8 @@ function Trippage() {
                     <div className="flex gap-2 justify-center items-center">
                       <button
                         onClick={() => {
+                          setAirportId([airport.id]);
+                          setValue("air_line_id", airLine.id);
                           ScrollUp();
                           setUpdateTripsID(id);
                           setUpdateMode(true);
@@ -937,7 +951,7 @@ function Trippage() {
                           setValue(
                             "airport_id",
                             showAirports
-                              .find((airport) => airport.id === airport.id)
+                              .find((air) => air.id === airport.id)
                               ?.id.toString()
                           );
                           setValue(
