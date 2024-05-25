@@ -39,6 +39,7 @@ function Trippage() {
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
     tripCost: z.string().min(1, { message: "يجب تعيين تكلفة الرحلة" }),
     take_off: z.string().min(1, { message: "ادخل تاريخ الرحلة" }),
+    take_off_time: z.string().min(1, { message: "ادخل وقت الرحلة" }),
     tripFrom: z.string().min(1, { message: "يجب تعيين بلد الانطلاق" }),
     tripTo: z.string().min(1, { message: "يجب تعيين بلد الوصول" }),
     tripDescription: z.string().min(1, { message: "ادخل وصف الرحلة" }),
@@ -254,7 +255,7 @@ function Trippage() {
         {
           name: getValues("tripName"),
           cost: getValues("tripCost").toString(),
-          take_off: getValues("take_off"),
+          take_off: `${getValues("take_off")} ${getValues("take_off_time")}`,
           from_countries_id: getValues("tripFrom"),
           to_countries_id: getValues("tripTo"),
           description: getValues("tripDescription"),
@@ -322,6 +323,7 @@ function Trippage() {
         setLoader(false);
       });
   }
+
   const updateTrips = async () => {
     setLoader(true);
     await axios
@@ -329,8 +331,8 @@ function Trippage() {
         `${baseUrl}trips/${updateTripsID}`,
         {
           name: getValues("tripName"),
-          cost: getValues("tripCost").toString(),
-          take_off: getValues("take_off"),
+          cost: getValues("tripCost"),
+          take_off: `${getValues("take_off")} ${getValues("take_off_time")}`,
           from_countries_id: getValues("tripFrom"),
           to_countries_id: getValues("tripTo"),
           description: getValues("tripDescription"),
@@ -547,15 +549,15 @@ function Trippage() {
                   )}
                 </div>
                 <div className="w-full">
-                  <textarea
-                    rows="1"
-                    {...register("tripDescription")}
-                    placeholder=" ملاحظات  "
-                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  <input
+                    type="time"
+                    {...register("take_off_time")}
+                    placeholder="وقت اقلاع الرحلة "
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   />
                   {errors && (
                     <span className="text-red-500 text-sm">
-                      {errors.tripDescription?.message}
+                      {errors.take_off_time?.message}
                     </span>
                   )}
                 </div>
@@ -703,7 +705,21 @@ function Trippage() {
                   )}
                 </div>
               </div>
-
+              <div className="flex">
+                <div className="w-full">
+                  <textarea
+                    rows="1"
+                    {...register("tripDescription")}
+                    placeholder=" ملاحظات  "
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  />
+                  {errors && (
+                    <span className="text-red-500 text-sm">
+                      {errors.tripDescription?.message}
+                    </span>
+                  )}
+                </div>
+              </div>
               <div className="pt-3">
                 <div className="-mx-3 flex flex-wrap">
                   {updateMode && (
@@ -845,7 +861,6 @@ function Trippage() {
               description,
               category,
               airport,
-              airLine,
             } = trip;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
@@ -905,10 +920,11 @@ function Trippage() {
                           setUpdateMode(true);
                           setValue("tripName", name);
                           setValue("tripCost", cost.toString());
-                          const [datePart] = takeOff.split(" ");
+                          const [datePart, timePart] = takeOff.split(" ");
                           const [year, month, day] = datePart.split("-");
                           const formattedDateString = `${year}-${month}-${day}`;
                           setValue("take_off", formattedDateString);
+                          setValue("take_off_time", timePart);
                           setValue("tripDescription", description);
                           setBranchStatus(status === "مفعل" ? true : false);
                           setValue(
