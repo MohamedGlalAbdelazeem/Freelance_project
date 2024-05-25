@@ -322,7 +322,6 @@ function Trippage() {
         setLoader(false);
       });
   }
-
   const updateTrips = async () => {
     setLoader(true);
     await axios
