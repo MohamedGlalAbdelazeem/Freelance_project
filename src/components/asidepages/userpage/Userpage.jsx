@@ -9,11 +9,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ScrollUp } from "../../ScrollUp";
-//pagenation
-import ReactPaginate from 'react-paginate';
+import ReactPaginate from "react-paginate";
 
 function Userpage() {
-  const baseUrl = import.meta.env.VITE_SOME_KEY
+  const baseUrl = import.meta.env.VITE_SOME_KEY;
   const [loader, setLoader] = useState(true);
 
   const [updateMode, setUpdateMode] = useState(false);
@@ -23,15 +22,16 @@ function Userpage() {
   const userToken = localStorage.getItem("user_token");
 
   const [employees, setEmployees] = useState([]);
+  const [filteredEmp, setFilteredEmp] = useState([]);
   const [branches, setBranches] = useState([]);
-  const Naviagate = useNavigate();
+  const Navigate = useNavigate();
 
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
       type: "error",
       autoClose: 4000,
     });
-    Naviagate("/Login");
+    Navigate("/Login");
     localStorage.removeItem("user_token");
     localStorage.removeItem("user_role_name");
   };
@@ -64,62 +64,63 @@ function Userpage() {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
- 
-//start pagenation
-const [currentPage, setCurrentPage] = useState(1);
-const [totalPages, setTotalPages] = useState(1);
-useEffect(() => {
-  fetchEmployees();
-  fetchBranchesInSelection();
-  fetchPagenation();
-}, []);
-const fetchPagenation = () => {
-  setLoader(true);
-  axios
-    .get(`http://127.0.0.1:8000/api/employees?page=${currentPage}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
-      setEmployees(response.data.data);
-      setTotalPages(response.data.meta.pagination.last_page);
-    })
-    .catch(function (error) {
-      console.error("Error fetching branches:", error);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
-const handlePageClick = (selectedPage) => {
-  setCurrentPage(selectedPage.selected + 1);  
-};
-//end pagenation
+  //start pagenation
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  useEffect(() => {
+    fetchEmployees();
+    fetchBranchesInSelection();
+    fetchPagenation();
+  }, []);
+  const fetchPagenation = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}employees?page=${currentPage}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
+        setEmployees(response.data.data);
+        setFilteredEmp(response.data.data);
+        setTotalPages(response.data.meta.pagination.last_page);
+      })
+      .catch(function (error) {
+        console.error("Error fetching branches:", error);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+  const handlePageClick = (selectedPage) => {
+    setCurrentPage(selectedPage.selected + 1);
+  };
+  //end pagenation
 
-const fetchEmployees = () => {
-  setLoader(true);
-  axios
-    .get(`${baseUrl}employees`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
+  const fetchEmployees = () => {
+    setLoader(true);
+    axios
+      .get(`${baseUrl}employees`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function (response) {
         setLoader(false);
         setEmployees(response.data.data);
-    })
-    .catch(function (error) {
-      if (error.response.data.message === "Unauthenticated.") {
-        handleUnauthenticated();
-      }
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
+        setFilteredEmp(response.data.data);
+      })
+      .catch(function (error) {
+        if (error.response.data.message === "Unauthenticated.") {
+          handleUnauthenticated();
+        }
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
-const fetchBranchesInSelection = () => {
+  const fetchBranchesInSelection = () => {
     axios
       .get(`${baseUrl}branches/select-name-id`, {
         headers: {
@@ -135,62 +136,63 @@ const fetchBranchesInSelection = () => {
       .finally(() => {
         setLoader(false);
       });
-}
-
-const storeEmployee = () => {
-  setLoader(true);
-  const employeeData = {
-    name: getValues("name"),
-    email: getValues("email"),
-    password: getValues("password"),
-    password_confirmation: getValues("password_confirmation"),
-    phone_number: getValues("phone_number"),
-    branch_id: getValues("branch_id").toString(),
   };
-  axios
-    .post(`${baseUrl}employees`, employeeData, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    .then(function (res) {
-      toast.success("تم تسجيل الموظف بنجاح");
-      fetchEmployees();
-      reset();
-      setValue("branch_id","");
-    })
-    .catch(function (error) {
-      if ( error.response.data.message === "The email has already been taken." ) {
-        toast.error("هذا البريد  الإلكتروني موجود بالفعل ");
-      }
-      console.error("Error fetching", error.response.data.message);
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
 
-const deleteEmp = (id) => {
-  setLoader(true);
-  axios
-    .delete(`${baseUrl}employees/${id}`, {
-      headers: {
-        Authorization: `Bearer ${userToken}`,
-      },
-    })
-    .then(function (response) {
+  const storeEmployee = () => {
+    setLoader(true);
+    const employeeData = {
+      name: getValues("name"),
+      email: getValues("email"),
+      password: getValues("password"),
+      password_confirmation: getValues("password_confirmation"),
+      phone_number: getValues("phone_number"),
+      branch_id: getValues("branch_id").toString(),
+    };
+    axios
+      .post(`${baseUrl}employees`, employeeData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      })
+      .then(function () {
+        toast.success("تم تسجيل الموظف بنجاح");
+        fetchEmployees();
+        reset();
+        setValue("branch_id", "");
+      })
+      .catch(function (error) {
+        if (
+          error.response.data.message === "The email has already been taken."
+        ) {
+          toast.error("هذا البريد  الإلكتروني موجود بالفعل ");
+        }
+        console.error("Error fetching", error.response.data.message);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
+
+  const deleteEmp = (id) => {
+    setLoader(true);
+    axios
+      .delete(`${baseUrl}employees/${id}`, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      })
+      .then(function () {
         toast.success("تم حذف الموظف بنجاح");
         fetchEmployees();
-    })
-    .catch(function (error) {
-      console.error("Error fetching", error.response.data.message);
-     
-    })
-    .finally(() => {
-      setLoader(false);
-    });
-};
+      })
+      .catch(function (error) {
+        console.error("Error fetching", error.response.data.message);
+      })
+      .finally(() => {
+        setLoader(false);
+      });
+  };
 
   const handleEmpUpdate = () => {
     setLoader(true);
@@ -225,26 +227,20 @@ const deleteEmp = (id) => {
       });
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-
-    if (!searchValue.trim()) {
-      fetchEmployees();
-      return;
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredEmp(employees);
+    } else {
+      setFilteredEmp(
+        employees.filter((item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     }
-    let allEmp = [...employees];
-    let filteredEmp = [];
-    allEmp.forEach((emp) => {
-      if (emp.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredEmp.push(emp);
-      }
-    });
-    setEmployees(filteredEmp);
-    setLoader(false);
-  };
+  }, [searchValue, employees]);
 
-return (
+  return (
     <div>
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         {/* register & update users */}
@@ -367,30 +363,20 @@ return (
 
       {/* Search input form */}
       <div className="my-3">
-        <form className="w-full">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <SearchIcon className="text-white" />
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder={`ابحث عن موظف بالاسم`}
-              required
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyUp={(e) => handleSearch(e)}
-            />
-            <button
-              onClick={(e) => handleSearch(e)}
-              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              بحث
-            </button>
-          
+        <div className="w-full relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <SearchIcon className="text-white" />
           </div>
-        </form>
+          <input
+            type="search"
+            id="default-search"
+            className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder={`ابحث عن موظف بالاسم`}
+            required
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+          />
+        </div>
       </div>
       {/* Table to display branch data */}
       <table className="border-collapse w-full">
@@ -417,7 +403,7 @@ return (
         </thead>
         <tbody>
           {/* Mapping branches data to table rows */}
-          {employees.map((emp, index) => {
+          {filteredEmp.map((emp, index) => {
             const {
               id,
               name,
@@ -456,7 +442,6 @@ return (
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  py-1 px-3 text-xs font-bold">
                     {branch?.name}
-                    
                   </span>
                 </td>
                 <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
