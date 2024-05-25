@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 
 function Settings() {
-  const baseUrl = import.meta.env.VITE_SOME_KEY
+  const baseUrl = import.meta.env.VITE_SOME_KEY;
   const userToken = localStorage.getItem("user_token");
   const [value, setValue] = useState("");
   const [updateDate, setUpdateDate] = useState("");
@@ -49,15 +49,15 @@ function Settings() {
         }
       )
       .then((res) => {
-        if (res.data.message === "Update Successfully")
-          toast("تم تعديل عدد الأيام  بنجاح");
-         setUpdateDate(res.data.data.updated_at);
+        if (res.data.message === "Update Successfully") toast("تم تعديل عدد الأيام  بنجاح");
+        setUpdateDate(res.data.data.updated_at);
+        console.log(updateDate.split("T"));
       })
       .catch((err) => {
         console.log(err);
       });
   };
-  
+
   return (
     <>
       <div>
@@ -89,10 +89,11 @@ function Settings() {
             </div>
           </form>
         </div>
-        <div className="rounded-lg text-center mt-3 mx-auto p-5 text-white bg-slate-600 w-fit">
-           اخر تاريخ تم تحديث فيه عدد الأيام : {updateDate}
-        </div>
-       
+        {updateDate && (
+          <div className="rounded-lg text-center mt-3 mx-auto p-5 text-white bg-slate-600 w-fit">
+            اخر تاريخ تم تحديث فيه عدد الأيام : {updateDate.split("T")[0]}
+          </div>
+        )}
       </div>
     </>
   );
