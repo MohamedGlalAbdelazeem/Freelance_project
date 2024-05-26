@@ -44,7 +44,6 @@ function Trippage() {
     tripDescription: z.string().min(1, { message: "ادخل وصف الرحلة" }),
     category_id: z.string().min(1, { message: "اختر نوع الرحلة" }),
     airport_id: z.string().min(1, { message: "اختر المطار" }),
-    air_line_id: z.string().min(1, { message: "اختر خط الطيران" }),
     currency_id: z.string().min(1, { message: "اختر العملة" }),
   });
 
@@ -322,6 +321,7 @@ function Trippage() {
         setLoader(false);
       });
   }
+
   const updateTrips = async () => {
     setLoader(true);
     await axios
@@ -899,7 +899,7 @@ function Trippage() {
                       <button
                         onClick={() => {
                           setAirportId([airport.id]);
-                          setValue("air_line_id", "");
+                          setValue("air_line_id", airLine.id);
                           ScrollUp();
                           setUpdateTripsID(id);
                           setUpdateMode(true);
