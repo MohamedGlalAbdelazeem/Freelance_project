@@ -15,11 +15,12 @@ import { ScrollUp } from "../../ScrollUp";
 import ReactPaginate from "react-paginate";
 
 function Branchpage() {
-  const baseUrl = import.meta.env.VITE_SOME_KEY
+  const baseUrl = import.meta.env.VITE_SOME_KEY;
 
   const [branches, setBranches] = useState([]);
+  const [filteredBranches, setFilteredBranches] = useState([]);
   const [loader, setLoader] = useState(true);
-  const Naviagate = useNavigate();
+  const Navigate = useNavigate();
   const userToken = localStorage.getItem("user_token");
   const [branchStatus, setBranchStatus] = useState(false);
   const [updateMode, setUpdateMode] = useState(false);
@@ -49,7 +50,7 @@ function Branchpage() {
     fetchBranches();
   }, []);
 
-//fetch barnches data
+  //fetch barnches data
   const fetchBranches = () => {
     setLoader(true);
     axios
@@ -59,12 +60,9 @@ function Branchpage() {
         },
       })
       .then(function (response) {
-        if (response.status === 401) {
-          handleUnauthenticated();
-        } else {
-          setLoader(false);
-          setBranches(response.data.data);
-        }
+        setLoader(false);
+        setBranches(response.data.data);
+        setFilteredBranches(response.data.data);
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
@@ -94,7 +92,6 @@ function Branchpage() {
       });
   };
 
-
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
@@ -104,13 +101,14 @@ function Branchpage() {
   const fetchPagenation = () => {
     setLoader(true);
     axios
-      .get(`http://127.0.0.1:8000/api/branches?page=${currentPage}`, {
+      .get(`${baseUrl}branches?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
       })
       .then(function (response) {
         setBranches(response.data.data);
+        setFilteredBranches(response.data.data);
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
@@ -130,7 +128,7 @@ function Branchpage() {
       type: "error",
       autoClose: 4000,
     });
-    Naviagate("/Login");
+    Navigate("/Login");
     localStorage.removeItem("user_token");
     localStorage.removeItem("user_role_name");
   };
@@ -186,9 +184,9 @@ function Branchpage() {
           Authorization: `Bearer ${userToken}`,
         },
       })
-      .then(function (response) {
-          toast.success("تم حذف الفرع بنجاح");
-          fetchBranches();
+      .then(function () {
+        toast.success("تم حذف الفرع بنجاح");
+        fetchBranches();
       })
       .catch(function (error) {
         console.error("Error deleting branch:", error);
@@ -246,24 +244,18 @@ function Branchpage() {
       });
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setLoader(true);
-
-    if (!searchValue.trim()) {
-      fetchBranches();
-      return;
+  //search
+  useEffect(() => {
+    if (searchValue === "") {
+      setFilteredBranches(branches);
+    } else {
+      setFilteredBranches(
+        branches.filter((item) =>
+          item.name.toLowerCase().includes(searchValue.toLowerCase())
+        )
+      );
     }
-    let allBranches = [...branches];
-    let filteredBranches = [];
-    allBranches.forEach((Branch) => {
-      if (Branch.name.toLowerCase().includes(searchValue.toLowerCase())) {
-        filteredBranches.push(Branch);
-      }
-    });
-    setBranches(filteredBranches);
-    setLoader(false);
-  };
+  }, [searchValue, branches]);
 
   return (
     <main className="branchTable">
@@ -410,30 +402,20 @@ function Branchpage() {
 
       {/* Search input form */}
       <div className="my-3">
-        <form className="w-full">
-          <div className="relative">
-            <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-              <SearchIcon className="text-white" />
-            </div>
-            <input
-              type="search"
-              id="default-search"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyUp={(e) => handleSearch(e)}
-              className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="ابحث عن فرع بالاسم"
-              required
-            />
-            <button
-              type="submit"
-              onClick={handleSearch}
-              className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              بحث{" "}
-            </button>
+        <div className="w-full relative">
+          <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <SearchIcon className="text-white" />
           </div>
-        </form>
+          <input
+            type="search"
+            id="default-search"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="block w-full p-4 pb-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="ابحث عن فرع بالاسم"
+            required
+          />
+        </div>
       </div>
 
       {/* Table to display branch data */}
@@ -475,7 +457,7 @@ function Branchpage() {
         </thead>
         <tbody>
           {/* Mapping branches data to table rows */}
-          {branches.map((branch, index) => {
+          {filteredBranches.map((branch, index) => {
             const {
               name,
               id,
@@ -575,19 +557,17 @@ function Branchpage() {
                     >
                       <DeleteForeverIcon />
                     </button>
-                      {
-                        show_client === "مفعل" ? (
-                          <button
-                          onClick={() => {
-                            document.getElementById("my_modal_2").showModal();
-                            fetchBranchClients(id);
-                          }}
-                          className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
-                        >
-                          <VisibilityIcon />
-                        </button>
-                        ) : null
-                      }
+                    {show_client === "مفعل" ? (
+                      <button
+                        onClick={() => {
+                          document.getElementById("my_modal_2").showModal();
+                          fetchBranchClients(id);
+                        }}
+                        className="bg-sky-700 text-white p-2 rounded hover:bg-sky-500"
+                      >
+                        <VisibilityIcon />
+                      </button>
+                    ) : null}
                   </div>
                 </td>
               </tr>
@@ -611,7 +591,6 @@ function Branchpage() {
                   className="text-2xl font-bold mb-6"
                 >
                   الموظفين الموجودين فى الفرع
-                 
                 </h1>
                 <table>
                   <thead>
@@ -634,15 +613,8 @@ function Branchpage() {
                   </thead>
                   <tbody>
                     {branchClients.map((client, index) => {
-                      const {
-                        id,
-                        name,
-                        address,
-                        email,
-                        phone_number,
-                        nationality,
-                        created_at,
-                      } = client;
+                      const { id, name, email, phone_number, created_at } =
+                        client;
                       return (
                         <tr
                           key={id}
@@ -655,7 +627,7 @@ function Branchpage() {
                             <span className="rounded  px-2 text-xs font-bold">
                               {name}
                             </span>
-                          </td> 
+                          </td>
                           <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                             <span className="rounded  py-1 px-3 text-xs font-bold">
                               {email}
@@ -688,27 +660,25 @@ function Branchpage() {
       </dialog>
 
       <div>
-          {/* Render pagination */}
-          <ReactPaginate
-            pageCount={totalPages}
-            pageRangeDisplayed={3}
-            marginPagesDisplayed={2}
-            onPageChange={handlePageClick}
-            containerClassName={"flex justify-center mt-4 text-2xl"}
-            activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
-            previousLabel={"السابق"}
-            nextLabel={"التالي"}
-            previousClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            nextClassName={
-              "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
-            }
-            pageClassName={
-              "mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "
-            }
-          />
-        </div>
+        {/* Render pagination */}
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={3}
+          marginPagesDisplayed={2}
+          onPageChange={handlePageClick}
+          containerClassName={"flex justify-center mt-4 text-2xl"}
+          activeClassName={"bg-blue-500 text-white hover:bg-blue-700"}
+          previousLabel={"السابق"}
+          nextLabel={"التالي"}
+          previousClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          nextClassName={
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
+          }
+          pageClassName={"mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "}
+        />
+      </div>
       {loader && (
         <>
           <div className="fixed bg-black/30 top-0 left-0 w-screen h-screen"></div>
