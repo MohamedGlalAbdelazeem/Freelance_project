@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import InventoryIcon from '@mui/icons-material/Inventory';
 import { zodResolver } from "@hookform/resolvers/zod";
 
 function Reportpage() {
@@ -100,7 +99,6 @@ const dailyReport = () => {
 return (
     <div className="bg-gray-300 p-9 rounded-xl">
       <h1 className="text-center text-3xl font-bold text-gray-900 -mb-5 underline underline-offset-8 decoration-blue-500">
-        <InventoryIcon sx={{ fontSize: 50, color:"black" }}/>
         الصندوق اليومي
       </h1>
       <form className="flex justify-center mt-10 gap-5 items-center">

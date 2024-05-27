@@ -43,7 +43,7 @@ return (
           <ContactMailIcon sx={{ fontSize: 55 , color:"white"}}/>
          </div>
         <p className="mt-4 text-lg font-semibold tracking-wide text-center text-gray-800 capitalize dark:text-white">
-            سوف يتم إرسال رسالة إلي البريد الإلكتروني الخاص بك
+         توجه إلي البريد الإلكتروني الحاص بك عند إرسال الرسالة
         </p>
 
         <div className="w-full max-w-md mx-auto mt-6">

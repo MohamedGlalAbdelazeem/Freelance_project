@@ -16,6 +16,11 @@ function Resetpassword() {
     const token = new URLSearchParams(queryString).get('token');
     const submitForm = async (e) => {
         e.preventDefault();
+        if (password1 === ""  ||  password2 === "") {
+          toast("من فضلك اكتب كلمة السر", { type: "error"});
+          return;
+        }
+
         if (password1.trim() !==  password2.trim()) {
             toast("كلمة المرور غير متطابقة", { type: "error"});
             return; 
@@ -35,13 +40,11 @@ function Resetpassword() {
           if (res.status === 200) {
             navigate("/Login");
             toast("تم تغيير كلمة المرور بنجاح", { type: "success"});
-            console.log(res);
           }
         } catch (error) {
           if (error.response.data.message === "The password must be at least 6 characters.") {
             toast("يجب ألا تقل كلمة المرور عن 6 أرقام", { type: "error"});
           }
-
           toast(error, { type: "error"});
           console.log(error);
         }
