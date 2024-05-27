@@ -279,7 +279,11 @@ function Services() {
 
   return (
     <div>
+       <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
+             صفحة إدراة الخدمات 
+        </div>
       <dialog id="my_modal_2" className="modal">
+
         <div className="modal-box relative">
           <div className="modal-action absolute -top-4 left-2">
             <form method="dialog">
@@ -394,10 +398,11 @@ function Services() {
                   </div>
                   <div className="flex-grow w-[49%]">
                     <select
+                       defaultValue="" 
                       {...register("currency_id")}
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 block w-full dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         اختر العملة
                       </option>
                       {showCurrency.map((currency, index) => {
@@ -420,11 +425,12 @@ function Services() {
               <div className="flex gap-4">
                 <div className="w-[49%] flex-grow">
                   <select
+                     defaultValue="" 
                     id="countries"
                     {...register("category_id")}
                     className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="" disabled selected>
+                    <option value="" disabled >
                       نوع الرحلة
                     </option>
                     {showCategories.map((categories, index) => {
@@ -528,7 +534,7 @@ function Services() {
                 "تكلفة الخدمة",
                 " الحالة",
                 "تاريخ الانشاء",
-                "التعديل",
+                "تعديل البيانات",
               ].map((header, index) => (
                 <th
                   key={index}
@@ -588,11 +594,11 @@ function Services() {
                 <td className="w-full lg:w-auto p-2 text-gray-800 border border-b text-center block lg:table-cell relative lg:static">
                   {status === "مفعل" ? (
                     <div className="bg-green-500 min-w-20 text-white text-sm rounded-lg p-1">
-                      مفعل
+                      مفعلة
                     </div>
                   ) : (
                     <div className="bg-red-500 min-w-20 text-white rounded-lg text-sm p-1">
-                      غير مفعل
+                      غير مفعلة
                     </div>
                   )}
                 </td>

@@ -101,7 +101,6 @@ function PaymentPage() {
         ) {
           toast.error("طريقة الدفع مسجل بالفعل");
         }
-        console.log(error);
       })
       .finally(() => {
         setLoader(false);
@@ -121,7 +120,7 @@ function PaymentPage() {
         fetchPayments();
       })
       .catch(function () {
-        return null;
+        console.error( error);
       })
       .finally(() => {
         setLoader(false);
@@ -192,7 +191,7 @@ function PaymentPage() {
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
-        console.error("Error fetching branches:", error);
+        console.error( error);
       });
   };
 
@@ -202,6 +201,9 @@ function PaymentPage() {
 
   return (
     <main className="branchTable">
+       <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
+             صفحة إدارة طرق الدفع 
+        </div>
       {/* add airport form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
@@ -290,7 +292,7 @@ function PaymentPage() {
               الترتيب
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الاسم
+              اسم طرقة الدفع
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               الحالة
@@ -300,7 +302,7 @@ function PaymentPage() {
               التاريخ/الوقت{" "}
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              التعديل
+              تعديل البيانات
             </th>
           </tr>
         </thead>

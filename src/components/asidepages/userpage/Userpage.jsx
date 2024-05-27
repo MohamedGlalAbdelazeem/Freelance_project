@@ -12,6 +12,7 @@ import { ScrollUp } from "../../ScrollUp";
 import ReactPaginate from "react-paginate";
 
 function Userpage() {
+  
   const baseUrl = import.meta.env.VITE_SOME_KEY;
   const [loader, setLoader] = useState(true);
 

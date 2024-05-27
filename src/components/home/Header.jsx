@@ -37,14 +37,13 @@ function Header() {
             to="/Mainpage/Userprofilepage"
             className="btn text-blue-600 hover:bg-gray-600 hover:text-white rounded-xl btn-ghost normal-case ml-4 bg-gray-200 text-lg"
           >
-            <AccountBoxIcon />
+            <AccountBoxIcon sx={{ fontSize: 35 }} />
             الصفحة الشخصية
           </Link>
           <Link
             to="/Mainpage"
-            className="btn text-blue-600 hover:bg-gray-600 hover:text-white rounded-xl btn-ghost normal-case bg-gray-200 text-lg"
-          >
-            <MenuBookIcon />
+            className="btn text-blue-600 hover:bg-gray-600 hover:text-white rounded-xl btn-ghost normal-case bg-gray-200 text-lg"  >
+            <MenuBookIcon sx={{ fontSize: 35 }} />
             الصندوق اليومي
           </Link>
         </div>

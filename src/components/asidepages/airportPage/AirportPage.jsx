@@ -48,7 +48,7 @@ function AirportPage() {
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
       type: "error",
-      autoClose: 4000,
+      autoClose: 2000,
     });
     Navigate("/Login");
     localStorage.removeItem("user_token");
@@ -70,6 +70,7 @@ function AirportPage() {
       .catch(function (error) {
         if (error.response.data.message === "Unauthenticated.") {
           handleUnauthenticated();
+          return;
         }
       })
       .finally(() => {
@@ -206,7 +207,7 @@ function AirportPage() {
         setOptions(options2);
       })
       .catch((error) => {
-        console.error("Error fetching branches:", error);
+        console.error( error);
       })
       .finally(() => {
         setLoader(false);
@@ -234,7 +235,7 @@ function AirportPage() {
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
-        console.error("Error fetching branches:", error);
+        console.error( error);
       });
   };
   const handlePageClick = (selectedPage) => {
@@ -264,6 +265,9 @@ function AirportPage() {
 
   return (
     <main className="branchTable">
+       <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
+             صفحة إدراة المطارات 
+        </div>
       {/* add airport form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
@@ -282,6 +286,7 @@ function AirportPage() {
               )}
             </div>
             <div className="flex-grow">
+              <label className="text-white">اختر اسم خط الطيران </label>
               <Select
                 isMulti
                 options={options}
@@ -367,17 +372,16 @@ function AirportPage() {
               اسم المطار
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              خطوط الطيران
-            </th>
-            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               الحالة
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              {" "}
-              التاريخ/الوقت{" "}
+              خطوط الطيران
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              التعديل
+              التاريخ/الوقت
+            </th>
+            <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
+              تعديل البيانات
             </th>
           </tr>
         </thead>
@@ -399,16 +403,6 @@ function AirportPage() {
                     {name}
                   </span>
                 </td>
-                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                  {airLines.map((airline, index) => (
-                    <p
-                      key={index}
-                      className="rounded bg-blue-200 px-2 py-1  w-fit my-1 mx-auto text-xs font-bold"
-                    >
-                      {index + 1}-{airline.name}
-                    </p>
-                  ))}
-                </td>
                 <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                   {status === "مفعل" ? (
                     <div className="bg-green-500 min-w-20 py-1 text-white text-sm rounded-lg">
@@ -420,6 +414,17 @@ function AirportPage() {
                     </div>
                   )}
                 </td>
+                <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
+                  {airLines.map((airline, index) => (
+                    <p
+                      key={index}
+                      className="rounded bg-blue-200 px-2 py-1  w-fit my-1 mx-auto text-xs font-bold"
+                    >
+                      {index + 1}-{airline.name}
+                    </p>
+                  ))}
+                </td>
+              
                 <td className="w-full lg:w-auto  text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                   <span className="rounded  px-1  text-xs font-bold">
                     {created_at}

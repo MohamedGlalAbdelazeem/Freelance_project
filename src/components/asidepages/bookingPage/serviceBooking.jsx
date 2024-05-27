@@ -509,9 +509,10 @@ const ServiceBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("client_id")}
+                      defaultValue="" 
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         اختر العميل
                       </option>
                       {clients.map((client, index) => {
@@ -546,9 +547,10 @@ const ServiceBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("payment_id")}
+                      defaultValue="" 
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         اختر طريقة الدفع
                       </option>
                       {payments.map((payment, index) => {
@@ -568,9 +570,10 @@ const ServiceBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("currency_id")}
+                      defaultValue="" 
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         اختر العملة
                       </option>
                       {showCurrencies.map((currency, index) => {
@@ -593,9 +596,10 @@ const ServiceBooking = () => {
                     <select
                       id="countries"
                       {...register("service_id")}
+                      defaultValue="" 
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         اسم الخدمة
                       </option>
                       {showSrvName.map((serviceName, index) => {

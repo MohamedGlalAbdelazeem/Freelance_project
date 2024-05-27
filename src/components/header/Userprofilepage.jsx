@@ -49,7 +49,7 @@ function UserProfilePage() {
       .catch(function (error) {
         if (error.response?.data?.message === "Unauthenticated.") {
           handleUnauthenticated();
-          console.error(error);
+          return;
         }
       })
       .finally(() => {
@@ -133,7 +133,6 @@ function UserProfilePage() {
         if (error.response.data.message === "The password is incorrect.") {
           toast("كلمة المررو القديمة غير صحيحة", { type: "error" });
         }
-        toast("لم يتم تغيير كلمة السر", { type: "error" });
       })
       .finally(() => {
         setLoader(false);

@@ -71,12 +71,7 @@ const TripBooking = () => {
     setBookingTrip(...single);
   };
 
-  // Get Today's Date
-  const fullDate = new Date();
-  const year = fullDate.getFullYear();
-  const month = fullDate.getMonth() + 1;
-  const day = fullDate.getDate();
-  const formattedDate = `${year}-${month}-${day}`;
+   
 
   const handleUnauthenticated = () => {
     toast("يجب عليك تسجيل الدخول مرة ثانية لانتهاء الصلاحية", {
@@ -88,7 +83,7 @@ const TripBooking = () => {
     localStorage.removeItem("user_role_name");
   };
 
-  //pagenation
+ 
   useEffect(() => {
     fetchPagenation();
   }, [currentPage]);
@@ -116,7 +111,7 @@ const TripBooking = () => {
     setCurrentPage(selectedPage.selected + 1);
   };
 
-  // fetch trip_id
+  
   function fetchTrip() {
     setLoader(true);
     axios
@@ -136,7 +131,7 @@ const TripBooking = () => {
       });
   }
 
-  // fetch payments method
+  
   const fetchPayments = () => {
     setLoader(true);
     axios
@@ -155,7 +150,7 @@ const TripBooking = () => {
         setLoader(false);
       });
   };
-  // fetch currencies
+  
   function fetchCurrencies() {
     setLoader(true);
     axios
@@ -174,7 +169,7 @@ const TripBooking = () => {
         setLoader(false);
       });
   }
-  // fetch clients
+
   const fetchClients = () => {
     setLoader(true);
     axios
@@ -193,7 +188,7 @@ const TripBooking = () => {
         setLoader(false);
       });
   };
-  // fetch booking trip
+ 
   const fetchData = () => {
     setLoader(true);
     axios
@@ -215,7 +210,7 @@ const TripBooking = () => {
         setLoader(false);
       });
   };
-  // store Booktrip
+ 
   const storeTrips = async () => {
     setLoader(true);
     let tripData = {
@@ -262,7 +257,7 @@ const TripBooking = () => {
         setLoader(false);
       });
   };
-  // delete trip
+ 
   function deleteTrips(id) {
     setLoader(true);
     axios
@@ -283,7 +278,7 @@ const TripBooking = () => {
         setLoader(false);
       });
   }
-  //update
+  
   const updateTrips = async () => {
     setLoader(true);
     let tripData = {
@@ -336,7 +331,7 @@ const TripBooking = () => {
       });
   };
 
-  //search
+  
   useEffect(() => {
     if (searchValue === "") {
       setFilteredBookings(bookings);
@@ -465,7 +460,7 @@ const TripBooking = () => {
                           <img
                             src={`${backBaseUrl}${bookingTrip?.documentPath}/${bookingTrip?.document}`}
                             alt="avatar"
-                            className="w-[160px] h-[160px]  border-4 border-zinc-500 mx-auto mt-5 mb-4"
+                            className="w-[200px] h-[200px]  rounded-lg border-2 p-1 border-zinc-500 mx-auto mt-5 mb-4"
                           />
                           <dt className="text-sm font-medium text-gray-500">
                             صورة الخدمة
@@ -547,9 +542,10 @@ const TripBooking = () => {
                   <div className="flex-grow w-full">
                     <select
                       {...register("client_id")}
+                      defaultValue="" 
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2  dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         اختر العميل
                       </option>
                       {clients.map((client, index) => {
@@ -618,10 +614,11 @@ const TripBooking = () => {
                 <div className="flex gap-4	">
                   <div className="flex-grow w-full">
                     <select
+                      defaultValue="" 
                       {...register("payment_id")}
                       className=" border border-gray-300 text-gray-900  text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         اختر طريقة الدفع
                       </option>
                       {payments.map((payment, index) => {
@@ -640,10 +637,11 @@ const TripBooking = () => {
                   </div>
                   <div className="flex-grow w-full">
                     <select
+                     defaultValue="" 
                       {...register("currency_id")}
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         اختر العملة
                       </option>
                       {showCurrencies.map((currency, index) => {
@@ -665,10 +663,11 @@ const TripBooking = () => {
                   <div className="w-1/2">
                     <select
                       id="countries"
+                      defaultValue="" 
                       {...register("type")}
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         نوع الرحلة
                       </option>
                       <option value="1">ذهاب</option>
@@ -682,11 +681,12 @@ const TripBooking = () => {
                   </div>
                   <div className="w-1/2">
                     <select
+                     defaultValue="" 
                       id="countries"
                       {...register("trip_id")}
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled selected>
+                      <option value="" disabled >
                         اسم الرحلة
                       </option>
                       {showTripName.map((tripName, index) => {

@@ -3,7 +3,7 @@ import { Link , useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Resetpassword from "./Resetpassword";
-import VpnKeyIcon from '@mui/icons-material/VpnKey';
+import ContactMailIcon from '@mui/icons-material/ContactMail';
 function Forgetpasssword() {
    const baseUrl = import.meta.env.VITE_SOME_KEY
     const [email, setEmail] = useState("");
@@ -23,7 +23,7 @@ function Forgetpasssword() {
       });
 
       if (res.status === 200) {
-        toast("تم إرسال رسالة إليك برجاء التوجة إلي البريد الإلكتروني الخاص بك", { type: "success"});
+        toast("تم إرسال رسالة إلي البريد الإلكتروني الخاص بك", { type: "success"});
       }
     } catch (error) {
       console.log(error);
@@ -39,11 +39,11 @@ return (
     <>
   <section className="bg-white dark:bg-gray-900">
     <div className="container flex flex-col items-center justify-center min-h-screen px-6 mx-auto">
-     <div className="flex justify-center bg-blue-500 rounded-full p-3 w-fit mx-auto">
-          <VpnKeyIcon sx={{ fontSize: 55 , color:"white"}}/>
+     <div className="flex justify-center bg-blue-500 rounded-full p-4 w-fit mx-auto">
+          <ContactMailIcon sx={{ fontSize: 55 , color:"white"}}/>
          </div>
         <p className="mt-4 text-lg font-semibold tracking-wide text-center text-gray-800 capitalize dark:text-white">
-            سوف يتم إرسال رسالة إلي البريد الإلكتروني الخاص بك
+         توجه إلي البريد الإلكتروني الحاص بك عند إرسال الرسالة
         </p>
 
         <div className="w-full max-w-md mx-auto mt-6">
@@ -57,11 +57,11 @@ return (
                         <input type="email" value={email} onChange={(e)=>setEmail(e.target.value)}  className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40" placeholder="البريد الإلكتروني "/>
                     </div>
                     <div className='text-right'>   
-                    <Link to="/Login"><span className="text-sm  inline-block  font-bold  text-white py-5  hover:cursor-pointer transition duration-200">تذكرت كلمة السر ؟ </span></Link>
+                    <Link to="/Login"><span className="text-sm  inline-block  font-bold  text-white border-b-2 pt-8  hover:cursor-pointer transition duration-200">تذكرت كلمة السر ؟ </span></Link>
                     </div>
                   
                     <div className="mt-6">
-                        <button onClick={(e)=>submitForm(e)} className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+                        <button onClick={(e)=>submitForm(e)} className="w-full px-6 py-3 text-lg font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
                          إرسال  
                         </button>
                     </div>
@@ -87,7 +87,7 @@ return (
               />
             </g>
           </svg>
-        )}
+                   )}
         </div>
     </div>
 </section>

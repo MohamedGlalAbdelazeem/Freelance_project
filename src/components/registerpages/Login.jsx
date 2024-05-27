@@ -4,7 +4,6 @@ import "./register.css";
 import axios from "axios";
 import { toast } from "react-toastify";
 import LockOpenIcon from '@mui/icons-material/LockOpen'; 
-import LoginIcon from '@mui/icons-material/Login';
 function Login() {
 
   const baseUrl = import.meta.env.VITE_SOME_KEY
@@ -12,12 +11,8 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [accept, setAccetp] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(false);
-
   const [loader, setLoader] = useState(false);
 
-
-  // submit login form
   const submitForm = async (e) => {
     e.preventDefault();
     setAccetp(true);
@@ -31,9 +26,7 @@ function Login() {
         password: password,
       });
       setLoader(false);
-
       if (res.status === 200) {
-      
         localStorage.setItem("user_token", res.data.access_token);
         localStorage.setItem("user_role_name", res.data.user.role_name);
         Navigate("/Mainpage");
@@ -41,13 +34,13 @@ function Login() {
       }
     } catch (error) {
       if (error.response.data.error === "Unauthorized") {
-        toast("كلمة السر غير صحيحة", { type: "error"});
+        toast("هذا المستخدم غير مسموح له بالدخول", { type: "error"});
       }
       setLoader(false);
     }
   };
 
-  return (
+return (
     <section className="bg-white dark:bg-gray-900">
       <div className="container flex items-center justify-center min-h-screen px-6 mx-auto"> 
         <form
@@ -77,7 +70,7 @@ function Login() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="block w-full py-3 text-gray-700 bg-white border rounded-lg px-11 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              className="block w-full py-4 text-gray-700 bg-white border rounded-lg px-11 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
               placeholder="البريد الإلكتروني "
             />
           </div>
@@ -103,7 +96,7 @@ function Login() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="block w-full px-10 py-3 text-gray-700 bg-white border rounded-lg dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
+              className="block w-full px-10 py-4 text-gray-700 bg-white border rounded-lg dark:bg-gray-900 dark:text-gray-300 dark:border-gray-600 focus:border-blue-400 dark:focus:border-blue-300 focus:ring-blue-300 focus:outline-none focus:ring focus:ring-opacity-40"
               placeholder="كلمة السر "
             />
           </div>
@@ -115,34 +108,18 @@ function Login() {
           )}
           <div className="text-right">
             <Link to="/Forgetpasssword">
-              <span className="text-sm  inline-block  font-bold  text-white py-5  hover:cursor-pointer transition duration-200">
+              <span className="text-sm border-b-2  inline-block  font-bold  text-white pt-7  hover:cursor-pointer transition duration-200">
                 هل نسيت كلمة السر ؟
               </span>
             </Link>
           </div>
-          {errorMessage && (
-            <div role="alert" className="alert alert-error">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="stroke-current shrink-0 h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinejoin="round"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              <span>هذا المستخدم غير مسموح له بالدخول</span>
-            </div>
-          )}
           <div className="mt-6">
-            <button className="w-full px-6 py-3 text-sm font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
+            <button className="w-full px-6 py-3 text-lg font-medium tracking-wide text-white capitalize transition-colors duration-300 transform bg-blue-500 rounded-lg hover:bg-blue-400 focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-50">
               سجل الدخول
-              <LoginIcon sx={{ fontSize: 30 }}/>
             </button>
           </div>
         </form>
+        
         {loader && (
           <svg
             id="loading-spinner"

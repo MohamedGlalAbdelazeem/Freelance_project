@@ -202,7 +202,10 @@ function CurrencyPage() {
   };
 
   return (
-    <main className="branchTable">
+    <main>
+       <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
+             صفحة إدراة العملات 
+        </div>
       {/* add Currency form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
@@ -291,17 +294,17 @@ function CurrencyPage() {
               الترتيب
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الاسم
+              اسم العملة
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              الحالة
+              حالة العملة
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
               {" "}
               التاريخ/الوقت{" "}
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              التعديل
+              تعديل البيانات
             </th>
           </tr>
         </thead>
@@ -366,6 +369,7 @@ function CurrencyPage() {
         </tbody>
       </table>
       <div>
+        {/* Render pagination */}
         <ReactPaginate
           pageCount={totalPages}
           pageRangeDisplayed={3}
@@ -376,14 +380,12 @@ function CurrencyPage() {
           previousLabel={"السابق"}
           nextLabel={"التالي"}
           previousClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
           }
           nextClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
+            "mx-1 px-4 py-1 border rounded-lg text-[20px] bg-gray-200 "
           }
-          pageClassName={
-            "mx-1 px-4 py-1 border rounded-lg text-[20px] hover:bg-gray-200"
-          }
+          pageClassName={"mx-1 px-3 py-1 border rounded-lg text-2xl font-bold "}
         />
       </div>
       {loader && (

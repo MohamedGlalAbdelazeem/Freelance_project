@@ -39,13 +39,11 @@ function Trippage() {
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
     tripCost: z.string().min(1, { message: "يجب تعيين تكلفة الرحلة" }),
     take_off: z.string().min(1, { message: "ادخل تاريخ الرحلة" }),
-    take_off_time: z.string().min(1, { message: "ادخل وقت الرحلة" }),
     tripFrom: z.string().min(1, { message: "يجب تعيين بلد الانطلاق" }),
     tripTo: z.string().min(1, { message: "يجب تعيين بلد الوصول" }),
     tripDescription: z.string().min(1, { message: "ادخل وصف الرحلة" }),
     category_id: z.string().min(1, { message: "اختر نوع الرحلة" }),
     airport_id: z.string().min(1, { message: "اختر المطار" }),
-    air_line_id: z.string().min(1, { message: "اختر خط الطيران" }),
     currency_id: z.string().min(1, { message: "اختر العملة" }),
   });
 
@@ -230,6 +228,7 @@ function Trippage() {
       .catch(function (error) {
         if (error.response.data.message === "Unauthenticated.") {
           handleUnauthenticated();
+          return;
         }
       })
       .finally(() => {
@@ -255,7 +254,7 @@ function Trippage() {
         {
           name: getValues("tripName"),
           cost: getValues("tripCost").toString(),
-          take_off: `${getValues("take_off")} ${getValues("take_off_time")}`, 
+          take_off: `${getValues("take_off")} ${getValues("take_off_time")}`,
           from_countries_id: getValues("tripFrom"),
           to_countries_id: getValues("tripTo"),
           description: getValues("tripDescription"),
@@ -331,8 +330,8 @@ function Trippage() {
         `${baseUrl}trips/${updateTripsID}`,
         {
           name: getValues("tripName"),
-          cost: getValues("tripCost"),
-          take_off: `${getValues("take_off")} ${getValues("take_off_time")}`,
+          cost: getValues("tripCost").toString(),
+          take_off: getValues("take_off"),
           from_countries_id: getValues("tripFrom"),
           to_countries_id: getValues("tripTo"),
           description: getValues("tripDescription"),
@@ -372,7 +371,6 @@ function Trippage() {
       });
   };
 
-  //search
   useEffect(() => {
     if (searchValue === "") {
       setFilteredTrips(trips);
@@ -387,6 +385,9 @@ function Trippage() {
 
   return (
     <main className="branchTable">
+      <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
+        صفحة إدراة الرحلات
+      </div>
       <dialog id="my_modal_2" className="modal">
         <div className="modal-box relative">
           <div className="modal-action absolute -top-4 left-2">
@@ -549,15 +550,15 @@ function Trippage() {
                   )}
                 </div>
                 <div className="w-full">
-                  <input
-                    type="time"
-                    {...register("take_off_time")}
-                    placeholder="وقت اقلاع الرحلة "
-                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  <textarea
+                    rows="1"
+                    {...register("tripDescription")}
+                    placeholder=" ملاحظات  "
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   />
                   {errors && (
                     <span className="text-red-500 text-sm">
-                      {errors.take_off_time?.message}
+                      {errors.tripDescription?.message}
                     </span>
                   )}
                 </div>
@@ -565,6 +566,7 @@ function Trippage() {
               <div className="flex gap-2	">
                 <div className="flex-grow w-full">
                   <select
+                    defaultValue=""
                     {...register("airport_id", {
                       onChange: () => {
                         setAirportId([getValues("airport_id")]);
@@ -572,7 +574,7 @@ function Trippage() {
                     })}
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="" disabled selected>
+                    <option value="" disabled>
                       اختر المطار
                     </option>
                     {showAirports.map((airport, index) => {
@@ -591,10 +593,11 @@ function Trippage() {
                 </div>
                 <div className="flex-grow w-full">
                   <select
+                    defaultValue=""
                     {...register("air_line_id")}
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="" disabled selected>
+                    <option value="" disabled>
                       اختر خط الطيران
                     </option>
                     {showAirLines[0]?.airLines?.map((line, index) => {
@@ -613,10 +616,11 @@ function Trippage() {
                 </div>
                 <div className="flex-grow w-full">
                   <select
+                    defaultValue=""
                     {...register("currency_id")}
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="" disabled selected>
+                    <option value="" disabled>
                       اختر العملة
                     </option>
                     {showCurrencies.map((currency, index) => {
@@ -637,11 +641,12 @@ function Trippage() {
               <div className="flex gap-2">
                 <div className="flex-grow w-full">
                   <select
+                    defaultValue=""
                     id="countries"
                     {...register("tripFrom")}
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="" disabled selected>
+                    <option value="" disabled>
                       من
                     </option>
                     {showCountCountries.map((trip, index) => {
@@ -660,11 +665,12 @@ function Trippage() {
                 </div>
                 <div className="flex-grow w-full">
                   <select
+                    defaultValue=""
                     id="countries"
                     {...register("tripTo")}
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="" disabled selected>
+                    <option value="" disabled>
                       إلى
                     </option>
                     {showCountCountries.map((trip, index) => {
@@ -683,11 +689,12 @@ function Trippage() {
                 </div>
                 <div className="flex-grow w-full">
                   <select
+                    defaultValue=""
                     id="countries"
                     {...register("category_id")}
                     className=" border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5   dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="" disabled selected>
+                    <option value="" disabled>
                       نوع الرحلة
                     </option>
                     {showCategories.map((categories, index) => {
@@ -705,21 +712,7 @@ function Trippage() {
                   )}
                 </div>
               </div>
-              <div className="flex">
-                <div className="w-full">
-                  <textarea
-                    rows="1"
-                    {...register("tripDescription")}
-                    placeholder=" ملاحظات  "
-                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
-                  />
-                  {errors && (
-                    <span className="text-red-500 text-sm">
-                      {errors.tripDescription?.message}
-                    </span>
-                  )}
-                </div>
-              </div>
+
               <div className="pt-3">
                 <div className="-mx-3 flex flex-wrap">
                   {updateMode && (
@@ -808,7 +801,7 @@ function Trippage() {
                 إلي
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                وقت الإقلاع
+                تاريخ الإقلاع
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 التكلفة
@@ -817,7 +810,7 @@ function Trippage() {
                 الحالة
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                التعديل
+                تعديل البيانات
               </th>
             </tr>
           </thead>
@@ -837,7 +830,7 @@ function Trippage() {
                 إلي
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                وقت الإقلاع
+                تاريخ الإقلاع
               </th>
               <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                 التكلفة
@@ -861,6 +854,7 @@ function Trippage() {
               description,
               category,
               airport,
+              airLine,
             } = trip;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
@@ -914,17 +908,16 @@ function Trippage() {
                       <button
                         onClick={() => {
                           setAirportId([airport.id]);
-                          setValue("air_line_id", "");
+                          setValue("air_line_id", airLine.id);
                           ScrollUp();
                           setUpdateTripsID(id);
                           setUpdateMode(true);
                           setValue("tripName", name);
                           setValue("tripCost", cost.toString());
-                          const [datePart, timePart] = takeOff.split(" ");
+                          const [datePart] = takeOff.split(" ");
                           const [year, month, day] = datePart.split("-");
                           const formattedDateString = `${year}-${month}-${day}`;
                           setValue("take_off", formattedDateString);
-                          setValue("take_off_time", timePart);
                           setValue("tripDescription", description);
                           setBranchStatus(status === "مفعل" ? true : false);
                           setValue(
