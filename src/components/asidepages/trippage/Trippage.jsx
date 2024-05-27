@@ -255,7 +255,7 @@ function Trippage() {
         {
           name: getValues("tripName"),
           cost: getValues("tripCost").toString(),
-          take_off: `${getValues("take_off")} ${getValues("take_off_time")}`,
+          take_off: `${getValues("take_off")} ${getValues("take_off_time")}`, 
           from_countries_id: getValues("tripFrom"),
           to_countries_id: getValues("tripTo"),
           description: getValues("tripDescription"),
