@@ -14,6 +14,7 @@ import ReactPaginate from "react-paginate";
 import { ScrollUp } from "../../ScrollUp";
 
 function Categoriespage() {
+
   const baseUrl = import.meta.env.VITE_SOME_KEY
   const [categories, setCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
@@ -201,7 +202,10 @@ function Categoriespage() {
   };
 
   return (
-    <main className="branchTable">
+    <main>
+       <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
+           صفحة تصنيف الرحلات
+        </div>
       {/* add category form */}
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
@@ -300,7 +304,7 @@ function Categoriespage() {
               التاريخ/الوقت{" "}
             </th>
             <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-              التعديل
+              تعديل البيانات
             </th>
           </tr>
         </thead>
@@ -325,11 +329,11 @@ function Categoriespage() {
                 <td className="w-full lg:w-auto p-2 text-gray-800   border border-b text-center block lg:table-cell relative lg:static">
                   {status === "مفعل" ? (
                     <div className="bg-green-500 min-w-20 py-1 text-white text-sm rounded-lg">
-                      مفعل
+                      مفعلة
                     </div>
                   ) : (
                     <div className="bg-red-500 min-w-20 py-1 text-white rounded-lg text-sm">
-                      غير مفعل
+                      غير مفعلة
                     </div>
                   )}
                 </td>

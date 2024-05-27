@@ -181,19 +181,17 @@ function Asidebar() {
         className="flex flex-col w-72 h-screen px-5 py-8 overflow-y-auto bg-white border-r rtl:border-r-0 rtl:border-l dark:bg-gray-900 dark:border-gray-700"
       >
         <div
-          className="flex flex-col items-center bg-slate-600 p-4 rounded-3xl"
-          id="admin"
-        >
+          className="flex flex-col items-center bg-slate-700 p-4 rounded-lg"  id="admin">
           <div className="avatar online bg-white rounded-3xl ">
-            <div className="w-14 rounded-full">
+            <div className="w-18 rounded-full">
               <Link to="/Mainpage/Userprofilepage">
-                <AccountCircleOutlinedIcon sx={{ fontSize: 55 }} />
+                <AccountCircleOutlinedIcon sx={{ fontSize: 50 }} />
               </Link>
             </div>
           </div>
 
           <div className="text-center">
-            <p className="font-bold text-lg text-green-400">
+            <p className="font-bold text-lg  bg-green-500 text-white mt-3 py-1 px-3 rounded-lg">
               {userProfile.role_name}
             </p>
           </div>

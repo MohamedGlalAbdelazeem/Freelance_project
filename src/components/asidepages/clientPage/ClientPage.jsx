@@ -14,8 +14,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import ReactPaginate from "react-paginate";
 
 function ClientPage() {
-  const baseUrl = "http://127.0.0.1:8000/api/";
-  const backBaseUrl = "http://127.0.0.1:8000";
+  const baseUrl = import.meta.env.VITE_SOME_KEY;
+  const backBaseUrl = import.meta.env.VITE_IMAGE_KEY;
   const [loader, setLoader] = useState(false);
   const [countries, setCountries] = useState([]);
 
@@ -43,7 +43,7 @@ function ClientPage() {
   const schema = z.object({
     name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
     email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
-    phone_number: z.string().min(11, { message: "يجب ادخال رقم الهاتف صحيح" }),
+    phone_number: z.string().min( { message: "يجب ادخال رقم الهاتف " }),
     address: z.string().min(1, { message: "يجب ادخال العنوان" }),
     countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
     image: z.any(),
@@ -249,28 +249,38 @@ function ClientPage() {
 
   return (
     <div>
+         <div className="w-full mb-5">
+        <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
+          صفحةإدراة العملاء 
+        </div>
+      </div>
       <dialog id="my_modal_2" className="modal">
         <div className="modal-box relative">
           <div className="modal-action absolute -top-4 left-2">
             <form method="dialog">
-              <button className="btn rounded-full w-12 h-10">X</button>
+              <button className="btn rounded-full w-12 h-10 bg-red-500 text-white text-lg">X</button>
             </form>
           </div>
           <div className="text-center flex flex-col justify-center">
             {singleClient?.imagePath && singleClient?.image && (
               <div>
+                <dt className="font-medium   mb-4 text-lg text-gray-500">
+                      صورة العميل  
+                    </dt>
                 <img
                   src={`${backBaseUrl}${singleClient?.imagePath}/${singleClient?.image}`}
                   alt="avatar"
-                  className="w-[130px] h-[130px] rounded-lg border-zinc-500 mx-auto mb-4"
+                  className="w-[140px] h-[140px] rounded-lg border-zinc-500 mx-auto mb-4"
                 />
               </div>
+              
             )}
+          
             <div className="bg-white overflow-hidden shadow rounded-lg border">
               <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
                 <dl className="sm:divide-y sm:divide-gray-200">
-                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
+                  <div className="bg-gray-300 py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt className="text-sm font-medium   text-gray-500">
                       الاسم :
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
@@ -285,7 +295,7 @@ function ClientPage() {
                       {singleClient?.email}
                     </dd>
                   </div>
-                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <div className="bg-gray-300  py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       رقم الهاتف :
                     </dt>
@@ -301,7 +311,7 @@ function ClientPage() {
                       {singleClient?.branch?.branch_name}
                     </dd>
                   </div>
-                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <div className="bg-gray-300  py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       الملاحظات:
                     </dt>
@@ -318,7 +328,7 @@ function ClientPage() {
                     </dd>
                   </div>
 
-                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <div className="bg-gray-300  py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       الجنسية :
                     </dt>
@@ -502,7 +512,7 @@ function ClientPage() {
         <thead>
           {userRoleName === "admin" ? (
             <tr>
-              {["الترتيب", "الاسم", "رقم الموبايل", "تعديل"].map(
+              {["الترتيب", "الاسم", "رقم الموبايل", "تعديل البيانات"].map(
                 (header, index) => (
                   <th
                     key={index}

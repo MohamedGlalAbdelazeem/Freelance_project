@@ -209,6 +209,9 @@ function Airlines() {
   return (
     <main>
       {/* add airlines form */}
+      <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
+             صفحة إدارة    خطوط الطيران 
+        </div>
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
           <form>

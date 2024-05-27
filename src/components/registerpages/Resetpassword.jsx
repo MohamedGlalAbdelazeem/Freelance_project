@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link , useNavigate } from "react-router-dom";
-import { useState , useEffect } from "react";
+import { useState  } from "react";
 import { toast } from "react-toastify";
 import LoginIcon from '@mui/icons-material/Login';
 import axios from "axios";
