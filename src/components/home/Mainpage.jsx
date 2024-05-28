@@ -13,7 +13,7 @@ function Mainpage() {
         <Header />
         <div className="p-5">
           <Outlet />
-           <a href="https://wa.me/+97000972599339233" target="_blank" >
+           <a href="https://wa.me/+972599339233" target="_blank" >
               <WhatsAppIcon sx={{ width:"60px",height:"60px", position:"fixed",left:"30px", bottom:"30px",  borderRadius:"50%",fontSize:"100px" , backgroundColor:"green" , color:"white"}}/>
            </a>
         </div>
