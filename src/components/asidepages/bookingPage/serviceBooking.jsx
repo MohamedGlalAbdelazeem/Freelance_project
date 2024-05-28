@@ -723,9 +723,7 @@ const ServiceBooking = () => {
                 <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
                   طريقة الدفع
                 </th>
-                <th className="p-3 font-bold uppercase bg-gray-200 text-gray-600 border border-gray-300 hidden lg:table-cell">
-                  اسم الخدمة
-                </th>
+                 
               </tr>
             </thead>
           )}
@@ -771,11 +769,7 @@ const ServiceBooking = () => {
                       {payment?.name}
                     </span>
                   </td>
-                  <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
-                    <span className="rounded  px-1 text-xs font-bold">
-                      {bookingService?.service?.name}
-                    </span>
-                  </td>
+                 
                   {userRoleName === "admin" ? (
                     <td className="w-full lg:w-auto p-2 text-gray-800  border border-b text-center block lg:table-cell relative lg:static">
                       <div className="flex gap-2 justify-center items-center">

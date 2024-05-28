@@ -838,7 +838,7 @@ const TripBooking = () => {
                 bookingTrip,
                 bookingService,
               } = booking;
-              const tableIndex = (currentPage - 1) * 15 + index + 1;
+              const tableIndex = (  - 1) * 15 + index + 1;
               if (bookingService !== null) return;
               return (
                 <tr
