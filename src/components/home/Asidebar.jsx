@@ -158,7 +158,7 @@ function Asidebar() {
       >
         <div className="logo flex justify-center items-center ">
           <Link to="/Mainpage">
-            <img src={logo} alt="logo" className="w-32 text-white" />
+            <img src={logo} alt="logo" className="w-80 pt-2 text-white" />
           </Link>
         </div>
 
