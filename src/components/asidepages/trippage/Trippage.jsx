@@ -335,6 +335,7 @@ function Trippage() {
       airport_id: getValues("airport_id"),
       currency_id: getValues("currency_id"),
       air_line_id: getValues("air_line_id"),
+      status: branchStatus 
     };
     if (getValues("tripDescription")) {
       data.notes = getValues("tripDescription");
@@ -875,6 +876,7 @@ function Trippage() {
               category,
               airport,
               airLine,
+              currency
             } = trip;
             const tableIndex = (currentPage - 1) * 15 + index + 1;
             return (
@@ -968,7 +970,7 @@ function Trippage() {
                           setValue(
                             "currency_id",
                             showCurrencies
-                              .find((currency) => currency.id === currency.id)
+                              .find((cur) => cur.id === currency.id)
                               ?.id.toString()
                           );
                         }}
