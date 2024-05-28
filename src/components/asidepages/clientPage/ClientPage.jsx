@@ -42,11 +42,10 @@ function ClientPage() {
   const schema = z.object({
     name: z.string().min(1, { message: "يجب ادخال اسم العميل" }),
     email: z.string().email({ message: "يجب ادخال بريد الكترونى صحيح" }),
-    phone_number: z.string().min( { message: "يجب ادخال رقم الهاتف " }),
+    phone_number: z.string().min(1, { message: "يجب ادخال رقم الهاتف " }),
     address: z.string().min(1, { message: "يجب ادخال العنوان" }),
     countries_id: z.string().min(1, { message: "يجب ادخال رمز المدينة" }),
     image: z.any(),
-    notes: z.string().min(1, { message: "يجب ادخال ملاحظات" }),
   });
 
   const {
@@ -142,8 +141,10 @@ function ClientPage() {
       address: getValues("address"),
       branch_id: clients[0]?.branch?.branch_id,
       countries_id: getValues("countries_id"),
-      notes: getValues("notes"),
     };
+    if (getValues("notes")) {
+      clientData.notes = getValues("notes");
+    }
     if (getValues("image").length > 0) {
       clientData.image = getValues("image")[0];
     }
@@ -201,8 +202,10 @@ function ClientPage() {
       address: getValues("address"),
       branch_id: clients[0]?.branch?.branch_id,
       countries_id: getValues("countries_id"),
-      notes: getValues("notes"),
     };
+    if (getValues("notes")) {
+      updateClientData.notes = getValues("notes");
+    }
     if (getValues("image").length > 0) {
       updateClientData.image = getValues("image")[0];
     }
@@ -249,37 +252,38 @@ function ClientPage() {
 
   return (
     <div>
-         <div className="w-full mb-5">
+      <div className="w-full mb-5">
         <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
-          صفحةإدراة العملاء 
+          صفحة إدراة العملاء
         </div>
       </div>
       <dialog id="my_modal_2" className="modal">
         <div className="modal-box relative">
           <div className="modal-action absolute -top-4 left-2">
             <form method="dialog">
-              <button className="btn rounded-full w-12 h-10 bg-red-500 text-white text-lg">X</button>
+              <button className="btn rounded-full w-12 h-10 bg-red-500 text-white text-lg">
+                X
+              </button>
             </form>
           </div>
           <div className="text-center flex flex-col justify-center">
             {singleClient?.imagePath && singleClient?.image && (
               <div>
                 <dt className="font-medium   mb-4 text-lg text-gray-500">
-                      صورة العميل  
-                    </dt>
+                  صورة العميل
+                </dt>
                 <img
                   src={`${backBaseUrl}${singleClient?.imagePath}/${singleClient?.image}`}
                   alt="avatar"
                   className="w-[140px] h-[140px] rounded-lg border-zinc-500 mx-auto mb-4"
                 />
               </div>
-              
             )}
-          
+
             <div className="bg-white overflow-hidden shadow rounded-lg border">
               <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
                 <dl className="sm:divide-y sm:divide-gray-200">
-                  <div className="bg-gray-300 py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium   text-gray-500">
                       الاسم :
                     </dt>
@@ -295,7 +299,7 @@ function ClientPage() {
                       {singleClient?.email}
                     </dd>
                   </div>
-                  <div className="bg-gray-300  py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <div className=" py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       رقم الهاتف :
                     </dt>
@@ -311,14 +315,16 @@ function ClientPage() {
                       {singleClient?.branch?.branch_name}
                     </dd>
                   </div>
-                  <div className="bg-gray-300  py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      الملاحظات:
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient?.notes}
-                    </dd>
-                  </div>
+                  {singleClient?.notes && (
+                    <div className=" py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                      <dt className="text-sm font-medium text-gray-500">
+                        الملاحظات:
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {singleClient?.notes}
+                      </dd>
+                    </div>
+                  )}
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       العنوان:
@@ -328,7 +334,7 @@ function ClientPage() {
                     </dd>
                   </div>
 
-                  <div className="bg-gray-300  py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <div className=" py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       الجنسية :
                     </dt>
@@ -419,11 +425,11 @@ function ClientPage() {
               <div className=" flex flex-wrap gap-3">
                 <div className="w-[49%] flex-grow ">
                   <select
-                  defaultValue=""
+                    defaultValue=""
                     {...register("countries_id")}
                     className="select select-bordered flex-grow w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   >
-                    <option value="" disabled >
+                    <option value="" disabled>
                       الدولة
                     </option>
                     {countries.map((nat) => {
@@ -458,11 +464,6 @@ function ClientPage() {
                   placeholder="ملاحظات"
                   className="w-full overflow-auto rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                 />
-                {errors && (
-                  <span className="text-red-500 text-sm">
-                    {errors.notes?.message}
-                  </span>
-                )}
               </div>
 
               <div>

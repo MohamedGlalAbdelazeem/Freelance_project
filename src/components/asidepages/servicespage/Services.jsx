@@ -14,7 +14,7 @@ import { ScrollUp } from "../../ScrollUp";
 import ReactPaginate from "react-paginate";
 
 function Services() {
-  const baseUrl = import.meta.env.VITE_SOME_KEY
+  const baseUrl = import.meta.env.VITE_SOME_KEY;
   const [loader, setLoader] = useState(true);
   const userRoleName = localStorage.getItem("user_role_name");
   const [updateMode, setUpdateMode] = useState(false);
@@ -42,7 +42,6 @@ function Services() {
   const schema = z.object({
     name: z.string().min(1, "ادخل اسم الخدمة"),
     cost: z.string().min(1, "ادخل تكلفة الخدمة "),
-    description: z.string().min(1, "ادخل وصف الخدمة"),
     category_id: z.string().min(1, "اختر تصنيف الخدمة"),
     currency_id: z.string().min(1, "اختر العملة"),
   });
@@ -61,13 +60,13 @@ function Services() {
     fetchCategories();
     fetchCurrency();
   }, []);
-  
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
     fetchPagenation();
-  }, [currentPage]);  
+  }, [currentPage]);
   const fetchPagenation = () => {
     setLoader(true);
     axios
@@ -149,7 +148,7 @@ function Services() {
         setFilteredServices(response.data.data);
       })
       .catch(function (error) {
-        if (error.response.data.message === "Unauthorized") {
+        if (error.response.data.message === "Unauthenticated.") {
           handleUnauthenticated();
         }
         if (
@@ -168,10 +167,12 @@ function Services() {
     const servicesData = {
       name: getValues("name"),
       cost: getValues("cost"),
-      description: getValues("description"),
       category_id: getValues("category_id"),
       currency_id: getValues("currency_id"),
     };
+    if (getValues("description")) {
+      servicesData.description = getValues("description");
+    }
     axios
       .post(`${baseUrl}services`, servicesData, {
         headers: {
@@ -228,23 +229,22 @@ function Services() {
 
   const handleSrvUpdate = () => {
     setLoader(true);
+    const servicesData = {
+      name: getValues("name"),
+      cost: getValues("cost"),
+      category_id: getValues("category_id"),
+      currency_id: getValues("currency_id"),
+      status: showSrv,
+    };
+    if (getValues("description")) {
+      servicesData.description = getValues("description");
+    }
     axios
-      .post(
-        `${baseUrl}services/${updateEmpID}`,
-        {
-          name: getValues("name"),
-          cost: getValues("cost"),
-          description: getValues("description"),
-          category_id: getValues("category_id"),
-          currency_id: getValues("currency_id"),
-          status: showSrv,
+      .post(`${baseUrl}services/${updateEmpID}`, servicesData, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
+      })
       .then(function () {
         toast.success("تم تحديث البيانات بنجاح");
         fetchServices();
@@ -260,6 +260,7 @@ function Services() {
         setLoader(false);
       });
   };
+
   //search
   useEffect(() => {
     if (searchValue === "") {
@@ -272,6 +273,7 @@ function Services() {
       );
     }
   }, [searchValue, services]);
+
   const fetchSrvById = (id) => {
     let single = services.filter((client) => client.id === id);
     setSingleSrv(...single);
@@ -279,11 +281,10 @@ function Services() {
 
   return (
     <div>
-       <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
-             صفحة إدراة الخدمات 
-        </div>
+      <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
+        صفحة إدراة الخدمات
+      </div>
       <dialog id="my_modal_2" className="modal">
-
         <div className="modal-box relative">
           <div className="modal-action absolute -top-4 left-2">
             <form method="dialog">
@@ -330,14 +331,16 @@ function Services() {
                       {singleSrv?.category?.name}
                     </dd>
                   </div>
-                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      الوصف :
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleSrv?.description}
-                    </dd>
-                  </div>
+                  {singleSrv?.description && (
+                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                      <dt className="text-sm font-medium text-gray-500">
+                        الوصف :
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {singleSrv?.description}
+                      </dd>
+                    </div>
+                  )}
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       الحالة :
@@ -398,11 +401,11 @@ function Services() {
                   </div>
                   <div className="flex-grow w-[49%]">
                     <select
-                       defaultValue="" 
+                      defaultValue=""
                       {...register("currency_id")}
                       className=" border border-gray-300 text-gray-900 text-md rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 block w-full dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                     >
-                      <option value="" disabled >
+                      <option value="" disabled>
                         اختر العملة
                       </option>
                       {showCurrency.map((currency, index) => {
@@ -425,12 +428,12 @@ function Services() {
               <div className="flex gap-4">
                 <div className="w-[49%] flex-grow">
                   <select
-                     defaultValue="" 
+                    defaultValue=""
                     id="countries"
                     {...register("category_id")}
                     className=" border border-gray-300 text-gray-900 text-md rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2 dark:placeholder-gray-400  dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   >
-                    <option value="" disabled >
+                    <option value="" disabled>
                       نوع الرحلة
                     </option>
                     {showCategories.map((categories, index) => {
