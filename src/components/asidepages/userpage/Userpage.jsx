@@ -147,7 +147,7 @@ function Userpage() {
       password: getValues("password"),
       password_confirmation: getValues("password_confirmation"),
       phone_number: getValues("phone_number"),
-      branch_id: getValues("branch_id").toString(),
+      branch_id: getValues("branch_id"),
     };
     axios
       .post(`${baseUrl}employees`, employeeData, {
@@ -206,7 +206,7 @@ function Userpage() {
           password: getValues("password"),
           password_confirmation: getValues("password_confirmation"),
           phone_number: getValues("phone_number"),
-          branch_id: getValues("branch_id").toString(),
+          branch_id: getValues("branch_id"),
         },
         {
           headers: {
@@ -410,7 +410,6 @@ function Userpage() {
               name,
               email,
               phone_number,
-              branch_id,
               branch,
               role_name,
               created_at,
@@ -464,10 +463,11 @@ function Userpage() {
                       setValue("name", name);
                       setValue("email", email);
                       setValue("phone_number", phone_number);
+                      console.log(branch.id);
                       setValue(
                         "branch_id",
                         branches
-                          .find((branch) => branch.id === branch_id)
+                          .find((br) => br.id === branch.id)
                           ?.id.toString()
                       );
                     }}
