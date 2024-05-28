@@ -129,7 +129,7 @@ return (
             type="submit"
             onClick={handleSubmit(onSubmit)}
             disabled={isSubmitting}
-            className="py-3 px-5 w-full font-bold text-lg bg-gray-600 hover:bg-gray-900 transition rounded-lg text-white h-fit mt-12"
+            className="py-3 px-5 w-full font-bold text-lg bg-gray-500 hover:bg-gray-900 transition rounded-lg text-white h-fit mt-12"
           >
             بحث
           </button>
