@@ -14,7 +14,8 @@ import { ScrollUp } from "../../ScrollUp";
 import Select from "react-select";
 
 function AirportPage() {
-  const baseUrl = import.meta.env.VITE_SOME_KEY
+  const baseUrl = import.meta.env.VITE_SOME_KEY;
+  
   const [airports, setAirports] = useState([]);
   const [filteredAirports, setFilteredAirports] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -39,9 +40,9 @@ function AirportPage() {
     getValues,
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
+  
   useEffect(() => {
     fetchAirports();
-    fetchPagination();
     fetchAirlinesInSelection();
   }, []);
 
@@ -179,7 +180,7 @@ function AirportPage() {
       });
   };
 
-  //search
+   
   useEffect(() => {
     if (searchValue === "") {
       setFilteredAirports(airports);
@@ -214,7 +215,6 @@ function AirportPage() {
       });
   };
 
-  //  pagenation
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
@@ -233,6 +233,7 @@ function AirportPage() {
         setAirports(response.data.data);
         setFilteredAirports(response.data.data);
         setTotalPages(response.data.meta.pagination.last_page);
+        setLoader(false);
       })
       .catch(function (error) {
         console.error( error);

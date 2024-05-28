@@ -9,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
-//pagenation
 import ReactPaginate from "react-paginate";
 import { ScrollUp } from "../../ScrollUp";
 
@@ -25,6 +24,10 @@ function Categoriespage() {
   const [updateMode, setUpdateMode] = useState(false);
   const [updateCategoryID, setUpdateCategoryID] = useState("");
   const [searchValue, setSearchValue] = useState("");
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const schema = z.object({
     categoryName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
@@ -49,11 +52,6 @@ function Categoriespage() {
     localStorage.removeItem("user_role_name");
   };
 
-  useEffect(() => {
-    fetchCategories();
-    fetchPagenation();
-  }, []);
-
   const fetchCategories = () => {
     setLoader(true);
     axios
@@ -68,9 +66,7 @@ function Categoriespage() {
         setFilteredCategories(response.data.data);
       })
       .catch(function (error) {
-        if (error.response.data.message === "Unauthenticated.") {
-          handleUnauthenticated();
-        }
+         console.log(error);
       })
       .finally(() => {
         setLoader(false);
@@ -98,7 +94,7 @@ function Categoriespage() {
       })
       .catch((error) => {
         if (error.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
+          toast("تصنيف الرحلة موجودة بالفعل ", { type: "error" });
         }
         if (
           error.response.data.message === "The name has already been taken."
@@ -120,11 +116,11 @@ function Categoriespage() {
           Authorization: `Bearer ${userToken}`,
         },
       })
-      .then(function (response) {
-        toast.success("تم حذف الرحلة بنجاح");
+      .then(function () {
         fetchCategories();
+        toast.success("تم حذف الرحلة بنجاح");
       })
-      .catch(function (error) {
+      .catch(function () {
         return null;
       });
     setLoader(false);
@@ -149,11 +145,15 @@ function Categoriespage() {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
         fetchCategories();
       })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
+      .catch((error) => {
+        if (error.response.data.message == "Already_exist") {
+          toast("تصنيف الرحلة موجودة بالفعل ", { type: "error" });
         }
-        console.log("Error updating category:", response.response.data.message);
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
+          toast.error("تصنيف الرحلة موجود بالفعل");
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -162,7 +162,7 @@ function Categoriespage() {
       });
   };
 
-  //search
+  
   useEffect(() => {
     if (searchValue === "") {
       setFilteredCategories(categories);
@@ -194,6 +194,10 @@ function Categoriespage() {
         setTotalPages(response.data.meta.pagination.last_page);
       })
       .catch(function (error) {
+        if (error.response.data.message === "Unauthenticated.") {
+          handleUnauthenticated();
+          return ;
+        }
         console.error("Error fetching branches:", error);
       });
   };
@@ -214,7 +218,7 @@ function Categoriespage() {
               <input
                 type="text"
                 {...register("categoryName")}
-                placeholder="اسم الرحلة"
+                placeholder="ادخل تصنيف الرحلة"
                 className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
               />
               {errors && (
@@ -228,7 +232,7 @@ function Categoriespage() {
                 {updateMode && (
                   <div className="w-full px-3 sm:w-1/2">
                     <label className="text-white">
-                      تفعيل الرحلة أو إلفاء تفعيل الرحلة ؟
+                      تفعيل تصنيف الرحلة أو إلفاء تفعيل  تصنيف الرحلة ؟
                     </label>
                     <div className="mb-5">
                       <Switch
@@ -251,7 +255,7 @@ function Categoriespage() {
                   disabled={isSubmitting}
                   className="text-center text-xl mb-3 p-2 w-52 font-bold text-white bg-green-700 rounded-2xl hover:bg-green-400 mx-auto block"
                 >
-                  تحديث التصنيف
+                       تحديث تصنيف الرحلة
                 </button>
               ) : (
                 <button

@@ -13,7 +13,8 @@ import ReactPaginate from "react-paginate";
 import { ScrollUp } from "../../ScrollUp";
 
 function Airlines() {
-  const baseUrl = "http://127.0.0.1:8000/api/";
+  const baseUrl = import.meta.env.VITE_SOME_KEY
+
   const [airlines, setAirlines] = useState([]);
   const [filteredAirlines, setFilteredAirlines] = useState([]);
   const [loader, setLoader] = useState(true);
@@ -51,7 +52,6 @@ function Airlines() {
     fetchAirlines();
   }, []);
 
-  // show Airlines
   const fetchAirlines = () => {
     setLoader(true);
     axios
@@ -74,7 +74,7 @@ function Airlines() {
       });
   };
 
-  // store airlines
+  
   const storeAirport = async () => {
     setLoader(true);
     await axios
@@ -91,8 +91,8 @@ function Airlines() {
       )
       .then(() => {
         toast.success("تم إنشاء خط الطيران بنجاح  بنجاح");
-        reset();
         fetchAirlines();
+        reset();
       })
       .catch((error) => {
         if (error.response.data.message == "Already_exist") {
@@ -109,7 +109,7 @@ function Airlines() {
       });
   };
 
-  // delete airlines
+   
   function deleteAirline(id) {
     setLoader(true);
     axios
@@ -129,8 +129,7 @@ function Airlines() {
         setLoader(false);
       });
   }
-
-  // update airlines
+ 
   const updateAirport = () => {
     setLoader(true);
     axios
@@ -164,7 +163,7 @@ function Airlines() {
       });
   };
 
-  //search
+   
   useEffect(() => {
     if (searchValue === "") {
       setFilteredAirlines(airlines);
@@ -177,18 +176,16 @@ function Airlines() {
     }
   }, [searchValue, airlines]);
 
-  //  pagenation
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   useEffect(() => {
     fetchPagination();
   }, [currentPage]);
-
   const fetchPagination = () => {
     setLoader(true);
     axios
-      .get(`http://127.0.0.1:8000/api/airlines?page=${currentPage}`, {
+      .get(`${baseUrl}airlines?page=${currentPage}`, {
         headers: {
           Authorization: `Bearer ${userToken}`,
         },
@@ -197,9 +194,10 @@ function Airlines() {
         setAirlines(response.data.data);
         setFilteredAirlines(response.data.data);
         setTotalPages(response.data.meta.pagination.last_page);
+        setLoader(false);
       })
       .catch(function (error) {
-        console.error("Error fetching branches:", error);
+        console.error(error);
       });
   };
   const handlePageClick = (selectedPage) => {
@@ -208,9 +206,8 @@ function Airlines() {
 
   return (
     <main>
-      {/* add airlines form */}
       <div className=" text-3xl font-bold text-gray-900 mb-5 underline underline-offset-8 decoration-blue-500">
-             صفحة إدارة    خطوط الطيران 
+             صفحة إدارة  خطوط الطيران 
         </div>
       <div className="flex items-center justify-center border-2 rounded-xl p-3 bg-gray-700">
         <div className="mx-auto w-full ">
@@ -420,5 +417,4 @@ function Airlines() {
     </main>
   );
 }
-
 export default Airlines;

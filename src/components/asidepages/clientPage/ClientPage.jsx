@@ -75,6 +75,7 @@ function ClientPage() {
         setClients(response.data.data);
         setFilteredClients(response.data.data);
         setTotalPages(response.data.meta.pagination.last_page);
+        setLoader(false);
       })
       .catch(function (error) {
         console.error("Error fetching branches:", error);
@@ -224,7 +225,11 @@ function ClientPage() {
         setValue("countries_id", "");
       })
       .catch(function (error) {
-        toast.error(error.response.data.message);
+        if (
+          error.response.data.message === "The email has already been taken."
+        ) {
+          toast.error("هذا البريد الإلكتروني موجود بالفعل");
+        }
       })
       .finally(() => {
         setLoader(false);
@@ -283,14 +288,7 @@ function ClientPage() {
             <div className="bg-white overflow-hidden shadow rounded-lg border">
               <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
                 <dl className="sm:divide-y sm:divide-gray-200">
-                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium   text-gray-500">
-                      الاسم :
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient?.name}
-                    </dd>
-                  </div>
+                 
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       البريد الإلكتروني :
@@ -299,17 +297,9 @@ function ClientPage() {
                       {singleClient?.email}
                     </dd>
                   </div>
-                  <div className=" py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      رقم الهاتف :
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleClient?.phone_number}
-                    </dd>
-                  </div>
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
-                      اسم الفرع :
+                      اسم الفرع المسجل به العميل:
                     </dt>
                     <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                       {singleClient?.branch?.branch_name}

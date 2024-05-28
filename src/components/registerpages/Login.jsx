@@ -4,6 +4,7 @@ import "./register.css";
 import axios from "axios";
 import { toast } from "react-toastify";
 import LockOpenIcon from '@mui/icons-material/LockOpen'; 
+import logo from "../../TempLogo.png";
 function Login() {
 
   const baseUrl = import.meta.env.VITE_SOME_KEY
@@ -48,8 +49,11 @@ return (
           onSubmit={(e) => submitForm(e)}
           dir="rtl"
         >
+          <div className="logo absolute top-4  left-1/2 -translate-x-1/2 flex justify-center items-center ">
+            <img src={logo} alt="logo" className="w-80 pt-2 text-white" />
+         </div> 
          <div className="flex justify-center bg-blue-500 rounded-full p-3 w-fit mx-auto">
-         <LockOpenIcon sx={{ fontSize: 52 , color:"white"}}/>
+         <LockOpenIcon sx={{ fontSize: 40 , color:"white"}}/>
          </div>
           <h1 className="text-center mt-3 text-2xl font-semibold text-gray-800 capitalize sm:text-3xl dark:text-white">
             تسجيل الدخول

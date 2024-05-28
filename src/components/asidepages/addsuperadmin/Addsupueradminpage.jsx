@@ -124,7 +124,7 @@ function Addsupueradminpage() {
         if (
           error.response.data.Message === "Not Found Or not Allow to Remove It"
         ) {
-          toast.error("لا يمكنك حذف سوبر أدمن وذلك لوجود 2 فقط سوبر أدمن");
+          toast.error("لا يمكن  حذف سوبر أدمن");
         }
         console.log(error);
       })
