@@ -1,4 +1,5 @@
 import BallotIcon from '@mui/icons-material/Ballot';
+import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
  import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -64,6 +65,9 @@ const dailyReport = () => {
       setLoader(false);
     });
 };
+const handlePrint = () => {
+  window.print();
+};
 
 return (
   <div className="bg-gray-300 p-9 rounded-xl">
@@ -80,6 +84,10 @@ return (
     
   </div>
   <>
+  <button className="mt-9 bg-slate-700 text-white p-3 rounded-xl font-bold hover:bg-gray-500" onClick={handlePrint}>
+      <LocalPrintshopIcon/>
+      طباعة التقارير 
+    </button>
     {/* bill summary  */}
         <h2 className="text-center w-full text-white p-2 bg-slate-500 mt-16">الجدول الخاص بالماليات</h2>
     <table className="border-collapse w-full  text-sm">

@@ -3,7 +3,6 @@ import SearchIcon from "@mui/icons-material/Search";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Switch } from "@mui/material";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -60,10 +59,10 @@ const TripBooking = () => {
   } = useForm({ resolver: zodResolver(schema) });
 
   useEffect(() => {
-    fetchPayments();
-    fetchTrip();
-    fetchCurrencies();
     fetchClients();
+    fetchPayments();
+    fetchCurrencies();
+    fetchTrip();
     fetchData();
   }, []);
 
@@ -164,7 +163,7 @@ const TripBooking = () => {
         setShowCurrencies(response.data.data);
       })
       .catch(function (error) {
-        return null;
+       console.log(error);
       })
       .finally(() => {
         setLoader(false);
@@ -312,19 +311,29 @@ const TripBooking = () => {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
         fetchData();
         setUpdateMode(false);
-        reset();
         setValue("type", "");
         setValue("tripTo", "");
         setValue("trip_id", "");
         setValue("client_id", "");
         setValue("currency_id", "");
         setValue("payment_id", "");
+        reset();
       })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
+      .catch((error) => {
+        if (error.response.data.message === "Already_exist") {
           toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
-        } else {
-          return null;
+        }  
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
+          toast("هذة الرحلة مسجل بالعفل ", { type: "error" });
+        }
+        if (
+          error.response.data.message ===   "You Not allow to update Booking Now"
+        ) {
+          toast("غير مسموع بتعديل هذة الرحلة الأن  ", { type: "error" });
+          setUpdateMode(false);
+          reset();
         }
       })
       .finally(() => {

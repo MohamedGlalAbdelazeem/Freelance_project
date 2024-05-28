@@ -168,12 +168,15 @@ function AirportPage() {
         setSelectedOptions([]);
         setUpdateMode(false);
       })
-      .catch((response) => {
+      .catch((error) => {
         if (
-          response.response.data.message == "The name has already been taken."
+          error.response.data.message == "The name has already been taken."
         ) {
           toast("هذا المطار مسجل بالعفل ", { type: "error" });
         }
+        if (error.response.data.message === "Already_exist") {
+          toast("هذا المطار موجودة بالعفل ", { type: "error" });
+        } 
       })
       .finally(() => {
         setLoader(false);

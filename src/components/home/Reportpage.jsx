@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { z } from "zod";
+import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -95,7 +97,10 @@ const dailyReport = () => {
       setLoader(false);
     });
 };
- 
+const handlePrint = () => {
+  window.print();
+};
+
 return (
     <div className="bg-gray-300 p-9 rounded-xl">
       <h1 className="text-center text-3xl font-bold text-gray-900 -mb-5 underline underline-offset-8 decoration-blue-500">
@@ -136,6 +141,10 @@ return (
         </div>
       </form>
       <>
+      <button className="mt-9 bg-slate-700 text-white p-3 rounded-xl font-bold hover:bg-gray-500" onClick={handlePrint}>
+      <LocalPrintshopIcon/>
+      طباعة التقارير 
+    </button>
         <div className="text-center mt-10 bg-slate-700 text-white p-3 text-lg font-bold  rounded-sm">
            التحصيل  اليومي  
           <CurrencyExchangeIcon sx={{ fontSize: 40, mx: 2 }} />

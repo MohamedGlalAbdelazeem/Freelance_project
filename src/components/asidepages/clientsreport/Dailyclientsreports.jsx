@@ -1,4 +1,4 @@
-import CurrencyExchangeIcon from "@mui/icons-material/CurrencyExchange";
+import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -66,8 +66,13 @@ const dailyReport = () => {
     });
 };
 
+const handlePrint = () => {
+  window.print();
+};
+
 return (
   <div className="bg-gray-300 p-9 rounded-xl">
+  
   <div className="w-full mb-5">
     <Link
       className="bg-gray-500 text-white float-left p-2 rounded-lg hover:bg-gray-700 hover:shadow-lg transition duration-200"
@@ -81,7 +86,12 @@ return (
     </div>
     
   </div>
+  
   <>
+  <button className="mt-9 bg-slate-700 text-white p-3 rounded-xl font-bold hover:bg-gray-500" onClick={handlePrint}>
+      <LocalPrintshopIcon/>
+      طباعة التقارير 
+    </button>
     <table className="border-collapse w-full mt-16 text-sm">
       <thead>
           <tr>

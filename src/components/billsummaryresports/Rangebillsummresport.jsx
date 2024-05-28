@@ -7,6 +7,8 @@ import BallotIcon from '@mui/icons-material/Ballot';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
+import LocalPrintshopIcon from '@mui/icons-material/LocalPrintshop';
+
 function Rangebillsummresport() {
   
 const baseUrl = import.meta.env.VITE_SOME_KEY
@@ -96,6 +98,9 @@ const dailyReport = () => {
       setLoader(false);
     });
 };
+const handlePrint = () => {
+  window.print();
+};
 
 return (
     <div className="bg-gray-300 p-9 rounded-xl">
@@ -145,6 +150,10 @@ return (
         </div>
       </form>
       <>
+      <button className="mt-9 bg-slate-700 text-white p-3 rounded-xl font-bold hover:bg-gray-500" onClick={handlePrint}>
+      <LocalPrintshopIcon/>
+      طباعة التقارير 
+    </button>
        {/* bill summary  */}
        <h2 className="text-center w-full text-white p-2 bg-slate-500 mt-5">الجدول الخاص بالماليات</h2>
         <table className="border-collapse w-full  text-sm">

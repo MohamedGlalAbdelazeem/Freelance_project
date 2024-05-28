@@ -119,7 +119,7 @@ function PaymentPage() {
         toast.success("تم حذف طريقة الدفع بنجاح");
         fetchPayments();
       })
-      .catch(function () {
+      .catch(function (error) {
         console.error( error);
       })
       .finally(() => {
@@ -146,9 +146,14 @@ function PaymentPage() {
         toast("تم تحديث طريقة الدفع  بنجاح", { type: "success" });
         fetchPayments();
       })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
-          toast("هذا طريقة الدفع مسجل بالعفل ", { type: "error" });
+      .catch((error) => {
+        if (error.response.data.message == "Already_exist") {
+          toast("هذا طريقة الدفع موجود بالفعل ", { type: "error" });
+        }
+        if (
+          error.response.data.message === "The name has already been taken."
+        ) {
+          toast.error("طريقة الدفع مسجل بالفعل");
         }
       })
       .finally(() => {
@@ -158,7 +163,7 @@ function PaymentPage() {
       });
   };
 
-  //search
+
   useEffect(() => {
     if (searchValue === "") {
       setFilteredPayments(payments);
