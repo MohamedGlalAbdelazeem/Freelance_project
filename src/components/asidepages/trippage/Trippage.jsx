@@ -39,9 +39,9 @@ function Trippage() {
     tripName: z.string().min(1, { message: "ادخل اسم الرحلة" }),
     tripCost: z.string().min(1, { message: "يجب تعيين تكلفة الرحلة" }),
     take_off: z.string().min(1, { message: "ادخل تاريخ الرحلة" }),
+    take_off_time: z.string().min(1, { message: "ادخل وقت الرحلة" }),
     tripFrom: z.string().min(1, { message: "يجب تعيين بلد الانطلاق" }),
     tripTo: z.string().min(1, { message: "يجب تعيين بلد الوصول" }),
-    tripDescription: z.string().min(1, { message: "ادخل وصف الرحلة" }),
     category_id: z.string().min(1, { message: "اختر نوع الرحلة" }),
     airport_id: z.string().min(1, { message: "اختر المطار" }),
     currency_id: z.string().min(1, { message: "اختر العملة" }),
@@ -247,28 +247,27 @@ function Trippage() {
   };
 
   const storeTrips = async () => {
+    const data = {
+      name: getValues("tripName"),
+      cost: getValues("tripCost").toString(),
+      take_off: `${getValues("take_off")} ${getValues("take_off_time")}`,
+      from_countries_id: getValues("tripFrom"),
+      to_countries_id: getValues("tripTo"),
+      category_id: getValues("category_id"),
+      airport_id: getValues("airport_id"),
+      currency_id: getValues("currency_id"),
+      air_line_id: getValues("air_line_id"),
+    };
+    if (getValues("tripDescription")) {
+      data.notes = getValues("tripDescription");
+    }
     setLoader(true);
     await axios
-      .post(
-        `${baseUrl}trips`,
-        {
-          name: getValues("tripName"),
-          cost: getValues("tripCost").toString(),
-          take_off: `${getValues("take_off")} ${getValues("take_off_time")}`,
-          from_countries_id: getValues("tripFrom"),
-          to_countries_id: getValues("tripTo"),
-          description: getValues("tripDescription"),
-          category_id: getValues("category_id"),
-          airport_id: getValues("airport_id"),
-          currency_id: getValues("currency_id"),
-          air_line_id: getValues("air_line_id"),
+      .post(`${baseUrl}trips`, data, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
+      })
       .then(() => {
         toast("تم إنشاء الرحلة  بنجاح", { type: "success" });
         fetchData();
@@ -291,7 +290,9 @@ function Trippage() {
           toast.error("يجب أن يكون وقت الإقلاع بعد الآن");
         }
         if (
-          error.response.data.message === "The name has already been taken."
+          error.response.data.message.includes(
+            "The name has already been taken."
+          )
         ) {
           toast.error("الرحلة موجود بالفعل");
         }
@@ -324,29 +325,27 @@ function Trippage() {
   }
 
   const updateTrips = async () => {
+    const data = {
+      name: getValues("tripName"),
+      cost: getValues("tripCost").toString(),
+      take_off: `${getValues("take_off")} ${getValues("take_off_time")}`,
+      from_countries_id: getValues("tripFrom"),
+      to_countries_id: getValues("tripTo"),
+      category_id: getValues("category_id"),
+      airport_id: getValues("airport_id"),
+      currency_id: getValues("currency_id"),
+      air_line_id: getValues("air_line_id"),
+    };
+    if (getValues("tripDescription")) {
+      data.notes = getValues("tripDescription");
+    }
     setLoader(true);
     await axios
-      .post(
-        `${baseUrl}trips/${updateTripsID}`,
-        {
-          name: getValues("tripName"),
-          cost: getValues("tripCost").toString(),
-          take_off: getValues("take_off"),
-          from_countries_id: getValues("tripFrom"),
-          to_countries_id: getValues("tripTo"),
-          description: getValues("tripDescription"),
-          category_id: getValues("category_id"),
-          airport_id: getValues("airport_id"),
-          air_line_id: getValues("air_line_id"),
-          currency_id: getValues("currency_id"),
-          status: branchStatus,
+      .post(`${baseUrl}trips/${updateTripsID}`, data, {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${userToken}`,
-          },
-        }
-      )
+      })
       .then(() => {
         toast("تم تحديث الرحلة  بنجاح", { type: "success" });
         fetchData();
@@ -359,11 +358,22 @@ function Trippage() {
         setValue("currency_id", "");
         setUpdateMode(false);
       })
-      .catch((response) => {
-        if (response.response.data.message == "Already_exist") {
-          toast("هذة الرحلة موجودة بالعفل ", { type: "error" });
-        } else {
-          toast.error(response.response.data.message);
+      .catch((error) => {
+        if (error.response.data.message == "Already_exist") {
+          toast("هذة الرحلة موجودة بالفعل ", { type: "error" });
+        }
+        if (
+          error.response.data.message ==
+          "The take off must be a date after now."
+        ) {
+          toast.error("يجب أن يكون وقت الإقلاع بعد الآن");
+        }
+        if (
+          error.response.data.message.includes(
+            "The name has already been taken."
+          )
+        ) {
+          toast.error("الرحلة موجود بالفعل");
         }
       })
       .finally(() => {
@@ -477,14 +487,16 @@ function Trippage() {
                       {singleTrip?.status}
                     </dd>
                   </div>
-                  <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt className="text-sm font-medium text-gray-500">
-                      الوصف :
-                    </dt>
-                    <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                      {singleTrip?.description}
-                    </dd>
-                  </div>
+                  {singleTrip?.description && (
+                    <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                      <dt className="text-sm font-medium text-gray-500">
+                        الوصف :
+                      </dt>
+                      <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {singleTrip?.description}
+                      </dd>
+                    </div>
+                  )}
                   <div className="py-3 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt className="text-sm font-medium text-gray-500">
                       وقت الإنشاء :
@@ -550,15 +562,15 @@ function Trippage() {
                   )}
                 </div>
                 <div className="w-full">
-                  <textarea
-                    rows="1"
-                    {...register("tripDescription")}
-                    placeholder=" ملاحظات  "
-                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                  <input
+                    type="time"
+                    {...register("take_off_time")}
+                    placeholder="وقت إقلاع الرحلة "
+                    className="w-full rounded-md border border-[#e0e0e0] bg-white py-3 px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
                   />
                   {errors && (
                     <span className="text-red-500 text-sm">
-                      {errors.tripDescription?.message}
+                      {errors.take_off_time?.message}
                     </span>
                   )}
                 </div>
@@ -711,6 +723,14 @@ function Trippage() {
                     </span>
                   )}
                 </div>
+              </div>
+              <div className="flex">
+                <textarea
+                  rows="1"
+                  {...register("tripDescription")}
+                  placeholder=" ملاحظات  "
+                  className="w-full rounded-md border border-[#e0e0e0] bg-white py-[13px] px-6 text-base font-medium text-[#6B7280] outline-none focus:border-[#6A64F1] focus:shadow-md"
+                />
               </div>
 
               <div className="pt-3">
@@ -914,10 +934,11 @@ function Trippage() {
                           setUpdateMode(true);
                           setValue("tripName", name);
                           setValue("tripCost", cost.toString());
-                          const [datePart] = takeOff.split(" ");
+                          const [datePart, timePart] = takeOff.split(" ");
                           const [year, month, day] = datePart.split("-");
                           const formattedDateString = `${year}-${month}-${day}`;
                           setValue("take_off", formattedDateString);
+                          setValue("take_off_time", timePart);
                           setValue("tripDescription", description);
                           setBranchStatus(status === "مفعل" ? true : false);
                           setValue(
