@@ -51,7 +51,7 @@ function Addsupueradminpage() {
     getAllManagers();
   }, []);
 
-  // get all managers
+  
   const getAllManagers = async () => {
     setLoader(true);
     await axios
@@ -73,7 +73,6 @@ function Addsupueradminpage() {
       });
   };
 
-  // store managers
   const storeManager = () => {
     setLoader(true);
     const managerData = {
@@ -107,7 +106,7 @@ function Addsupueradminpage() {
       });
   };
 
-  // delete manager
+
   const deleteManager = (id) => {
     setLoader(true);
     axios
@@ -134,7 +133,7 @@ function Addsupueradminpage() {
       });
   };
 
-  // update manager
+
   const handleManagerUpdate = () => {
     setLoader(true);
     axios
@@ -167,7 +166,7 @@ function Addsupueradminpage() {
       });
   };
 
-  //search
+  
   useEffect(() => {
     if (searchValue === "") {
       setFilteredManagers(managers);
@@ -180,7 +179,7 @@ function Addsupueradminpage() {
     }
   }, [searchValue, managers]);
 
-  // pagenation
+
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
@@ -209,7 +208,8 @@ function Addsupueradminpage() {
   const handlePageClick = (selectedPage) => {
     setCurrentPage(selectedPage.selected + 1);
   };
-  return (
+  
+return (
     <div className="items-center justify-center">
       {/* store managers */}
       <div className="mx-auto w-full bg-slate-700 p-3  rounded-sm mb-9">
@@ -396,7 +396,7 @@ function Addsupueradminpage() {
                   <button
                     onClick={() => deleteManager(id)}
                     className="bg-red-800 text-white p-2 m-1 rounded hover:bg-red-500"
-                  >
+         >
                     <DeleteForeverIcon />
                   </button>
                 </td>

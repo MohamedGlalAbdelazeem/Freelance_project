@@ -10,7 +10,6 @@ import { ScrollUp } from "../../ScrollUp";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-//pagenation
 import ReactPaginate from "react-paginate";
 
 function ClientPage() {
@@ -58,7 +57,7 @@ function ClientPage() {
     formState: { errors, isSubmitting },
   } = useForm({ resolver: zodResolver(schema) });
 
-  // pagenation
+ 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   useEffect(() => {
@@ -92,7 +91,8 @@ function ClientPage() {
     fetchClients();
     fetchCountries();
   }, []);
-  // countries
+  
+
   const fetchCountries = () => {
     setLoader(true);
     axios
@@ -111,7 +111,7 @@ function ClientPage() {
         setLoader(false);
       });
   };
-  // get clients
+ 
   const fetchClients = () => {
     setLoader(true);
     axios
@@ -131,7 +131,7 @@ function ClientPage() {
         setLoader(false);
       });
   };
-  //store
+  
   const storeClient = () => {
     setLoader(true);
     const clientData = {
@@ -175,7 +175,7 @@ function ClientPage() {
         setLoader(false);
       });
   };
-  //delete
+  
   const deleteClient = (id) => {
     setLoader(true);
     axios
@@ -192,7 +192,7 @@ function ClientPage() {
         toast.error(error.response.data.message);
       });
   };
-  //update
+ 
   const handleClientUpdate = () => {
     setLoader(true);
     const updateClientData = {
@@ -231,7 +231,7 @@ function ClientPage() {
       });
   };
 
-  //search
+
   useEffect(() => {
     if (searchValue === "") {
       setFilteredClients(clients);
@@ -244,7 +244,7 @@ function ClientPage() {
     }
   }, [searchValue, clients]);
 
-  // get client by id
+ 
   const fetchClientById = (id) => {
     let single = clients.filter((client) => client.id === id);
     setSingleClient(...single);

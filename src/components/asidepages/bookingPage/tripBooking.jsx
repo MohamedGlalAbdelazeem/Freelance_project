@@ -15,6 +15,7 @@ import ReactPaginate from "react-paginate";
 import KeyboardDoubleArrowLeftIcon from "@mui/icons-material/KeyboardDoubleArrowLeft";
 
 const TripBooking = () => {
+  
   const baseUrl = import.meta.env.VITE_SOME_KEY;
   const backBaseUrl = import.meta.env.VITE_IMAGE_KEY;
 
